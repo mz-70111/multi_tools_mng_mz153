@@ -7,12 +7,9 @@ import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
 import 'package:users_tasks_mz_153/pages/02_home.dart';
-import 'package:users_tasks_mz_153/tamplate/appbar.dart';
-import 'package:users_tasks_mz_153/tamplate/bottomnavbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 import 'package:intl/intl.dart' as df;
 
-MainController mainController = Get.find();
 
 class Tasks extends StatelessWidget {
   Tasks({super.key});
@@ -67,23 +64,7 @@ class Tasks extends StatelessWidget {
       'maxlines': 3
     },
   ];
-  static List dbtasktableAction = [
-    {
-      'label': 'اسم المهمة',
-      'icon': Icons.sort,
-      'action': () {
-        mainController.sort(table: mylista, sortby: 'taskname');
-      }
-    },
-    {
-      'label': 'حالة المهمة',
-      'icon': Icons.sort,
-      'action': () {
-        mainController.sort(table: mylista, sortby: 'status');
-      }
-    },
-    {'label': 'المكلف بالمهمة', 'icon': Icons.people, 'action': null},
-  ];
+  
   static List easyeditask({e, ctx}) => [
         {
           'invisible': true,
@@ -393,328 +374,49 @@ class Tasks extends StatelessWidget {
   static bool deletewait = false;
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: GetBuilder<DBController>(
-        init: dbController,
-        builder: (_) => Scaffold(
-          body: Stack(
-            children: [
-              FutureBuilder(future: Future(() async {
-                try {
-                  return await dbController.gettable(
-                    list: mylista,
-                    tableid: 'task_id',
-                    table: 'tasks',
-                  );
-                } catch (e) {
-                  null;
-                }
-              }), builder: (_, snap) {
-                if (snap.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (!snap.hasData) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text("لا يمكن الوصول للمخدم"),
-                        TextButton(
-                            onPressed: () {
-                              dbController.update();
-                            },
-                            child: const Icon(Icons.refresh))
-                      ],
-                    ),
-                  );
-                } else {
-                  if (!DB.userstable[DB.userstable.indexWhere((element) =>
-                          element['username'] == Home.logininfo)]['privilege']
-                      .contains("مشرف")) {
-                    Future(() => mainController.snakbar(
-                        context, 'لست مشرفا في اي مكتب لا يمكنك اضافة مهام'));
-                  }
-                  return GetBuilder<MainController>(
-                      init: mainController,
-                      builder: (_) {
-                        if (DB.todotable.isEmpty) {
-                          return const Center(
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text("لا يوجد اي مهمة مضافة الى الآن")
-                                ]),
-                          );
-                        } else {
-                          List checkallvaluetrue = [];
-                          List officelist = ['جميع النتائج', 'مخصص'];
-                          for (var i in DB.officetable) {
-                            officelist.add(i['officename']);
-                          }
-                          checkallvaluetrue.clear();
-                          temp.clear();
-                          for (var j in Home.searchlist) {
-                            if (j['check'] == true) {
-                              checkallvaluetrue.add('1');
-                              if (j.keys.toList().first == 'office_id') {
-                                temp.add(j['officename']);
-                              }
-                            }
-                          }
-                          if (checkallvaluetrue.length ==
-                              Home.searchlist.length) {
-                            officelistvalue = 'جميع النتائج';
-                          } else if (temp.length == 1) {
-                            officelistvalue = temp[0];
-                          } else {
-                            officelistvalue = 'مخصص';
-                          }
-
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Row(
-                                children: [
-                                  //sort by office
-                                  Visibility(
-                                      visible: DB.officetable.isNotEmpty
-                                          ? true
-                                          : false,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Card(
-                                          child: DropdownButton(
-                                              value: officelistvalue,
-                                              items: officelist
-                                                  .map((e) => DropdownMenuItem(
-                                                      value: e,
-                                                      child: Text("$e")))
-                                                  .toList(),
-                                              onChanged: (x) {
-                                                mainController.chooseoffice(x);
-                                                dbController.update();
-                                              }),
-                                        ),
-                                      )),
-                                  Expanded(
-                                    child: TextFieldMZ(
-                                        label: "بحث",
-                                        onChanged: (word) {
-                                          mainController.search(
-                                              word: word,
-                                              list: mylista,
-                                              range: [
-                                                'task_id',
-                                                'taskname',
-                                                'taskdetails',
-                                                'userstask_name',
-                                                'comment'
-                                              ]);
-                                        }),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration:
-                                      BoxDecoration(border: Border.all()),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Text("بحث بحسب التاريخ"),
-                                        TextButton.icon(
-                                          onPressed: () {
-                                            mainController.choosedate(
-                                                ctx: context,
-                                                beginorend: 'begin');
-                                          },
-                                          icon: const Icon(Icons.date_range),
-                                          label: Text(
-                                            "من ${df.DateFormat('yyyy-MM-dd').format(sortbydatebegin)}",
-                                            style:
-                                                const TextStyle(fontSize: 15),
-                                          ),
-                                        ),
-                                        TextButton.icon(
-                                            onPressed: () {
-                                              mainController.choosedate(
-                                                  ctx: context,
-                                                  beginorend: 'end');
-                                            },
-                                            icon: const Icon(Icons.date_range),
-                                            label: Text(
-                                              "إلى ${df.DateFormat('yyyy-MM-dd').format(sortbydateend)}",
-                                              style:
-                                                  const TextStyle(fontSize: 15),
-                                            )),
-                                      ]),
-                                ),
-                              ),
-                              Row(children: [
-                                ...dbtasktableAction
-                                    .map((e) => Expanded(
-                                          child: Row(
-                                            children: [
-                                              IconButton(
-                                                  onPressed: e['action'],
-                                                  icon: Icon(e['icon'])),
-                                              Expanded(
-                                                child: Text(
-                                                  e['label'],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ))
-                                    .toList(),
-                              ]),
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    children: mylista.map((e) {
-                                      return Visibility(
-                                        visible: e['visible'],
-                                        child: Card(
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: 10,
-                                                    height: 30,
-                                                    color: Color(int.parse(DB
-                                                            .officetable[
-                                                        DB.officetable.indexWhere(
-                                                            (element) =>
-                                                                element[
-                                                                    'office_id'] ==
-                                                                e['task_office_id'])]['color'])),
-                                                  ),
-                                                  IconButton(
-                                                      onPressed: () {
-                                                        // dialogeditinfo(
-                                                        //     ctx: context, e: e);
-                                                      },
-                                                      icon: const Icon(
-                                                          Icons.info_outline)),
-                                                  Expanded(
-                                                    child: Text(
-                                                      "# ${e['task_id']} _ ${e['taskname']} _>",
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          e['status'] == 1
-                                                              ? "منجزة"
-                                                              : "غير منجزة",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                      child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                        ...e['userstask_name']
-                                                            .map((e) =>
-                                                                Text("$e"))
-                                                            .toList()
-                                                      ])),
-                                                ],
-                                              ),
-                                              const Divider(),
-                                              Row(
-                                                children: [
-                                                  Switch(
-                                                      value: e['notifi'] == 1
-                                                          ? true
-                                                          : false,
-                                                      onChanged: DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'])][
-                                                                      'admin'] ==
-                                                                  1 ||
-                                                              DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)][
-                                                                      'user_id'] ==
-                                                                  e[
-                                                                      'createby_id'] ||
-                                                              mainController.checkifuserSupervisor(
-                                                                      officeid: e['task_office_id'],
-                                                                      userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) ==
-                                                                  true
-                                                          ? (x) {
-                                                              mainController
-                                                                  .changenotifitask(
-                                                                      notifi: x,
-                                                                      id: e[
-                                                                          'task_id']);
-                                                            }
-                                                          : null),
-                                                  Text(e['notifi'] == 1
-                                                      ? "اشعار مفعل"
-                                                      : "إشعار غير مفعل")
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      });
-                }
-              }),
-
-              Visibility(
-                  visible: DB.userstable[DB.userstable.indexWhere(
-                                  (e1) => e1['username'] == Home.logininfo)]
-                              ['privilege']
-                          .contains("مشرف")
-                      ? true
-                      : false,
-                  child: Positioned(
-                      left: 0,
-                      bottom: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // dialogeadd(ctx: context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(50)))),
-                          child: const Icon(Icons.add),
-                        ),
-                      ))),
-              //moretools
-              Positioned(bottom: 0, left: 0, child: MoreTools()),
-              //notification
-              Positioned(left: 0, child: Notificationm()),
-              //personal panel(logout and chang password)
-              Positioned(left: 0, child: PersonPanel()),
-            ],
-          ),
-        ),
-      ),
+        MainController mainController = Get.find();
+    List mainColumn = [
+      {
+        'label': 'اسم المهمة',
+        'icon': Icons.sort,
+        'action': () {
+          mainController.sort(table: mylista, sortby: 'taskname');
+        }
+      },
+      {
+        'label': 'حالة المهمة',
+        'icon': Icons.sort,
+        'action': () {
+          mainController.sort(table: mylista, sortby: 'status');
+        }
+      },
+      {'label': 'المكلف بالمهمة', 'icon': Icons.people, 'action': null},
+    ];
+    return MYPAGE(
+      mylista: mylista,
+      table: 'tasks',
+      tableId: 'task_id',
+      page: Tasks,
+      searchRange: const ['taskname','userstask_name'],
+      mainColumn: mainColumn,
+      items: items,
+      notifi: const SizedBox(),
+      addlabel: addFunction['addlabel'],
+      action: addFunction['action'],
+      customInitdataforAdd: () => customInitforAdd(),
+      customWidgetofADD: customWidgetofADD(
+          ctx: context, pickcolor: () => pickcolor(ctx: context)),
+      textfeildlista: offices,
+      scrollController: scrollController,
+      mainEditvisible: checkifUserisAdmin() == true ? true : false,
+      mainAddvisible: checkifUserisAdmin() == true ? true : false,
+      customWidgetofEdit: customWidgetofEdit(
+          ctx: context, pickcolor: () => pickcolor(ctx: context)),
+      customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
+      getinfo: () => getinfo(e: MYPAGE.eE, ctx: context),
+      actionSave: () => editOfficeSaveAction(ctx: context, e: MYPAGE.eE),
+      actionEdit: () => mainController.showeditpanel(),
+      actionDelete: () => deleteOffice(ctx: context, e: MYPAGE.eE),
     );
   }
 

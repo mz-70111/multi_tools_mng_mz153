@@ -56,6 +56,7 @@ class Office extends StatelessWidget {
   static ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
+    MainController mainController = Get.find();
     List mainColumn = [
       {
         'label': 'اسم المكتب',
@@ -133,6 +134,8 @@ class Office extends StatelessWidget {
   }
 
   pickcolor({ctx}) {
+    MainController mainController = Get.find();
+
     for (var i in colorpicklist) {
       i['size'] = 30.0;
     }

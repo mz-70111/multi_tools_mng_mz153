@@ -568,9 +568,9 @@ class MainController extends GetxController {
         }
       }
     } else if (page == Tasks) {
-      Tasks.errormsg = null;
+      AddPanel.errormsg = null;
       if (Tasks.usersfortaskswidget.isEmpty) {
-        Tasks.errormsg =
+        AddPanel.errormsg =
             "لا يمكن أن تنشئ مهمة دون ان تعين لها موظف واحد على الأقل";
       } else {
         h:
@@ -580,7 +580,7 @@ class MainController extends GetxController {
                 Tasks.usersfortaskswidget.indexOf(i) !=
                     Tasks.usersfortaskswidget.indexOf(j)) {
               duplicateCheck = true;
-              Tasks.errormsg = "لايمكن تعيين نفس الموظف للمهمة نفسها مرتين";
+              AddPanel.errormsg = "لايمكن تعيين نفس الموظف للمهمة نفسها مرتين";
               break h;
             } else {
               duplicateCheck = false;
@@ -589,7 +589,6 @@ class MainController extends GetxController {
         }
         if (duplicateCheck == false) {
           try {
-            Tasks.addwaitvis = true;
             update();
             for (var i in DB.tasktable) {
               for (var l in Home.searchlist) {
@@ -604,14 +603,12 @@ class MainController extends GetxController {
             }
             Get.back();
           } catch (e) {
-            Tasks.addwaitvis = false;
             "$e".contains('timed out')
-                ? Tasks.errormsg = 'لا يمكن الوصول للمخدم'
+                ? AddPanel.errormsg = 'لا يمكن الوصول للمخدم'
                 : "$e".contains('Duplicat')
-                    ? Tasks.errormsg = 'اسم محجوز مسبقا'
-                    : Tasks.errormsg = "لا يمكن الوصول للمخدم'";
+                    ? AddPanel.errormsg = 'اسم محجوز مسبقا'
+                    : AddPanel.errormsg = "لا يمكن الوصول للمخدم'";
           }
-          Tasks.addwaitvis = false;
           update();
         }
       }
@@ -670,7 +667,7 @@ class MainController extends GetxController {
                             .indexWhere((element) => element['user_id'] == e['user_id'])]
                         ['fullname']
                     : page == Tasks
-                        ? name = Tasks.mylista[Tasks.mylista.indexWhere((element) => element['task_id'] == Tasks.taskid)]
+                        ? name = Tasks.mylista[Tasks.mylista.indexWhere((element) => element['task_id'] == e['task_id'])]
                             ['taskname']
                         : page == Whattodo
                             ? name = Whattodo.mylista[Whattodo.mylista
@@ -871,7 +868,7 @@ class MainController extends GetxController {
       } else if (page == Tasks) {
         Tasks.extratimecontrollererror = null;
         if (Tasks.usersfortaskswidget.isEmpty) {
-          Tasks.errormsg =
+          Editpanel.errormsg =
               "لا يمكن أن تنشئ مهمة دون ان تعين لها موظف واحد على الأقل";
         } else {
           if (Tasks.extratimecontroller.text.isEmpty) {
@@ -884,7 +881,7 @@ class MainController extends GetxController {
                   Tasks.usersfortaskswidget.indexOf(i) !=
                       Tasks.usersfortaskswidget.indexOf(j)) {
                 checkdublicateuseroftask = true;
-                Tasks.errormsg = "لايمكن تعيين نفس الموظف للمهمة نفسها مرتين";
+                Editpanel.errormsg = "لايمكن تعيين نفس الموظف للمهمة نفسها مرتين";
                 break h;
               } else {
                 checkdublicateuseroftask = false;
@@ -892,7 +889,6 @@ class MainController extends GetxController {
             }
           }
           if (checkdublicateuseroftask == false) {
-            Tasks.addwaitvis = true;
             update();
             Tasks.extratimecontroller.text.isEmpty ? "0" : null;
             try {
@@ -901,29 +897,23 @@ class MainController extends GetxController {
               Tasks.extratimecontrollererror = "أدخل قيمة عددية صحيحة فقط";
             }
             try {
-              Tasks.addwaitvis = true;
               update();
               await DBController().edittask(
-                  id: Tasks.taskid,
-                  taskname: Tasks.tasks[0]['controller'].text,
-                  taskdetails: Tasks.tasks[1]['controller'].text,
-                  extratime: int.parse(Tasks.extratimecontroller.text),
-                  taskofficeid: DB.officetable[DB.officetable.indexWhere(
-                      (element) =>
-                          element['officename'] ==
-                          Tasks.taskofficeNameselected)]['office_id']);
+                  id: e['task_id']
+                 
+                  
+              );
               Get.back();
             } catch (e) {
               "$e".contains('timed out')
-                  ? Tasks.errormsg = 'لا يمكن الوصول للمخدم'
+                  ? Editpanel.errormsg = 'لا يمكن الوصول للمخدم'
                   : "$e".contains('Duplicat')
-                      ? Tasks.errormsg = 'اسم محجوز مسبقا'
+                      ? Editpanel.errormsg = 'اسم محجوز مسبقا'
                       : "$e".contains('FormatExcep')
-                          ? Tasks.errormsg = 'أدخل قيمة عددية صحيحة'
-                          : Tasks.errormsg = "$e";
+                          ? Editpanel.errormsg = 'أدخل قيمة عددية صحيحة'
+                          : Editpanel.errormsg = "$e";
               update();
             }
-            Tasks.addwaitvis = false;
             update();
           }
         }
@@ -1236,7 +1226,7 @@ class MainController extends GetxController {
   }
 
   addusertotask({userid}) async {
-    Tasks.errormsg = null;
+    Editpanel.errormsg =AddPanel.errormsg= null;
     Tasks.usersfortasks.clear();
     try {
       var t = await DB().customquery(
@@ -1255,13 +1245,13 @@ class MainController extends GetxController {
       }
 
       if (Tasks.usersfortasks.isEmpty) {
-        Tasks.errormsg =
+        Editpanel.errormsg =AddPanel.errormsg=
             'لايوجد اي موظف في المكتب الذي تملك صلاحية الاشراف عليه';
       } else {
         Tasks.usersfortaskswidget.add({'i': 0, 'name': Tasks.usersfortasks[0]});
       }
     } catch (e) {
-      Tasks.errormsg = "لايمكن الوصول للمخدم";
+      Editpanel.errormsg = AddPanel.errormsg = "لايمكن الوصول للمخدم";
     }
 
     update();
@@ -1275,7 +1265,6 @@ class MainController extends GetxController {
       update();
       await addcommentaction;
       e['commentcontroller'].text = '';
-
       e['waitsend'] = true;
       update();
     } catch (c) {
@@ -1550,6 +1539,8 @@ class MainController extends GetxController {
     } else {
       LogIn.errorMSglogin = '';
       try {
+        LogIn.loginwait = true;
+        update();
         await dbController.updatepassword(
             newpass: LogIn.newpassword.text,
             id: DB.userstable[DB.userstable.indexWhere(
@@ -1568,6 +1559,8 @@ class MainController extends GetxController {
       } catch (r) {
         LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
       }
+      LogIn.loginwait = false;
+      update();
     }
 
     update();
@@ -1715,6 +1708,7 @@ class MainController extends GetxController {
               LogIn.errorMSglogin = "تم تعطيل حسابك اتصل بالمسؤول";
               break i;
             } else if (i['mustchgpass'] == 1) {
+              LogIn.errorMSglogin = '';
               LogIn.usernamereadonly = true;
               LogIn.oldpassvisible = false;
             } else {
@@ -1769,6 +1763,8 @@ class MainController extends GetxController {
             LogIn.errorMSglogin = "تم تعطيل حسابك اتصل بالمسؤول";
             break i;
           } else if (i['mustchgpass'] == 1) {
+            LogIn.errorMSglogin = '';
+
             LogIn.usernamereadonly = true;
             LogIn.oldpassvisible = false;
           } else {

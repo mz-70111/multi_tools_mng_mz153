@@ -23,21 +23,20 @@ class DBController extends GetxController {
     await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
     try {
-      await DB().createuserstable();
-      await DB().createofficetable();
-      await DB().createusersofficetable();
-      await DB().createtaskstable();
-      await DB().createuserstasktable();
-      await DB().createuserstasksCommentstable();
-      await DB().createtodotable();
-      await DB().createuserstodo();
-      await DB().createuserstodoCommentstable();
-      await DB().createuserstodoRatestable();
-      await DB().createschedueldtable();
-      await DB().createuserschedtable();
-      await DB().createuserschedlogtable();
+      // await DB().createuserstable();
+      // await DB().createofficetable();
+      // await DB().createusersofficetable();
+      // await DB().createtaskstable();
+      // await DB().createuserstasktable();
+      // await DB().createuserstasksCommentstable();
+      // await DB().createtodotable();
+      // await DB().createuserstodo();
+      // await DB().createuserstodoCommentstable();
+      // await DB().createuserstodoRatestable();
+      // await DB().createschedueldtable();
+      // await DB().createuserschedtable();
+      // await DB().createuserschedlogtable();
     } catch (e) {
-      print(e);
       "$e".contains('timed out')
           ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
           : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
@@ -713,6 +712,7 @@ enable=${Employ.enable == true ? 1 : 0},
 mustchgpass=${Employ.mustchgpass == true ? 1 : 0},
 addremind=${Employ.addremind == true ? 1 : 0},
 addping=${Employ.addping == true ? 1 : 0},
+addtodo=${Employ.addtodo == true ? 1 : 0},
 pbx=${Employ.pbx == true ? 1 : 0}
 where user_id=$id;
 ''')
@@ -727,6 +727,7 @@ enable=${Employ.enable == true ? 1 : 0},
 mustchgpass=${Employ.mustchgpass == true ? 1 : 0},
 addremind=${Employ.addremind == true ? 1 : 0},
 addping=${Employ.addping == true ? 1 : 0},
+addtodo=${Employ.addtodo == true ? 1 : 0},
 pbx=${Employ.pbx == true ? 1 : 0}
 where user_id=$id;
 ''');
@@ -856,29 +857,20 @@ where: 'where todo_id=$id;
     update();
   }
 
-  edittask(
-      {taskname,
-      taskdetails,
-      status,
-      users,
-      duration,
-      extratime = 0,
-      donedate,
-      taskofficeid,
-      id}) async {
+  edittask({id}) async {
     await DB()
         .customquery(query: 'delete from users_tasks where ut_task_id=$id');
 
     await DB().customquery(query: '''
-update tasks set taskname="$taskname",
-taskdetails="$taskdetails",
+update tasks set taskname="${Tasks.tasks[0]['controller'].text}",
+taskdetails="${Tasks.tasks[1]['controller'].text}",
 status=${Tasks.taskstatus},
 duration=${Tasks.duration.toInt()},
 editdate="${DateTime.now()}",
-extratime="$extratime",
+extratime="${int.parse(Tasks.extratimecontroller.text)}",
 editby="${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']}",
 editby_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']},
-task_office_id=$taskofficeid
+task_office_id=${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Tasks.taskofficeNameselected)]['office_id']}
 where task_id=$id;
 ''');
     if (Tasks.taskstatus == true) {
@@ -943,6 +935,27 @@ where utdr_user_id=$userid && utdr_todo_id=$todoid;
     }
 
     await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
+    Home.searchlist = [
+      ...DB.officetable,
+      ...DB.userstable,
+      ...DB.tasktable,
+      ...DB.todotable
+    ];
+  }
+
+  updatepersonalinfo({fullname, mobile, email, id}) async {
+    await DB().customquery(query: '''
+update users set
+fullname="$fullname",
+mobile="$mobile",
+email="$email"
+where user_id=$id;
+''');
+    await gettable(list: Employ.mylista, table: 'users', tableid: 'user_id');
+    DB.userstable[
+            DB.userstable.indexWhere((element) => element['user_id'] == id)] =
+        Employ.mylista[
+            Employ.mylista.indexWhere((element) => element['user_id'] == id)];
     Home.searchlist = [
       ...DB.officetable,
       ...DB.userstable,

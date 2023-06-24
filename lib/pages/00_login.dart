@@ -139,8 +139,11 @@ class LogIn extends StatelessWidget {
                             children: loginaction(wait: loginwait)
                                 .map((e) => e['label'].isEmpty
                                     ? Visibility(
-                                        visible: e['visible'],
-                                        child: e['icon'] as Widget)
+                                        visible: e['visible0'],
+                                        child: Visibility(
+                                            visible: e['visible'],
+                                            child: e['icon'] as Widget),
+                                      )
                                     : Visibility(
                                         visible: e['visible0'],
                                         child: Visibility(

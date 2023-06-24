@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:teledart/model.dart';
 import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
@@ -26,7 +27,8 @@ class TextFieldMZ extends StatelessWidget {
       required this.onChanged,
       this.suffixIcon,
       this.hint,
-      this.error,this.readonly=false});
+      this.error,
+      this.readonly = false});
   final String? label, hint, error;
   final TextDirection textdirection;
   final int maxlines;
@@ -52,7 +54,6 @@ class TextFieldMZ extends StatelessWidget {
               suffixIcon: suffixIcon,
               label: Text(label!),
               hintText: hint,
-              
               errorStyle: TextStyle(
                   color: ThemeMZ.mode == 'light'
                       ? Colors.red
@@ -208,10 +209,14 @@ showADDEDITINFO({
 }
 
 class Comment extends StatelessWidget {
-  const Comment({super.key, required this.mylista, required this.page});
+  const Comment(
+      {super.key,
+      required this.mylista,
+      required this.page,
+      required this.editcomment});
   final List mylista;
   final Type page;
-
+  final List editcomment;
   static List collectCommentinfo = [],
       resperateCommentaftersort = [],
       usersId = [],
@@ -256,7 +261,7 @@ class Comment extends StatelessWidget {
                                 : false,
                             child: Row(
                                 children: page == Tasks
-                                    ? Tasks.easyeditaskcomment(
+                                    ? editcomment(
                                         ctx: context,
                                         usercomment:
                                             "${commentinfoaftersort['userscomment'][index]}",
@@ -543,9 +548,8 @@ class MYPAGE extends StatelessWidget {
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
                                       SizedBox(
-                                        height: AppBar().preferredSize.height *
-                                            0.75,
-                                      ),
+                                          height:
+                                              AppBar().preferredSize.height),
                                       Row(
                                         children: [
                                           Visibility(
@@ -1116,7 +1120,7 @@ class Editpanel extends StatelessWidget {
   final bool mainEditvisible;
   @override
   Widget build(BuildContext context) {
-    List edititems({e, ctx}) => [
+    List edititems() => [
           {
             'visible0': page == Employ
                 ? e['username'] == Home.logininfo
@@ -1251,7 +1255,6 @@ infoEditItemWidget(
 
 class UserName extends StatelessWidget {
   const UserName({super.key});
-
   @override
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
@@ -1270,11 +1273,26 @@ class UserName extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               child: GetBuilder<MainController>(
                 init: mainController,
-                builder: (_) => Text(
-                  DB.userstable[DB.userstable.indexWhere(
-                          (element) => element['username'] == Home.logininfo)]
-                      ['fullname'],
-                  textAlign: TextAlign.center,
+                builder: (_) => Column(
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              showinfo(ctx: context);
+                            },
+                            icon: const Icon(Icons.info)),
+                        Expanded(
+                          child: Text(
+                            DB.userstable[DB.userstable.indexWhere((element) =>
+                                    element['username'] == Home.logininfo)]
+                                ['fullname'],
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -1286,6 +1304,179 @@ class UserName extends StatelessWidget {
           color: Colors.indigoAccent,
         ),
       ],
+    );
+  }
+
+  static var userindex = DB.userstable
+      .indexWhere((element) => element['username'] == Home.logininfo);
+  getprivileges() {
+    List priv = DB.userstable[userindex]['privilege'];
+    List off = DB.userstable[userindex]['office'];
+    String p = '';
+    for (var i = 0; i < priv.length; i++) {
+      p +=
+          "\n    * ${priv[i]} ${off[i] == '=' ? '' : off[i] == '_' ? '' : DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == off[i])]['officename']}";
+    }
+    return p;
+  }
+
+  static List infoList = [
+    [
+      'اسم المستخدم',
+      TextEditingController(text: DB.userstable[userindex]['username']),
+      true
+    ],
+    [
+      'الاسم الكامل',
+      TextEditingController(text: DB.userstable[userindex]['fullname']),
+      false
+    ],
+    [
+      'الايميل',
+      TextEditingController(text: DB.userstable[userindex]['email']),
+      false
+    ],
+    [
+      'الموبايل',
+      TextEditingController(text: DB.userstable[userindex]['mobile']),
+      false
+    ],
+  ];
+  showinfo({ctx}) {
+    UserName.infoList.clear();
+
+    infoList = [
+      [
+        'اسم المستخدم',
+        TextEditingController(text: DB.userstable[userindex]['username']),
+        true
+      ],
+      [
+        'الاسم الكامل',
+        TextEditingController(text: DB.userstable[userindex]['fullname']),
+        false
+      ],
+      [
+        'الايميل',
+        TextEditingController(text: DB.userstable[userindex]['email']),
+        false
+      ],
+      [
+        'الموبايل',
+        TextEditingController(text: DB.userstable[userindex]['mobile']),
+        false
+      ],
+    ];
+    MainController mainController = Get.find();
+    DBController dbController = Get.find();
+    String? errormsg;
+    bool wait = false;
+    showDialog(
+        context: ctx,
+        builder: (_) {
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              scrollable: true,
+              content: GetBuilder<MainController>(
+                init: mainController,
+                builder: (_) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Visibility(
+                            visible: !wait,
+                            child: IconButton(
+                                onPressed: () async {
+                                  wait = true;
+                                  errormsg = '';
+                                  mainController.update();
+                                  try {
+                                    await dbController.updatepersonalinfo(
+                                        fullname: infoList[1][1].text ?? '_',
+                                        email: infoList[2][1].text,
+                                        mobile: infoList[3][1].text,
+                                        id: DB.userstable[userindex]
+                                            ['user_id']);
+                                    DB.userstable[userindex]['fullname'] =
+                                        infoList[1][1].text;
+                                    DB.userstable[userindex]['email'] =
+                                        infoList[2][1].text;
+                                    DB.userstable[userindex]['mobile'] =
+                                        infoList[3][1].text;
+                                    Get.back();
+                                  } catch (e) {
+                                    errormsg = 'لا يمكن الوصول للمخدم';
+                                    mainController.update();
+                                  }
+                                  wait = false;
+                                  mainController.update();
+                                },
+                                icon: const Icon(Icons.save)),
+                          ),
+                          Visibility(
+                              visible: wait,
+                              child: SizedBox(
+                                width: 100,
+                                child: LinearProgressIndicator(),
+                              )),
+                          Visibility(
+                              visible: errormsg == null ? false : true,
+                              child: Text("$errormsg")),
+                        ],
+                      ),
+                      ...infoList.map((e) => TextFieldMZ(
+                            label: "${e[0]}",
+                            textEditingController: e[1],
+                            onChanged: (x) => null,
+                            readonly: e[2],
+                          ))
+                    ]),
+              ),
+            ),
+          );
+        });
+  }
+}
+
+//editcommentpanel
+class EditPanelComment extends StatelessWidget {
+  const EditPanelComment({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    List editcommentitems({commentOwner}) => [
+          {
+            'visible': true,
+            'icon': Icons.delete,
+            'action': () async {},
+            'color': Colors.grey
+          },
+          {
+            'visible': DB.userstable[DB.userstable.indexWhere(
+                            (element) => element['username'] == Home.logininfo)]
+                        ['fullname'] ==
+                    commentOwner
+                ? true
+                : false,
+            'icon': Icons.edit,
+            'action': () async {
+              commentcontrolleredit.text = commenttext;
+              await mainController.editcomment(
+                page: Tasks,
+                ctx: ctx,
+                errorcomment: errorcomment,
+                commentid: commentid,
+                editcommentwait: editcommentwait,
+                commentcontrolleredit: commentcontrolleredit,
+              );
+            },
+            'color': Colors.grey
+          }
+        ];
+    return Row(
+      children: editcommentitems().map((c) => Text('')).toList(),
     );
   }
 }

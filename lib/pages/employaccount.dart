@@ -21,6 +21,7 @@ class Employ extends StatelessWidget {
   static bool pbx = false;
   static bool addtodo = false;
   static List<Map> mylista = [];
+  static var hideshowpass;
   static List<Map> employs = [
     {
       'label': 'اسم المستخدم',
@@ -44,7 +45,7 @@ class Employ extends StatelessWidget {
       'error': null,
       'icon': Icons.visibility_off,
       'obscuretext': true,
-      'action': () => mainController.showpassAdduser(),
+      'action': hideshowpass,
       'hint': ''
     },
     {
@@ -53,7 +54,7 @@ class Employ extends StatelessWidget {
       'error': null,
       'icon': Icons.visibility_off,
       'obscuretext': true,
-      'action': () => mainController.showpassAdduser(),
+      'action': hideshowpass,
       'hint': ''
     },
     {
@@ -81,6 +82,7 @@ class Employ extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
+    hideshowpass = () => mainController.showpassAdduser();
     List mainColumn = [
       {
         'label': 'الاسم',
@@ -241,6 +243,10 @@ class Employ extends StatelessWidget {
   }
 
   customInitforAdd() {
+    mustchgpass = true;
+    addping = false;
+    addremind = false;
+    pbx = false;
     admin = false;
     privilege.clear();
   }
@@ -259,6 +265,10 @@ class Employ extends StatelessWidget {
     Employ.employs[4]['controller'].text = e['email'] ?? '';
     Employ.employs[5]['controller'].text = e['mobile'] ?? '';
     Employ.admin = e['admin'] == 1 ? true : false;
+    mustchgpass = e['mustchgpass'] == 1 ? true : false;
+    addping = e['addping'] == 1 ? true : false;
+    addremind = e['addremind'] == 1 ? true : false;
+    pbx = e['pbx'] == 1 ? true : false;
     if ((!e['privilege'].contains('_') && e['admin'] == 0) ||
         (!e['privilege'].contains('_') &&
             e['admin'] == 1 &&
@@ -308,7 +318,7 @@ class Employ extends StatelessWidget {
 اسم المستخدم : ${e['username']}
 الاسم الكامل : ${e['fullname']}
 البريد الالكتروني : ${e['email'] ?? ''}
-الموبايل : ${e['mobile'] ?? ''},
+الموبايل : ${e['mobile'] ?? ''}
 الصلاحيات :$p"""),
         Visibility(
             visible: e['addremind'] == 1 ? true : false,
@@ -331,11 +341,6 @@ class Employ extends StatelessWidget {
     );
   }
 
-  getE({e}) {
-    e = MYPAGE.eE;
-    return e;
-  }
-
   edituserSaveAction({ctx, e}) async {
     MainController mainController = Get.find();
 
@@ -354,6 +359,7 @@ class Employ extends StatelessWidget {
     e['admin'] = Employ.admin == true ? 1 : 0;
     e['mustchgpass'] = Employ.mustchgpass == true ? 1 : 0;
     e['addping'] = Employ.addping == true ? 1 : 0;
+    e['addtodo'] = Employ.addtodo == true ? 1 : 0;
     e['addremind'] = Employ.addremind == true ? 1 : 0;
     e['pbx'] = Employ.pbx == true ? 1 : 0;
     e['enable'] = Employ.enable == true ? 1 : 0;
