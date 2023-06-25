@@ -767,7 +767,7 @@ class MainController extends GetxController {
     update();
   }
 
-  editItemMainController({e, ctx, page, listofFeildmz}) async {
+  editItemMainController({e, page, listofFeildmz}) async {
     var checkdublicateoffice = false;
     var checkdublicateuseroftask = false;
     Editpanel.errormsg = null;
@@ -859,7 +859,6 @@ class MainController extends GetxController {
                         'اسم المستخدم  او الاسم الكامل محجوز مسبقا'
                     : Editpanel.errormsg = "$e";
           }
-
           Editpanel.wait = false;
           Editpanel.savevisible = false;
           ADDEDITINFOItem.addeditvisible = false;
@@ -881,7 +880,8 @@ class MainController extends GetxController {
                   Tasks.usersfortaskswidget.indexOf(i) !=
                       Tasks.usersfortaskswidget.indexOf(j)) {
                 checkdublicateuseroftask = true;
-                Editpanel.errormsg = "لايمكن تعيين نفس الموظف للمهمة نفسها مرتين";
+                Editpanel.errormsg =
+                    "لايمكن تعيين نفس الموظف للمهمة نفسها مرتين";
                 break h;
               } else {
                 checkdublicateuseroftask = false;
@@ -892,18 +892,15 @@ class MainController extends GetxController {
             update();
             Tasks.extratimecontroller.text.isEmpty ? "0" : null;
             try {
+              
               int.parse(Tasks.extratimecontroller.text);
             } catch (o) {
               Tasks.extratimecontrollererror = "أدخل قيمة عددية صحيحة فقط";
             }
             try {
-              update();
-              await DBController().edittask(
-                  id: e['task_id']
-                 
-                  
-              );
-              Get.back();
+               Editpanel.wait = true;
+            update();
+              await DBController().edittask(id: e['task_id']);
             } catch (e) {
               "$e".contains('timed out')
                   ? Editpanel.errormsg = 'لا يمكن الوصول للمخدم'
@@ -912,9 +909,11 @@ class MainController extends GetxController {
                       : "$e".contains('FormatExcep')
                           ? Editpanel.errormsg = 'أدخل قيمة عددية صحيحة'
                           : Editpanel.errormsg = "$e";
-              update();
             }
-            update();
+              Editpanel.wait = false;
+          Editpanel.savevisible = false;
+          ADDEDITINFOItem.addeditvisible = false;
+          update();
           }
         }
       } else if (page == Whattodo) {
@@ -1063,7 +1062,7 @@ class MainController extends GetxController {
         'privilege': Employ.permission[0],
         'office': DB.officetable[0]['officename']
       });
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      scrollController.jumpTo(scrollController.position.maxScrollExtent+100);
     } else {
       AddPanel.errormsg = 'لم تقم بإضافة أي مكتب';
     }
@@ -1226,7 +1225,7 @@ class MainController extends GetxController {
   }
 
   addusertotask({userid}) async {
-    Editpanel.errormsg =AddPanel.errormsg= null;
+    Editpanel.errormsg = AddPanel.errormsg = null;
     Tasks.usersfortasks.clear();
     try {
       var t = await DB().customquery(
@@ -1243,9 +1242,8 @@ class MainController extends GetxController {
               ['fullname']);
         }
       }
-
       if (Tasks.usersfortasks.isEmpty) {
-        Editpanel.errormsg =AddPanel.errormsg=
+        Editpanel.errormsg = AddPanel.errormsg =
             'لايوجد اي موظف في المكتب الذي تملك صلاحية الاشراف عليه';
       } else {
         Tasks.usersfortaskswidget.add({'i': 0, 'name': Tasks.usersfortasks[0]});
@@ -1253,13 +1251,11 @@ class MainController extends GetxController {
     } catch (e) {
       Editpanel.errormsg = AddPanel.errormsg = "لايمكن الوصول للمخدم";
     }
-
     update();
   }
 
   addcomment({e, addcommentaction}) async {
     e['error'] = null;
-
     try {
       e['waitsend'] = false;
       update();
@@ -1343,66 +1339,6 @@ class MainController extends GetxController {
         });
 
     update();
-  }
-
-  deletecommen({required ctx, id, commintid, page, deletewait}) async {
-    MainController mainController = Get.find();
-    String errormsg = '';
-    showDialog(
-        context: ctx,
-        builder: (_) {
-          return Directionality(
-              textDirection: TextDirection.rtl,
-              child: GetBuilder<MainController>(
-                  init: mainController,
-                  builder: (_) {
-                    return AlertDialog(
-                      scrollable: true,
-                      title: const Text('هل أنت متأكد من حذف التعليق'),
-                      actions: [
-                        Column(
-                          children: [
-                            Text(errormsg),
-                            Row(
-                              children: [
-                                Visibility(
-                                    visible: !deletewait,
-                                    child: IconButton(
-                                        onPressed: () async {
-                                          deletewait = true;
-                                          update();
-                                          errormsg = '';
-                                          update();
-                                          try {
-                                            page == Tasks
-                                                ? await DBController()
-                                                    .deletecommenttask(
-                                                        commentid: commintid)
-                                                : page == Whattodo
-                                                    ? await DBController()
-                                                        .deletecommenttodo(
-                                                            commentid:
-                                                                commintid)
-                                                    : null;
-                                            Get.back();
-                                          } catch (e) {
-                                            errormsg = "لا يمكن الوصول للمخدم";
-                                          }
-                                          deletewait = false;
-                                          update();
-                                        },
-                                        icon: const Icon(Icons.delete))),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Visibility(
-                            visible: Tasks.deletewait,
-                            child: const CircularProgressIndicator())
-                      ],
-                    );
-                  }));
-        });
   }
 
   taskstatuschg(x) async {

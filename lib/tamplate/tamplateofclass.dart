@@ -259,54 +259,7 @@ class Comment extends StatelessWidget {
                                         1
                                 ? true
                                 : false,
-                            child: Row(
-                                children: page == Tasks
-                                    ? editcomment(
-                                        ctx: context,
-                                        usercomment:
-                                            "${commentinfoaftersort['userscomment'][index]}",
-                                        commenttext:
-                                            "${commentinfoaftersort['comment'][index]}",
-                                        commentid:
-                                            commentinfoaftersort['comment_id']
-                                                [index],
-                                      ).map((ec) {
-                                        return Visibility(
-                                          visible: ec['visible'],
-                                          child: IconButton(
-                                              onPressed: ec['action'],
-                                              icon: Icon(
-                                                ec['icon'],
-                                                color: ec['color'],
-                                                size: 15,
-                                              )),
-                                        );
-                                      }).toList()
-                                    : page == Whattodo
-                                        ? Whattodo.easyedittodocomment(
-                                                ctx: context,
-                                                usercomment: Comment
-                                                        .commentinfoaftersort[
-                                                    'userscomment'][index],
-                                                commenttext: Comment
-                                                        .commentinfoaftersort[
-                                                    'comment'][index],
-                                                commentid: Comment
-                                                        .commentinfoaftersort[
-                                                    'comment_id'][index])
-                                            .map((ec) {
-                                            return Visibility(
-                                              visible: ec['visible'],
-                                              child: IconButton(
-                                                  onPressed: ec['action'],
-                                                  icon: Icon(
-                                                    ec['icon'],
-                                                    color: ec['color'],
-                                                    size: 15,
-                                                  )),
-                                            );
-                                          }).toList()
-                                        : []),
+                            child: Row(children: []),
                           ),
                           Text(
                             commentinfoaftersort['userscomment'][index] != null
@@ -765,7 +718,7 @@ class MYPAGE extends StatelessWidget {
                                                                               ...i['item'].map((ii) => Expanded(
                                                                                     child: Row(
                                                                                       children: [
-                                                                                        ...ii.map((iii) => Text("${e[iii]} "))
+                                                                                        ...ii.map((iii) => iii['w'])
                                                                                       ],
                                                                                     ),
                                                                                   ))
@@ -918,6 +871,9 @@ getcolorofoffice({page, e}) {
     }
   } else if (page == Office) {
     colors.add(e['color']);
+  } else if (page == Tasks) {
+    colors.add(DB.officetable[DB.officetable.indexWhere(
+        (element) => element['office_id'] == e['task_office_id'])]['color']);
   }
   return colors;
 }
@@ -1156,7 +1112,7 @@ class Editpanel extends StatelessWidget {
             child: Column(
               children: [
                 Row(
-                    children: edititems(ctx: context, e: e)
+                    children: edititems()
                         .map((e) => Visibility(
                               visible: e['visible0'],
                               child: Visibility(
@@ -1262,7 +1218,6 @@ class UserName extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: MediaQuery.of(context).size.width / 3,
           decoration: BoxDecoration(
               border: Border.all(color: Colors.indigoAccent),
               borderRadius:
@@ -1282,13 +1237,11 @@ class UserName extends StatelessWidget {
                               showinfo(ctx: context);
                             },
                             icon: const Icon(Icons.info)),
-                        Expanded(
-                          child: Text(
-                            DB.userstable[DB.userstable.indexWhere((element) =>
-                                    element['username'] == Home.logininfo)]
-                                ['fullname'],
-                            textAlign: TextAlign.center,
-                          ),
+                        Text(
+                          DB.userstable[DB.userstable.indexWhere((element) =>
+                                  element['username'] == Home.logininfo)]
+                              ['fullname'],
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -1299,8 +1252,8 @@ class UserName extends StatelessWidget {
           ),
         ),
         Container(
+          width: 300,
           height: 10,
-          width: MediaQuery.of(context).size.width / 3,
           color: Colors.indigoAccent,
         ),
       ],
@@ -1442,15 +1395,21 @@ class UserName extends StatelessWidget {
 
 //editcommentpanel
 class EditPanelComment extends StatelessWidget {
-  const EditPanelComment({super.key});
-
+  const EditPanelComment(
+      {super.key,
+      required this.actiondeleteComment,
+      required this.actioneditComment,
+      required this.commentOwner});
+  final Function actiondeleteComment;
+  final Function actioneditComment;
+  final String commentOwner;
   @override
   Widget build(BuildContext context) {
-    List editcommentitems({commentOwner}) => [
+    List editcommentitems() => [
           {
             'visible': true,
             'icon': Icons.delete,
-            'action': () async {},
+            'action': () => actiondeleteComment(),
             'color': Colors.grey
           },
           {
@@ -1461,22 +1420,21 @@ class EditPanelComment extends StatelessWidget {
                 ? true
                 : false,
             'icon': Icons.edit,
-            'action': () async {
-              commentcontrolleredit.text = commenttext;
-              await mainController.editcomment(
-                page: Tasks,
-                ctx: ctx,
-                errorcomment: errorcomment,
-                commentid: commentid,
-                editcommentwait: editcommentwait,
-                commentcontrolleredit: commentcontrolleredit,
-              );
-            },
+            'action': () => actioneditComment(),
             'color': Colors.grey
           }
         ];
     return Row(
-      children: editcommentitems().map((c) => Text('')).toList(),
+      children: editcommentitems()
+          .map((c) => Visibility(
+              visible: c['visible'],
+              child: IconButton(
+                  onPressed: c['action'],
+                  icon: Icon(
+                    c['icon'],
+                    color: c['color'],
+                  ))))
+          .toList(),
     );
   }
 }

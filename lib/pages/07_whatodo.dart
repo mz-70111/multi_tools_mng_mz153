@@ -148,7 +148,6 @@ class Whattodo extends StatelessWidget {
             todoid = e['todo_id'];
             await mainController.editItemMainController(
               e: e,
-              ctx: ctx,
               page: Whattodo,
               // pagelisttextfeild: todos,
             );
@@ -212,14 +211,7 @@ class Whattodo extends StatelessWidget {
         {
           'visible': true,
           'icon': Icons.delete,
-          'action': () async {
-            await mainController.deletecommen(
-                ctx: ctx,
-                id: commentid,
-                deletewait: deletewait,
-                page: Whattodo,
-                commintid: commentid);
-          },
+          'action': () async {},
           'color': Colors.grey
         },
         {
@@ -547,26 +539,6 @@ class Whattodo extends StatelessWidget {
                 : 'تم تعديلها بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['editdate'] ?? DateTime.now())} بواسطة حساب محذوف'),
           ),
           const Divider(),
-          Comment(
-            page: Whattodo,
-            mylista: mylista,
-          ),
-          WriteComment(
-            e: e,
-            writeComment: () async {
-              await mainController.addcomment(
-                  e: e,
-                  addcommentaction: e['commentcontroller'].text.isNotEmpty
-                      ? dbController.addcommenttodo(
-                          userid: DB.userstable[DB.userstable.indexWhere(
-                                  (element) =>
-                                      element['username'] == Home.logininfo)]
-                              ['user_id'],
-                          todoid: e['todo_id'],
-                          comment: e['commentcontroller'].text)
-                      : null);
-            },
-          )
         ],
       ),
     );

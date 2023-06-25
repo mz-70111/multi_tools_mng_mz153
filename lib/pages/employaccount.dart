@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
-import 'package:users_tasks_mz_153/pages/06_tasks.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 
 class Employ extends StatelessWidget {
@@ -243,12 +242,14 @@ class Employ extends StatelessWidget {
   }
 
   customInitforAdd() {
+    MainController mainController = Get.find();
     mustchgpass = true;
     addping = false;
     addremind = false;
     pbx = false;
     admin = false;
     privilege.clear();
+    mainController.cloasedp();
   }
 
   customInitforEdit({e}) {
@@ -345,7 +346,7 @@ class Employ extends StatelessWidget {
     MainController mainController = Get.find();
 
     await mainController.editItemMainController(
-        page: Employ, e: MYPAGE.eE, ctx: ctx, listofFeildmz: Employ.employs);
+        page: Employ, e: MYPAGE.eE, listofFeildmz: Employ.employs);
     updateafteredit(e: e);
   }
 

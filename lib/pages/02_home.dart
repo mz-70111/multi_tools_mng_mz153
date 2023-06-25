@@ -204,8 +204,7 @@ class Home extends StatelessWidget {
                                                     String i;
                                                     e.keys.toList().first ==
                                                             'user_id'
-                                                        ? i =
-                                                            "${e['username']}_${e['fullname']}"
+                                                        ? i = "${e['fullname']}"
                                                         : e
                                                                     .keys
                                                                     .toList()

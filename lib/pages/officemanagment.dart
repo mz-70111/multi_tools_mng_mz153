@@ -127,7 +127,7 @@ class Office extends StatelessWidget {
           ctx: context, pickcolor: () => pickcolor(ctx: context)),
       customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
       getinfo: () => getinfo(e: MYPAGE.eE, ctx: context),
-      actionSave: () => editOfficeSaveAction(ctx: context, e: MYPAGE.eE),
+      actionSave: () => editOfficeSaveAction(e: MYPAGE.eE),
       actionEdit: () => mainController.showeditpanel(),
       actionDelete: () => deleteOffice(ctx: context, e: MYPAGE.eE),
     );
@@ -308,11 +308,11 @@ class Office extends StatelessWidget {
     );
   }
 
-  editOfficeSaveAction({ctx, e}) async {
+  editOfficeSaveAction({e}) async {
     MainController mainController = Get.find();
 
     await mainController.editItemMainController(
-        page: Office, e: MYPAGE.eE, ctx: ctx, listofFeildmz: Office.offices);
+        page: Office, e: MYPAGE.eE, listofFeildmz: Office.offices);
     updateafteredit(e: e);
   }
 
