@@ -232,7 +232,12 @@ class Tasks extends StatelessWidget {
       scrollController: scrollController,
       mainEditvisible: checkifUserisAdmin() == true ? true : false,
       mainAddvisible: checkifUserisAdmin() == true ? true : false,
-      getinfo: () => getinfo(e: MYPAGE.eE, ctx: context),
+      getinfo: () {
+        return getinfo(
+          e: MYPAGE.eE,
+          ctx: context,
+        );
+      },
       actionSave: () => edittask(e: MYPAGE.eE),
       actionEdit: () => mainController.showeditpanel(),
       actionDelete: () => deletetask(ctx: context, e: MYPAGE.eE),
@@ -322,12 +327,14 @@ class Tasks extends StatelessWidget {
                   " أنجزت بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['donedate'] ?? DateTime.now())}"),
             ])),
         Comment(
-            e: e,
-            comment: comment,
-            deletecomment: () {},
-            editcomment: () {},
-            table: 'users_tasks_comments',
-            tableid: 'utc_id'),
+          e: e,
+          comment: comment,
+          deletecomment: () {},
+          editcomment: () {},
+          table: 'users_tasks_comments',
+          tableIdname: 'utc_task_id',
+          tableId: e['task_id'],
+        ),
         WriteComment(e: e, writeComment: () => addcomment(e: MYPAGE.eE))
       ],
     );

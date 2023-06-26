@@ -211,12 +211,14 @@ class Comment extends StatelessWidget {
   const Comment(
       {super.key,
       required this.table,
-      required this.tableid,
       required this.comment,
       required this.deletecomment,
       required this.editcomment,
-      required this.e});
-  final String table, tableid;
+      required this.e,
+      required this.tableId,
+      required this.tableIdname});
+  final String table, tableIdname;
+  final int tableId;
   final List<Map> comment;
   final Function deletecomment;
   final Function editcomment;
@@ -226,10 +228,11 @@ class Comment extends StatelessWidget {
     DBController dbController = Get.find();
     return FutureBuilder(future: Future(() async {
       try {
-        return await dbController.gettable(
+        return await getcommenttable(
           list: comment,
-          tableid: tableid,
           table: table,
+          tableIdname: tableIdname,
+          tableId: tableId,
         );
       } catch (e) {
         null;
@@ -239,6 +242,7 @@ class Comment extends StatelessWidget {
         {'icon': Icons.delete, 'action': () => deletecomment()},
         {'icon': Icons.edit, 'action': () => editcomment()}
       ];
+
       return ExpansionTile(title: const Text("التعليقات"), children: [
         ...comment.map((e) {
           return Padding(
@@ -1376,6 +1380,24 @@ getofficeUsers({required List list, officeid}) async {
   for (var j in t) {
     list.add(DB.userstable[DB.userstable
         .indexWhere((element) => element['user_id'] == j[0])]['fullname']);
+  }
+  return list;
+}
+
+getcommenttable({list, table, tableIdname, tableId}) async {
+  var desctable = await DB().customquery(query: 'desc $table;');
+  var selecttable = await DB()
+      .customquery(query: 'select * from $table where $tableIdname=$tableId;');
+  var y = 0, x = 0;
+  list.clear();
+  for (var i in selecttable) {
+    list.add({});
+    y = 0;
+    for (var j in desctable) {
+      list[x].addAll({j[0]: i[y]});
+      y++;
+    }
+    x++;
   }
   return list;
 }
