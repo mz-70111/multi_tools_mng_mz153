@@ -277,11 +277,11 @@ class DBController extends GetxController {
     return list;
   }
 
-  adduser({privilege}) async {
+  adduser() async {
     String passw =
         codepassword(word: "${Employ.employs[2]['controller'].text}");
     await DB().customquery(query: '''
-insert into users (username,fullname,password,email,mobile,admin,mustchgpass,addremind,addping,pbx)
+insert into users (username,fullname,password,email,mobile,admin,mustchgpass,addremind,addtodo,addping,pbx)
 values
 (
 "${Employ.employs[0]['controller'].text}",
@@ -292,6 +292,7 @@ values
 ${Employ.admin},
 ${Employ.mustchgpass},
 ${Employ.addremind},
+${Employ.addtodo},
 ${Employ.addping},
 ${Employ.pbx}
 );
@@ -591,9 +592,9 @@ update users_todo_comments set utdc_user_id=null where utdc_user_id=$id;''');
     await DB().customquery(query: '''
 delete from users_todo_rates where utdr_user_id=$id;''');
     await DB().customquery(query: '''
-update users_todo set utd_editby_id=null where utd_editby_id=$id;''');
+update users_todo set editby_id=null where editby_id=$id;''');
     await DB().customquery(query: '''
-update users_todo set utd_createby_id=null where utd_createby_id=$id;''');
+update users_todo set createby_id=null where createby_id=$id;''');
     await DB().customquery(query: '''
 update users_tasks_comments set utc_user_id=null where utc_user_id=$id;''');
     await DB().customquery(query: '''

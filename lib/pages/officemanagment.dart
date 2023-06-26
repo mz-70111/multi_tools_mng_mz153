@@ -54,6 +54,7 @@ class Office extends StatelessWidget {
   static Color selectcolor = colorpicklist[0]['color'];
   static List customWidgetofEdit({ctx, pickcolor}) => [];
   static ScrollController scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
@@ -67,13 +68,28 @@ class Office extends StatelessWidget {
         }
       },
     ];
-    List items = [
-      {
-        'item': [
-          ['office_id', 'officename']
-        ]
-      }
-    ];
+    List itemskey = ['color', 'office_id', 'officename'];
+    List itemResult = [];
+    List colors = [];
+    Widget itemsWidget() {
+      colors.clear();
+      colors.add(itemResult[0]);
+      return Column(children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              ...colors.map((c) =>
+                  Container(height: 40, width: 10, color: Color(int.parse(c)))),
+              Expanded(child: Text("# ${itemResult[1]}_ ${itemResult[2]}")),
+            ],
+          ),
+        ),
+        Divider(),
+      ]);
+    }
+
     Map addFunction = {
       'action': () => addoffice(),
       'addlabel': 'إضافة مكتب جديد',
@@ -112,7 +128,9 @@ class Office extends StatelessWidget {
       page: Office,
       searchRange: const ['officename'],
       mainColumn: mainColumn,
-      items: items,
+      items: itemskey,
+      itemsResult: itemResult,
+      itemsWidget: () => itemsWidget(),
       notifi: const SizedBox(),
       addlabel: addFunction['addlabel'],
       action: addFunction['action'],

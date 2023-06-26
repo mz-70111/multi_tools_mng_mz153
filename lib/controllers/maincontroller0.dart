@@ -892,14 +892,13 @@ class MainController extends GetxController {
             update();
             Tasks.extratimecontroller.text.isEmpty ? "0" : null;
             try {
-              
               int.parse(Tasks.extratimecontroller.text);
             } catch (o) {
               Tasks.extratimecontrollererror = "أدخل قيمة عددية صحيحة فقط";
             }
             try {
-               Editpanel.wait = true;
-            update();
+              Editpanel.wait = true;
+              update();
               await DBController().edittask(id: e['task_id']);
             } catch (e) {
               "$e".contains('timed out')
@@ -910,10 +909,10 @@ class MainController extends GetxController {
                           ? Editpanel.errormsg = 'أدخل قيمة عددية صحيحة'
                           : Editpanel.errormsg = "$e";
             }
-              Editpanel.wait = false;
-          Editpanel.savevisible = false;
-          ADDEDITINFOItem.addeditvisible = false;
-          update();
+            Editpanel.wait = false;
+            Editpanel.savevisible = false;
+            ADDEDITINFOItem.addeditvisible = false;
+            update();
           }
         }
       } else if (page == Whattodo) {
@@ -1062,7 +1061,7 @@ class MainController extends GetxController {
         'privilege': Employ.permission[0],
         'office': DB.officetable[0]['officename']
       });
-      scrollController.jumpTo(scrollController.position.maxScrollExtent+100);
+      scrollController.jumpTo(scrollController.position.maxScrollExtent + 100);
     } else {
       AddPanel.errormsg = 'لم تقم بإضافة أي مكتب';
     }
@@ -1228,20 +1227,11 @@ class MainController extends GetxController {
     Editpanel.errormsg = AddPanel.errormsg = null;
     Tasks.usersfortasks.clear();
     try {
-      var t = await DB().customquery(
-          query:
-              'select uf_user_id from users_office where uf_office_id=${DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Tasks.taskofficeNameselected)]['office_id'])]['office_id']}');
-      for (var j in t) {
-        if (Tasks.usersfortasks.contains(DB.userstable[DB.userstable
-                .indexWhere((element) => element['user_id'] == j[0])]
-            ['fullname'])) {
-          continue;
-        } else {
-          Tasks.usersfortasks.add(DB.userstable[DB.userstable
-                  .indexWhere((element) => element['user_id'] == j[0])]
-              ['fullname']);
-        }
-      }
+      await getofficeUsers(
+          list: Tasks.usersfortasks,
+          officeid: DB.officetable[DB.officetable.indexWhere((element) =>
+                  element['officename'] == Tasks.taskofficeNameselected)]
+              ['office_id']);
       if (Tasks.usersfortasks.isEmpty) {
         Editpanel.errormsg = AddPanel.errormsg =
             'لايوجد اي موظف في المكتب الذي تملك صلاحية الاشراف عليه';
@@ -1249,6 +1239,7 @@ class MainController extends GetxController {
         Tasks.usersfortaskswidget.add({'i': 0, 'name': Tasks.usersfortasks[0]});
       }
     } catch (e) {
+      print(e);
       Editpanel.errormsg = AddPanel.errormsg = "لايمكن الوصول للمخدم";
     }
     update();

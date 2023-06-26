@@ -516,7 +516,7 @@ class Whattodo extends StatelessWidget {
   }
 
   getinfo({e, ctx}) {
-    buildcomment(mylista: mylista);
+    // buildcomment(mylista: mylista);
     return Visibility(
       visible: !editvisible,
       child: Column(

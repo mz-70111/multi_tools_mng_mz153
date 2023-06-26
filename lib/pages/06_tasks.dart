@@ -7,6 +7,7 @@ import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
 import 'package:users_tasks_mz_153/pages/02_home.dart';
+import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 import 'package:intl/intl.dart' as df;
 
@@ -21,7 +22,7 @@ class Tasks extends StatelessWidget {
   static String? extratimecontrollererror;
   static String? taskofficeNameselected;
   static List taskofficelist = [];
-  static List<Map> mylista = [];
+  static List<Map> mylista = [], comment = [];
   static double duration = 7;
   static bool taskstatus = false, notifi = true;
   static String taskstatus0() =>
@@ -49,11 +50,9 @@ class Tasks extends StatelessWidget {
       'maxlines': 3
     },
   ];
-
   static DateTime sortbydatebegin = DateTime.parse('2022-10-01');
   static DateTime sortbydateend = DateTime.now();
   static ScrollController scrollController = ScrollController();
-
   @override
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
@@ -74,23 +73,40 @@ class Tasks extends StatelessWidget {
       },
       {'label': 'المكلف بالمهمة', 'icon': Icons.people, 'action': null},
     ];
-    List items(i) => [
-          {
-            'item': [
-              [
-                {'i': 'task_id', 'w': Text("$i")},
-                {'i': 'taskname', 'w': Text("$i")}
-              ],
-              // ['status'],
-              // ['userstask_name']
-            ]
-          },
-          // {
-          //   'item': [
-          //     ['notifi']
-          //   ]
-          // },
-        ];
+    List itemskey = [
+      'task_office_id',
+      'task_id',
+      'taskname',
+      'status',
+      'userstask_name',
+    ];
+    List itemResult = [];
+    List colors = [];
+    Widget itemsWidget() {
+      colors.clear();
+      colors.add(DB.officetable[DB.officetable
+              .indexWhere((element) => element['office_id'] == itemResult[0])]
+          ['color']);
+      return Column(children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              ...colors.map((c) =>
+                  Container(height: 40, width: 10, color: Color(int.parse(c)))),
+              Expanded(child: Text("# ${itemResult[1]}_ ${itemResult[2]}")),
+              Expanded(child: Text(itemResult[3] == 1 ? "منجزة" : "غير منجزة")),
+              Expanded(
+                  child:
+                      Column(children: [...itemResult[4].map((t) => Text(t))]))
+            ],
+          ),
+        ),
+        const Divider(),
+      ]);
+    }
+
     Map addFunction = {
       'action': () => addtask(),
       'addlabel': 'إضافة حساب جديد',
@@ -195,7 +211,6 @@ class Tasks extends StatelessWidget {
             ),
           ),
         ]);
-
     return MYPAGE(
       mylista: mylista,
       table: 'tasks',
@@ -203,7 +218,9 @@ class Tasks extends StatelessWidget {
       page: Tasks,
       searchRange: const ['taskname', 'userstask_name'],
       mainColumn: mainColumn,
-      items: items(MYPAGE.eE),
+      items: itemskey,
+      itemsResult: itemResult,
+      itemsWidget: () => itemsWidget(),
       notifi: const SizedBox(),
       addlabel: addFunction['addlabel'],
       action: addFunction['action'],
@@ -218,12 +235,11 @@ class Tasks extends StatelessWidget {
       getinfo: () => getinfo(e: MYPAGE.eE, ctx: context),
       actionSave: () => edittask(e: MYPAGE.eE),
       actionEdit: () => mainController.showeditpanel(),
-      actionDelete: () => deletetask(),
+      actionDelete: () => deletetask(ctx: context, e: MYPAGE.eE),
     );
   }
 
   getinfo({e, ctx}) {
-    buildcomment(mylista: mylista);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -305,6 +321,14 @@ class Tasks extends StatelessWidget {
               Text(
                   " أنجزت بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['donedate'] ?? DateTime.now())}"),
             ])),
+        Comment(
+            e: e,
+            comment: comment,
+            deletecomment: () {},
+            editcomment: () {},
+            table: 'users_tasks_comments',
+            tableid: 'utc_id'),
+        WriteComment(e: e, writeComment: () => addcomment(e: MYPAGE.eE))
       ],
     );
   }
@@ -342,14 +366,13 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
       }
     }
     taskofficeNameselected = taskofficelist[0];
-
     usersfortasks.clear();
     usersfortaskswidget.clear();
     duration = 7;
     extratimecontroller.text = 0.toString();
   }
 
-  customInitforEdit({e}) {
+  customInitforEdit({e}) async {
     for (var i in Tasks.tasks) {
       i['error'] = null;
     }
@@ -369,8 +392,12 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
     Tasks.taskdetails.text = e['taskdetails'];
     usersfortasks.clear();
     usersfortaskswidget.clear();
+    await getofficeUsers(
+        list: Tasks.usersfortasks,
+        officeid: DB.officetable[DB.officetable.indexWhere((element) =>
+                element['officename'] == Tasks.taskofficeNameselected)]
+            ['office_id']);
     for (var i in e['userstask_name']) {
-      usersfortasks.add(i);
       usersfortaskswidget.add({'i': 0, 'name': i});
     }
   }
@@ -392,16 +419,29 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
     updateafteredit(e: e);
   }
 
+  updateafteredit({e}) {
+    e['taskname'] = Tasks.tasks[0]['controller'].text;
+    e['taskdetails'] = Tasks.tasks[1]['controller'].text;
+    e['notifi'] = Tasks.notifi == true ? 1 : 0;
+    e['duration'] = Tasks.duration.toInt();
+    e['extratime'] = int.parse(Tasks.extratimecontroller.text);
+  }
+
   deletetask({ctx, e}) async {
     MainController mainController = Get.find();
     await mainController.deleteItemMainController(ctx: ctx, e: e, page: Tasks);
   }
-}
 
-updateafteredit({e}) {
-  e['taskname'] = Tasks.tasks[0]['controller'].text;
-  e['taskdetails'] = Tasks.tasks[1]['controller'].text;
-  e['notifi'] = Tasks.notifi == true ? 1 : 0;
-  e['duration'] = Tasks.duration.toInt();
-  e['extratime'] = int.parse(Tasks.extratimecontroller.text);
+  addcomment({e}) async {
+    if (e['commentcontroller'].text.isNotEmpty) {
+      await mainController.addcomment(
+        e: e,
+        addcommentaction: dbController.addcommenttask(
+            userid: DB.userstable[DB.userstable.indexWhere(
+                (element) => element['username'] == Home.logininfo)]['user_id'],
+            taskid: e['task_id'],
+            comment: e['commentcontroller'].text),
+      );
+    }
+  }
 }

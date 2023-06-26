@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:teledart/model.dart';
 import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
@@ -211,81 +210,85 @@ showADDEDITINFO({
 class Comment extends StatelessWidget {
   const Comment(
       {super.key,
-      required this.mylista,
-      required this.page,
-      required this.editcomment});
-  final List mylista;
-  final Type page;
-  final List editcomment;
-  static List collectCommentinfo = [],
-      resperateCommentaftersort = [],
-      usersId = [],
-      usersC = [],
-      comment = [],
-      commentid = [],
-      commentdate = [];
-  static Map commentinfoaftersort = {};
-
+      required this.table,
+      required this.tableid,
+      required this.comment,
+      required this.deletecomment,
+      required this.editcomment,
+      required this.e});
+  final String table, tableid;
+  final List<Map> comment;
+  final Function deletecomment;
+  final Function editcomment;
+  final e;
   @override
   Widget build(BuildContext context) {
-    MainController mainController = Get.find();
-    int index = 0;
-    return GetBuilder<MainController>(
-      init: mainController,
-      builder: (_) {
-        return ExpansionTile(title: const Text("التعليقات"), children: [
-          ...commentinfoaftersort['commentdate'].map((e) {
-            index = commentinfoaftersort['commentdate'].indexOf(e);
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(border: Border.all()),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    DBController dbController = Get.find();
+    return FutureBuilder(future: Future(() async {
+      try {
+        return await dbController.gettable(
+          list: comment,
+          tableid: tableid,
+          table: table,
+        );
+      } catch (e) {
+        null;
+      }
+    }), builder: (_, snap) {
+      List editcommentpanel = [
+        {'icon': Icons.delete, 'action': () => deletecomment()},
+        {'icon': Icons.edit, 'action': () => editcomment()}
+      ];
+      return ExpansionTile(title: const Text("التعليقات"), children: [
+        ...comment.map((e) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: BoxDecoration(border: Border.all()),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Visibility(
-                            visible: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                            ['fullname'] ==
-                                        commentinfoaftersort['userscomment'][
-                                            commentinfoaftersort['commentdate']
-                                                .indexOf(e)] ||
-                                    DB.userstable[DB.userstable.indexWhere((element) =>
-                                            element['username'] ==
-                                            Home.logininfo)]['admin'] ==
-                                        1
+                      Visibility(
+                        visible:
+                            checkifUserisSame(userId: e['utc_user_id']) == true
                                 ? true
                                 : false,
-                            child: Row(children: []),
-                          ),
-                          Text(
-                            commentinfoaftersort['userscomment'][index] != null
-                                ? "${commentinfoaftersort['userscomment'][index]}"
-                                : "حساب محذوف",
-                            softWrap: true,
-                          ),
-                        ],
+                        child: Row(
+                            children: editcommentpanel
+                                .map((e) => IconButton(
+                                    onPressed: e['action'],
+                                    icon: Icon(
+                                      e['icon'],
+                                      size: 15,
+                                      color: Colors.grey,
+                                    )))
+                                .toList()),
                       ),
                       Text(
-                        "${commentinfoaftersort['comment'][index]}",
-                        softWrap: true,
-                      ),
-                      Text(
-                        " ${df.DateFormat("yyyy-MM-dd | HH:mm").format(DateTime.parse(e))}",
+                        e['utc_user_id'] != null
+                            ? "${DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == e['utc_user_id'])]['fullname']}"
+                            : "حساب محذوف",
                         softWrap: true,
                       ),
                     ],
                   ),
-                ),
+                  Text(
+                    "${e['comments']}",
+                    softWrap: true,
+                  ),
+                  Text(
+                    " ${df.DateFormat("yyyy-MM-dd | HH:mm").format(e['commentdate'])}",
+                    softWrap: true,
+                  ),
+                ],
               ),
-            );
-          })
-        ]);
-      },
-    );
+            ),
+          );
+        })
+      ]);
+    });
   }
 }
 
@@ -332,79 +335,40 @@ class WriteComment extends StatelessWidget {
   }
 }
 
-buildcomment({mylista}) {
-  try {
-    Comment.collectCommentinfo.clear();
-    for (var j = 0; j < mylista.length; j++) {
-      for (var i = 0; i < mylista[j]['commentdate'].length; i++) {
-        Comment.collectCommentinfo.add(
-            "${mylista[j]['commentdate'][i]}=m=${mylista[j]['users_id_comment'][i]}=m=${mylista[j]['users_c'][i]}=m=${mylista[j]['comment'][i]}=m=${mylista[j]['comment_id'][i]}");
-      }
-    }
-  } catch (e) {
-    null;
-  }
-  Comment.collectCommentinfo
-      .sort((a, b) => a.toString().compareTo(b.toString()));
-  Comment.resperateCommentaftersort.clear();
-  for (var i in Comment.collectCommentinfo) {
-    Comment.resperateCommentaftersort.add(i.split('=m='));
-  }
-  Comment.usersId.clear();
-  Comment.usersC.clear();
-  Comment.comment.clear();
-  Comment.commentid.clear();
-  Comment.commentdate.clear();
-  for (var i in Comment.resperateCommentaftersort) {
-    Comment.commentdate.add(i[0]);
-    Comment.usersId.add(i[1]);
-    Comment.usersC.add(i[2]);
-    Comment.comment.add(i[3]);
-    Comment.commentid.add(i[4]);
-  }
-  Comment.commentinfoaftersort.clear();
-  Comment.commentinfoaftersort.addAll({
-    'commentdate': Comment.commentdate,
-    'users_id': Comment.usersId,
-    'userscomment': Comment.usersC,
-    'comment_id': Comment.commentid,
-    'comment': Comment.comment,
-  });
-}
-
 class MYPAGE extends StatelessWidget {
-  const MYPAGE({
-    super.key,
-    required this.mylista,
-    required this.table,
-    required this.tableId,
-    required this.page,
-    required this.searchRange,
-    required this.mainColumn,
-    required this.items,
-    required this.notifi,
-    required this.textfeildlista,
-    required this.customWidgetofADD,
-    required this.customInitdataforAdd,
-    required this.customInitforEdit,
-    required this.scrollController,
-    required this.mainEditvisible,
-    required this.mainAddvisible,
-    required this.customWidgetofEdit,
-    required this.action,
-    required this.addlabel,
-    required this.getinfo,
-    required this.actionSave,
-    required this.actionEdit,
-    required this.actionDelete,
-  });
+  const MYPAGE(
+      {super.key,
+      required this.mylista,
+      required this.table,
+      required this.tableId,
+      required this.page,
+      required this.searchRange,
+      required this.mainColumn,
+      required this.notifi,
+      required this.textfeildlista,
+      required this.customWidgetofADD,
+      required this.customInitdataforAdd,
+      required this.customInitforEdit,
+      required this.scrollController,
+      required this.mainEditvisible,
+      required this.mainAddvisible,
+      required this.customWidgetofEdit,
+      required this.action,
+      required this.addlabel,
+      required this.getinfo,
+      required this.actionSave,
+      required this.actionEdit,
+      required this.actionDelete,
+      required this.items,
+      required this.itemsResult,
+      required this.itemsWidget});
   final List<Map> mylista;
   final String table, tableId, addlabel;
   final Type page;
   final List<String> searchRange;
-  final List mainColumn;
+  final List mainColumn, items, itemsResult;
   final Widget notifi;
-  final List textfeildlista, items;
+  final List textfeildlista;
   final Widget customWidgetofADD, customWidgetofEdit;
   final Function customInitdataforAdd,
       customInitforEdit,
@@ -412,7 +376,8 @@ class MYPAGE extends StatelessWidget {
       action,
       actionSave,
       actionEdit,
-      actionDelete;
+      actionDelete,
+      itemsWidget;
   final bool mainAddvisible, mainEditvisible;
   final ScrollController scrollController;
   //static
@@ -476,7 +441,6 @@ class MYPAGE extends StatelessWidget {
                               init: mainController,
                               builder: (_) {
                                 List officetrue = [];
-
                                 officetrue.clear();
                                 officelist.clear();
                                 officelist = ['جميع المكاتب', 'مخصص'];
@@ -627,114 +591,51 @@ class MYPAGE extends StatelessWidget {
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
-                                              children: mylista.map((e) {
-                                                return Visibility(
-                                                  visible: e['visible'],
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              ...getcolorofoffice(
-                                                                      e: e,
-                                                                      page:
-                                                                          page)
-                                                                  .map((r) =>
-                                                                      Container(
-                                                                        height:
-                                                                            40,
-                                                                        width:
-                                                                            10,
-                                                                        color: Color(
-                                                                            int.parse(r)),
-                                                                      )),
-                                                              IconButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    eE = e;
-                                                                    infoEditItemWidget(
-                                                                      page:
-                                                                          page,
-                                                                      mainEditvisible:
-                                                                          mainEditvisible,
-                                                                      e: e,
-                                                                      ctx:
-                                                                          context,
-                                                                      scrollController:
-                                                                          scrollController,
-                                                                      customInitforEdit:
-                                                                          () =>
-                                                                              customInitforEdit(),
-                                                                      textfeildlista:
-                                                                          textfeildlista,
-                                                                      customWidgetofEdit:
-                                                                          customWidgetofEdit,
-                                                                      getinfo: () =>
-                                                                          getinfo(),
-                                                                      actionSave:
-                                                                          () =>
-                                                                              actionSave(),
-                                                                      actionEdit:
-                                                                          () =>
-                                                                              actionEdit(),
-                                                                      actionDelete:
-                                                                          () =>
-                                                                              actionDelete(),
-                                                                    );
-                                                                  },
-                                                                  icon: const Icon(
-                                                                      Icons
-                                                                          .info_outline)),
-                                                              page == Employ
-                                                                  ? Icon(
-                                                                      Icons
-                                                                          .person,
-                                                                      color: e['enable'] == 1
-                                                                          ? Colors
-                                                                              .green
-                                                                          : Colors
-                                                                              .grey)
-                                                                  : const SizedBox(),
-                                                              Expanded(
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    ...items.map(
-                                                                        (i) =>
-                                                                            Row(children: [
-                                                                              ...i['item'].map((ii) => Expanded(
-                                                                                    child: Row(
-                                                                                      children: [
-                                                                                        ...ii.map((iii) => iii['w'])
-                                                                                      ],
-                                                                                    ),
-                                                                                  ))
-                                                                            ]))
-                                                                  ],
-                                                                ),
-                                                              )
-                                                            ]),
-                                                      ),
-                                                      const Divider(
-                                                        color: Colors.amber,
-                                                      )
-                                                    ],
-                                                  ),
-                                                );
-                                              }).toList(),
+                                              children: [
+                                                ...mylista.map((e) {
+                                                  itemsResult.clear();
+                                                  for (var i in items) {
+                                                    itemsResult.add(e[i]);
+                                                  }
+                                                  return Visibility(
+                                                    visible: e['visible'],
+                                                    child: Row(children: [
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            eE = e;
+                                                            infoEditItemWidget(
+                                                              page: page,
+                                                              mainEditvisible:
+                                                                  mainEditvisible,
+                                                              e: e,
+                                                              ctx: context,
+                                                              scrollController:
+                                                                  scrollController,
+                                                              customInitforEdit:
+                                                                  () =>
+                                                                      customInitforEdit(),
+                                                              textfeildlista:
+                                                                  textfeildlista,
+                                                              customWidgetofEdit:
+                                                                  customWidgetofEdit,
+                                                              getinfo: () =>
+                                                                  getinfo(),
+                                                              actionSave: () =>
+                                                                  actionSave(),
+                                                              actionEdit: () =>
+                                                                  actionEdit(),
+                                                              actionDelete: () =>
+                                                                  actionDelete(),
+                                                            );
+                                                          },
+                                                          icon: const Icon(Icons
+                                                              .info_outline)),
+                                                      Expanded(
+                                                          child: itemsWidget()),
+                                                    ]),
+                                                  );
+                                                })
+                                              ],
                                             ),
                                           ),
                                         ),
@@ -808,12 +709,12 @@ checkifUserisUserinOffice({officeid}) {
   return result;
 }
 
-checkifUserisSame({username}) {
+checkifUserisSame({userId}) {
   bool result = false;
   if (DB.userstable[DB.userstable
               .indexWhere((element) => element['username'] == Home.logininfo)]
-          ['username'] ==
-      username) {
+          ['user_id'] ==
+      userId) {
     result = true;
   }
   return result;
@@ -1465,4 +1366,16 @@ setlogin({required String username, required String password}) async {
 
 getlogin() {
   return LogIn.Pref.getStringList('login');
+}
+
+getofficeUsers({required List list, officeid}) async {
+  var t = await DB().customquery(
+      query:
+          'select uf_user_id from users_office where uf_office_id=$officeid');
+  list.clear();
+  for (var j in t) {
+    list.add(DB.userstable[DB.userstable
+        .indexWhere((element) => element['user_id'] == j[0])]['fullname']);
+  }
+  return list;
 }

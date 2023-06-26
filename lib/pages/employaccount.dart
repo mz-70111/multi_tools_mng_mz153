@@ -78,6 +78,7 @@ class Employ extends StatelessWidget {
   static ScrollController scrollController = ScrollController();
   static String information = '';
   static List<Color> personenablecolor = [];
+
   @override
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
@@ -92,18 +93,41 @@ class Employ extends StatelessWidget {
         }
       },
     ];
-    List items = [
-      {
-        'item': [
-          ['user_id', 'username'],
-        ]
-      },
-      {
-        'item': [
-          ['fullname']
-        ]
-      },
-    ];
+    List itemskey = ['office', 'user_id', 'fullname', 'enable'];
+    List itemResult = [];
+    List colors = [];
+    Widget itemsWidget() {
+      colors.clear();
+      if (itemResult[0] != null) {
+        for (var i in itemResult[0]) {
+          try {
+            colors.add(DB.officetable[DB.officetable
+                .indexWhere((element) => element['office_id'] == i)]['color']);
+          } catch (ee) {
+            null;
+          }
+        }
+      }
+      return Column(children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              ...colors.map((c) =>
+                  Container(height: 40, width: 10, color: Color(int.parse(c)))),
+              Icon(
+                Icons.person,
+                color: itemResult[3] == 1 ? Colors.green : Colors.grey,
+              ),
+              Expanded(child: Text("# ${itemResult[1]}_ ${itemResult[2]}")),
+            ],
+          ),
+        ),
+        const Divider(),
+      ]);
+    }
+
     Map addFunction = {
       'action': () => adduser(),
       'addlabel': 'إضافة حساب جديد',
@@ -222,7 +246,9 @@ class Employ extends StatelessWidget {
       page: Employ,
       searchRange: const ['username', 'fullname'],
       mainColumn: mainColumn,
-      items: items,
+      items: itemskey,
+      itemsResult: itemResult,
+      itemsWidget: () => itemsWidget(),
       notifi: const SizedBox(),
       addlabel: addFunction['addlabel'],
       action: addFunction['action'],
