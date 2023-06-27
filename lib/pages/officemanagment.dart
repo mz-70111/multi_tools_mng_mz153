@@ -139,7 +139,8 @@ class Office extends StatelessWidget {
           ctx: context, pickcolor: () => pickcolor(ctx: context)),
       textfeildlista: offices,
       scrollController: scrollController,
-      mainEditvisible: checkifUserisAdmin() == true ? true : false,
+      mainEditvisible: () => checkifUserisAdmin() == true ? true : false,
+      subeditvisible: () => true,
       mainAddvisible: checkifUserisAdmin() == true ? true : false,
       customWidgetofEdit: customWidgetofEdit(
           ctx: context, pickcolor: () => pickcolor(ctx: context)),
@@ -280,13 +281,19 @@ class Office extends StatelessWidget {
   getinfo({e, ctx}) {
     List supervisor = [];
     List users = [];
+    supervisor.clear();
+    users.clear();
     for (var i in DB.userstable) {
-      if (checkifUserisSupervisorinOffice(officeid: e['office_id']) == true) {
-        supervisor.add("# ${i['user_id']} ${i['fullname']}");
-      } else if (checkifUserisUserinOffice(officeid: e['office_id']) == true) {
-        users.add("# ${i['user_id']} ${i['fullname']}");
+      for (var j = 0; j < i['office'].length; j++) {
+        if (i['office'][j] == e['office_id'] && i['privilege'][j] == 'مشرف') {
+          supervisor.add("_#${i['user_id']}_ ${i['fullname']}");
+        } else if (i['office'][j] == e['office_id'] &&
+            i['privilege'][j] == 'موظف') {
+          users.add("_#${i['user_id']}_ ${i['fullname']}");
+        }
       }
     }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -319,8 +326,8 @@ class Office extends StatelessWidget {
         users.isEmpty
             ? const Text('موظفوا المكتب _ لايوجد')
             : Column(children: [
-                const Text("موظفوا المكتب _"),
-                ...users.map((c) => Text("$c")).toList()
+                const Text("موظفوا المكتب"),
+                ...users.map((c) => Text(" $c")).toList()
               ]),
       ],
     );

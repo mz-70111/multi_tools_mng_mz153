@@ -230,8 +230,21 @@ class Tasks extends StatelessWidget {
       customWidgetofEdit: customWidgetofEdit(),
       textfeildlista: tasks,
       scrollController: scrollController,
-      mainEditvisible: checkifUserisAdmin() == true ? true : false,
-      mainAddvisible: checkifUserisAdmin() == true ? true : false,
+      mainEditvisible: () {
+        return (checkifUserisAdmin() == true ||
+                checkifUserisSupervisorinOffice(
+                        officeid: MYPAGE.eE['task_office_id']) ==
+                    true)
+            ? true
+            : false;
+      },
+      subeditvisible: () => checkifUserisSupervisorinOffice(
+                  officeid: MYPAGE.eE['task_office_id']) ==
+              true
+          ? true
+          : false,
+      mainAddvisible:
+          checkifUserisSupervisorinAnyOffice() == true ? true : false,
       getinfo: () {
         return getinfo(
           e: MYPAGE.eE,
@@ -329,11 +342,13 @@ class Tasks extends StatelessWidget {
         Comment(
           e: e,
           comment: comment,
-          deletecomment: () {},
-          editcomment: () {},
+          deletecomment: () => deletecomment(ctx: ctx, e: e),
+          editcomment: () => editcomment(),
           table: 'users_tasks_comments',
           tableIdname: 'utc_task_id',
           tableId: e['task_id'],
+          officeId: e['task_office_id'],
+          userIdname: 'utc_user_id',
         ),
         WriteComment(e: e, writeComment: () => addcomment(e: MYPAGE.eE))
       ],
@@ -451,4 +466,17 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
       );
     }
   }
+
+  deletecomment({e, ctx, actiondelete}) async {
+    await deletecommentT(
+        ctx: ctx,
+        actiondelete: () => dbController.deletecomment(
+            table: 'users_tasks_comments',
+            commentIdname: 'utc_id',
+            commentId: Comment.Ee['utc_id'],
+            maintableidname: e['task_id'],
+            maintablename: 'tasks'));
+  }
+
+  editcomment() {}
 }

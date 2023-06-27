@@ -222,17 +222,7 @@ class Whattodo extends StatelessWidget {
               ? true
               : false,
           'icon': Icons.edit,
-          'action': () async {
-            commentcontrolleredit.text = commenttext;
-            await mainController.editcomment(
-              page: Whattodo,
-              ctx: ctx,
-              errorcomment: errorcomment,
-              commentid: commentid,
-              editcommentwait: editcommentwait,
-              commentcontrolleredit: commentcontrolleredit,
-            );
-          },
+          'action': () async {},
           'color': Colors.grey
         }
       ];

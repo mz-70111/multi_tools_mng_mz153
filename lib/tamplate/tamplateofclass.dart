@@ -208,24 +208,30 @@ showADDEDITINFO({
 }
 
 class Comment extends StatelessWidget {
-  const Comment(
-      {super.key,
-      required this.table,
-      required this.comment,
-      required this.deletecomment,
-      required this.editcomment,
-      required this.e,
-      required this.tableId,
-      required this.tableIdname});
-  final String table, tableIdname;
-  final int tableId;
+  const Comment({
+    super.key,
+    required this.table,
+    required this.comment,
+    required this.deletecomment,
+    required this.editcomment,
+    required this.e,
+    required this.tableId,
+    required this.tableIdname,
+    required this.userIdname,
+    required this.officeId,
+  });
+  final String table, tableIdname, userIdname;
+  final int tableId, officeId;
   final List<Map> comment;
   final Function deletecomment;
   final Function editcomment;
   final e;
+  static var Ee;
+  static bool wait = false;
+  static String? errmsg;
+  static TextEditingController commentcontrolleredit = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    DBController dbController = Get.find();
     return FutureBuilder(future: Future(() async {
       try {
         return await getcommenttable(
@@ -242,58 +248,152 @@ class Comment extends StatelessWidget {
         {'icon': Icons.delete, 'action': () => deletecomment()},
         {'icon': Icons.edit, 'action': () => editcomment()}
       ];
-
-      return ExpansionTile(title: const Text("التعليقات"), children: [
-        ...comment.map((e) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(border: Border.all()),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Visibility(
-                        visible:
-                            checkifUserisSame(userId: e['utc_user_id']) == true
-                                ? true
-                                : false,
-                        child: Row(
-                            children: editcommentpanel
-                                .map((e) => IconButton(
-                                    onPressed: e['action'],
-                                    icon: Icon(
-                                      e['icon'],
-                                      size: 15,
-                                      color: Colors.grey,
-                                    )))
-                                .toList()),
-                      ),
-                      Text(
-                        e['utc_user_id'] != null
-                            ? "${DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == e['utc_user_id'])]['fullname']}"
-                            : "حساب محذوف",
-                        softWrap: true,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    "${e['comments']}",
-                    softWrap: true,
-                  ),
-                  Text(
-                    " ${df.DateFormat("yyyy-MM-dd | HH:mm").format(e['commentdate'])}",
-                    softWrap: true,
-                  ),
-                ],
+      if (snap.hasData) {
+        return ExpansionTile(title: const Text("التعليقات"), children: [
+          ...comment.map((e) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(border: Border.all()),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Visibility(
+                          visible: checkifUserisSame(userId: e[userIdname]) ==
+                                      true ||
+                                  checkifUserisSupervisorinOffice(
+                                          officeid: officeId) ==
+                                      true ||
+                                  checkifUserisAdmin() == true
+                              ? true
+                              : false,
+                          child: Row(
+                              children: editcommentpanel.map((ed) {
+                            Ee = e;
+                            return Visibility(
+                              visible: ed['icon'] == Icons.delete
+                                  ? true
+                                  : checkifUserisSame(userId: e[userIdname]) ==
+                                          true
+                                      ? true
+                                      : false,
+                              child: IconButton(
+                                  onPressed: ed['action'],
+                                  icon: Icon(
+                                    ed['icon'],
+                                    size: 15,
+                                    color: Colors.grey,
+                                  )),
+                            );
+                          }).toList()),
+                        ),
+                        Text(
+                          e[userIdname] != null
+                              ? "${DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == e['utc_user_id'])]['fullname']}"
+                              : "حساب محذوف",
+                          softWrap: true,
+                        ),
+                      ],
+                    ),
+                    Text(
+                      "${e['comments']}",
+                      softWrap: true,
+                    ),
+                    Text(
+                      " ${df.DateFormat("yyyy-MM-dd | HH:mm").format(e['commentdate'])}",
+                      softWrap: true,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        })
-      ]);
+            );
+          })
+        ]);
+      } else {
+        return const ExpansionTile(
+            title: Text("التعليقات"),
+            children: [Text("لا يمكن الوصول للمخدم")]);
+      }
     });
   }
+}
+
+deletecommentT({e, ctx, actiondelete}) {
+  MainController mainController = Get.find();
+  showDialog(
+      context: ctx,
+      builder: (_) {
+        return GetBuilder<MainController>(
+          init: mainController,
+          builder: (_) => AlertDialog(
+            scrollable: true,
+            content: Column(
+              children: [
+                const Text("هل أنت متأكد من حذف التعليق"),
+                Visibility(
+                    visible: Comment.errmsg == null ? false : true,
+                    child: Text("${Comment.errmsg}"))
+              ],
+            ),
+            actions: [
+              Visibility(
+                  visible: !Comment.wait,
+                  child: IconButton(
+                      onPressed: () async {
+                        mainController.deletecomment(
+                            actiondeletecomment: () => actiondelete());
+                      },
+                      icon: const Icon(Icons.delete))),
+              Visibility(
+                  visible: Comment.wait,
+                  child: const SizedBox(
+                    width: 100,
+                    child: LinearProgressIndicator(),
+                  ))
+            ],
+          ),
+        );
+      });
+}
+
+editcommentT({e, ctx, actiondelete}) {
+  MainController mainController = Get.find();
+  showDialog(
+      context: ctx,
+      builder: (_) {
+        return GetBuilder<MainController>(
+          init: mainController,
+          builder: (_) => AlertDialog(
+            scrollable: true,
+            content: Column(
+              children: [
+                const Text("هل أنت متأكد من حذف التعليق"),
+                Visibility(
+                    visible: Comment.errmsg == null ? false : true,
+                    child: Text("${Comment.errmsg}"))
+              ],
+            ),
+            actions: [
+              Visibility(
+                  visible: !Comment.wait,
+                  child: IconButton(
+                      onPressed: () async {
+                        mainController.deletecomment(
+                            actiondeletecomment: () => actiondelete());
+                      },
+                      icon: const Icon(Icons.delete))),
+              Visibility(
+                  visible: Comment.wait,
+                  child: const SizedBox(
+                    width: 100,
+                    child: LinearProgressIndicator(),
+                  ))
+            ],
+          ),
+        );
+      });
 }
 
 class WriteComment extends StatelessWidget {
@@ -365,7 +465,8 @@ class MYPAGE extends StatelessWidget {
       required this.actionDelete,
       required this.items,
       required this.itemsResult,
-      required this.itemsWidget});
+      required this.itemsWidget,
+      required this.subeditvisible});
   final List<Map> mylista;
   final String table, tableId, addlabel;
   final Type page;
@@ -381,8 +482,10 @@ class MYPAGE extends StatelessWidget {
       actionSave,
       actionEdit,
       actionDelete,
-      itemsWidget;
-  final bool mainAddvisible, mainEditvisible;
+      itemsWidget,
+      mainEditvisible,
+      subeditvisible;
+  final bool mainAddvisible;
   final ScrollController scrollController;
   //static
   static DateTime sortbydatebegin = DateTime.parse('2022-10-01');
@@ -431,16 +534,6 @@ class MYPAGE extends StatelessWidget {
                                     child: const Icon(Icons.refresh))
                               ]));
                         } else {
-                          if (checkifUserisinAnyOffice() == false &&
-                              page == Whattodo) {
-                            Future(() => mainController.snakbar(context,
-                                'لست عضوا في اي مكتب لا يمكنك اضافة إجرايئات'));
-                          } else if (checkifUserisSupervisorinAnyOffice() ==
-                                  false &&
-                              page == Tasks) {
-                            Future(() => mainController.snakbar(context,
-                                'لست مشرفا في اي مكتب لا يمكنك اضافة مهام'));
-                          }
                           return GetBuilder<MainController>(
                               init: mainController,
                               builder: (_) {
@@ -609,8 +702,10 @@ class MYPAGE extends StatelessWidget {
                                                             eE = e;
                                                             infoEditItemWidget(
                                                               page: page,
-                                                              mainEditvisible:
-                                                                  mainEditvisible,
+                                                              mainEditvisible: () =>
+                                                                  mainEditvisible(),
+                                                              subeditvisible: () =>
+                                                                  subeditvisible(),
                                                               e: e,
                                                               ctx: context,
                                                               scrollController:
@@ -705,7 +800,12 @@ checkifUserisUserinOffice({officeid}) {
   bool result = false;
   for (var j in DB.userstable) {
     for (var l = 0; l < j['office'].length; l++) {
-      if (j['office'][l] == officeid && j['privilege'][l] == 'موظف') {
+      if (j['office'][l] == officeid &&
+          j['privilege'][l] == 'موظف' &&
+          DB.userstable[DB.userstable.indexWhere(
+                      (element) => element['username'] == Home.logininfo)]
+                  ['user_id'] ==
+              j['user_id']) {
         result = true;
       }
     }
@@ -741,7 +841,12 @@ checkifUserisSupervisorinOffice({officeid}) {
   bool result = false;
   for (var j in DB.userstable) {
     for (var l = 0; l < j['office'].length; l++) {
-      if (j['office'][l] == officeid && j['privilege'][l] == 'مشرف') {
+      if (j['office'][l] == officeid &&
+          j['privilege'][l] == 'مشرف' &&
+          DB.userstable[DB.userstable.indexWhere(
+                      (element) => element['username'] == Home.logininfo)]
+                  ['user_id'] ==
+              j['user_id']) {
         result = true;
       }
     }
@@ -972,13 +1077,14 @@ class Editpanel extends StatelessWidget {
       required this.actionSave,
       required this.e,
       required this.mainEditvisible,
-      required this.page});
+      required this.page,
+      required this.subeditvisible});
   final Function actionDelete, actionEdit, actionSave;
   final e;
   static String? errormsg;
   static bool wait = false, savevisible = false;
   final page;
-  final bool mainEditvisible;
+  final Function mainEditvisible, subeditvisible;
   @override
   Widget build(BuildContext context) {
     List edititems() => [
@@ -994,14 +1100,14 @@ class Editpanel extends StatelessWidget {
             'color': Colors.redAccent
           },
           {
-            'visible0': true,
+            'visible0': subeditvisible(),
             'visible': !savevisible,
             'icon': Icons.edit,
             'action': () => actionEdit(),
             'color': Colors.indigoAccent
           },
           {
-            'visible0': true,
+            'visible0': subeditvisible(),
             'visible': savevisible,
             'icon': Icons.save,
             'action': () => actionSave(),
@@ -1009,7 +1115,7 @@ class Editpanel extends StatelessWidget {
           }
         ];
     return Visibility(
-      visible: mainEditvisible,
+      visible: mainEditvisible(),
       child: Row(
         children: [
           Visibility(
@@ -1085,7 +1191,8 @@ infoEditItemWidget(
     savevisible0,
     editvisible0,
     deletevisible0,
-    page}) {
+    page,
+    subeditvisible}) {
   MainController mainController = Get.find();
   initialdataforEdit(
       customInitdataforEdit: customInitforEdit, textfeildlista: textfeildlista);
@@ -1097,6 +1204,7 @@ infoEditItemWidget(
             init: mainController,
             builder: (_) => ADDEDITINFOItem(
               editpanel: Editpanel(
+                  subeditvisible: subeditvisible,
                   mainEditvisible: mainEditvisible,
                   actionDelete: actionDelete,
                   actionEdit: actionEdit,
@@ -1165,63 +1273,70 @@ class UserName extends StatelessWidget {
     );
   }
 
-  static var userindex = DB.userstable
-      .indexWhere((element) => element['username'] == Home.logininfo);
   getprivileges() {
-    List priv = DB.userstable[userindex]['privilege'];
-    List off = DB.userstable[userindex]['office'];
+    List priv = DB.userstable[DB.userstable
+            .indexWhere((element) => element['username'] == Home.logininfo)]
+        ['privilege'];
+    List off = DB.userstable[DB.userstable
+            .indexWhere((element) => element['username'] == Home.logininfo)]
+        ['office'];
     String p = '';
     for (var i = 0; i < priv.length; i++) {
       p +=
           "\n    * ${priv[i]} ${off[i] == '=' ? '' : off[i] == '_' ? '' : DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == off[i])]['officename']}";
     }
+    DB.userstable[DB.userstable.indexWhere(
+                    (element) => element['username'] == Home.logininfo)]
+                ['addping'] ==
+            1
+        ? p += "\n -إضافة بينغ"
+        : null;
+    DB.userstable[DB.userstable.indexWhere(
+                (element) => element['username'] == Home.logininfo)]['pbx'] ==
+            1
+        ? p += "\n -وصول لتسجيلات المقسم"
+        : null;
+    DB.userstable[DB.userstable.indexWhere(
+                    (element) => element['username'] == Home.logininfo)]
+                ['addtodo'] ==
+            1
+        ? p += "\n -إضافة إجرائية"
+        : null;
     return p;
   }
 
-  static List infoList = [
-    [
-      'اسم المستخدم',
-      TextEditingController(text: DB.userstable[userindex]['username']),
-      true
-    ],
-    [
-      'الاسم الكامل',
-      TextEditingController(text: DB.userstable[userindex]['fullname']),
-      false
-    ],
-    [
-      'الايميل',
-      TextEditingController(text: DB.userstable[userindex]['email']),
-      false
-    ],
-    [
-      'الموبايل',
-      TextEditingController(text: DB.userstable[userindex]['mobile']),
-      false
-    ],
-  ];
+  static List infoList = [];
   showinfo({ctx}) {
     UserName.infoList.clear();
-
     infoList = [
       [
         'اسم المستخدم',
-        TextEditingController(text: DB.userstable[userindex]['username']),
+        TextEditingController(
+            text: DB.userstable[DB.userstable.indexWhere(
+                    (element) => element['username'] == Home.logininfo)]
+                ['username']),
         true
       ],
       [
         'الاسم الكامل',
-        TextEditingController(text: DB.userstable[userindex]['fullname']),
+        TextEditingController(
+            text: DB.userstable[DB.userstable.indexWhere(
+                    (element) => element['username'] == Home.logininfo)]
+                ['fullname']),
         false
       ],
       [
         'الايميل',
-        TextEditingController(text: DB.userstable[userindex]['email']),
+        TextEditingController(
+            text: DB.userstable[DB.userstable.indexWhere(
+                (element) => element['username'] == Home.logininfo)]['email']),
         false
       ],
       [
         'الموبايل',
-        TextEditingController(text: DB.userstable[userindex]['mobile']),
+        TextEditingController(
+            text: DB.userstable[DB.userstable.indexWhere(
+                (element) => element['username'] == Home.logininfo)]['mobile']),
         false
       ],
     ];
@@ -1255,13 +1370,24 @@ class UserName extends StatelessWidget {
                                         fullname: infoList[1][1].text ?? '_',
                                         email: infoList[2][1].text,
                                         mobile: infoList[3][1].text,
-                                        id: DB.userstable[userindex]
-                                            ['user_id']);
-                                    DB.userstable[userindex]['fullname'] =
+                                        id: DB.userstable[DB.userstable
+                                            .indexWhere((element) =>
+                                                element['username'] ==
+                                                Home.logininfo)]['user_id']);
+                                    DB.userstable[DB.userstable.indexWhere(
+                                            (element) =>
+                                                element['username'] ==
+                                                Home.logininfo)]['fullname'] =
                                         infoList[1][1].text;
-                                    DB.userstable[userindex]['email'] =
+                                    DB.userstable[DB.userstable.indexWhere(
+                                            (element) =>
+                                                element['username'] ==
+                                                Home.logininfo)]['email'] =
                                         infoList[2][1].text;
-                                    DB.userstable[userindex]['mobile'] =
+                                    DB.userstable[DB.userstable.indexWhere(
+                                            (element) =>
+                                                element['username'] ==
+                                                Home.logininfo)]['mobile'] =
                                         infoList[3][1].text;
                                     Get.back();
                                   } catch (e) {
@@ -1289,58 +1415,13 @@ class UserName extends StatelessWidget {
                             textEditingController: e[1],
                             onChanged: (x) => null,
                             readonly: e[2],
-                          ))
+                          )),
+                      Text("${getprivileges()}")
                     ]),
               ),
             ),
           );
         });
-  }
-}
-
-//editcommentpanel
-class EditPanelComment extends StatelessWidget {
-  const EditPanelComment(
-      {super.key,
-      required this.actiondeleteComment,
-      required this.actioneditComment,
-      required this.commentOwner});
-  final Function actiondeleteComment;
-  final Function actioneditComment;
-  final String commentOwner;
-  @override
-  Widget build(BuildContext context) {
-    List editcommentitems() => [
-          {
-            'visible': true,
-            'icon': Icons.delete,
-            'action': () => actiondeleteComment(),
-            'color': Colors.grey
-          },
-          {
-            'visible': DB.userstable[DB.userstable.indexWhere(
-                            (element) => element['username'] == Home.logininfo)]
-                        ['fullname'] ==
-                    commentOwner
-                ? true
-                : false,
-            'icon': Icons.edit,
-            'action': () => actioneditComment(),
-            'color': Colors.grey
-          }
-        ];
-    return Row(
-      children: editcommentitems()
-          .map((c) => Visibility(
-              visible: c['visible'],
-              child: IconButton(
-                  onPressed: c['action'],
-                  icon: Icon(
-                    c['icon'],
-                    color: c['color'],
-                  ))))
-          .toList(),
-    );
   }
 }
 
@@ -1373,14 +1454,16 @@ getlogin() {
 }
 
 getofficeUsers({required List list, officeid}) async {
-  var t = await DB().customquery(
-      query:
-          'select uf_user_id from users_office where uf_office_id=$officeid');
-  list.clear();
-  for (var j in t) {
-    list.add(DB.userstable[DB.userstable
-        .indexWhere((element) => element['user_id'] == j[0])]['fullname']);
-  }
+  try {
+    var t = await DB().customquery(
+        query:
+            'select uf_user_id from users_office where uf_office_id=$officeid');
+    list.clear();
+    for (var j in t) {
+      list.add(DB.userstable[DB.userstable
+          .indexWhere((element) => element['user_id'] == j[0])]['fullname']);
+    }
+  } catch (e) {}
   return list;
 }
 

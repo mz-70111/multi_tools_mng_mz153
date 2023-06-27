@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
+import 'package:users_tasks_mz_153/main.dart';
 import 'package:users_tasks_mz_153/pages/00_login.dart';
 import 'package:users_tasks_mz_153/pages/01_homepage.dart';
 import 'package:users_tasks_mz_153/pages/02_home.dart';
@@ -194,58 +195,6 @@ class MainController extends GetxController {
   taskduration(x) {
     Tasks.duration = x;
     update();
-  }
-
-  deletecommenttodo({required ctx, id, commintid, index}) async {
-    String errormsg = '';
-    showDialog(
-        context: ctx,
-        builder: (_) {
-          MainController mainController = Get.find();
-          return Directionality(
-              textDirection: TextDirection.rtl,
-              child: GetBuilder<MainController>(
-                  init: mainController,
-                  builder: (_) {
-                    return AlertDialog(
-                      scrollable: true,
-                      title: const Text('هل أنت متأكد من حذف التعليق'),
-                      actions: [
-                        Column(
-                          children: [
-                            Text(errormsg),
-                            Row(
-                              children: [
-                                Visibility(
-                                    visible: !Whattodo.deletewait,
-                                    child: IconButton(
-                                        onPressed: () async {
-                                          Whattodo.deletewait = true;
-                                          errormsg = '';
-                                          update();
-                                          try {
-                                            await DBController()
-                                                .deletecommenttodo(
-                                                    commentid: commintid);
-                                            Get.back();
-                                          } catch (e) {
-                                            errormsg = "$e";
-                                          }
-                                          Whattodo.deletewait = false;
-                                          update();
-                                        },
-                                        icon: const Icon(Icons.delete))),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Visibility(
-                            visible: Whattodo.deletewait,
-                            child: const CircularProgressIndicator())
-                      ],
-                    );
-                  }));
-        });
   }
 
   rate(index, ratting, userid, todoid) async {
@@ -1239,7 +1188,6 @@ class MainController extends GetxController {
         Tasks.usersfortaskswidget.add({'i': 0, 'name': Tasks.usersfortasks[0]});
       }
     } catch (e) {
-      print(e);
       Editpanel.errormsg = AddPanel.errormsg = "لايمكن الوصول للمخدم";
     }
     update();
@@ -1262,78 +1210,23 @@ class MainController extends GetxController {
     update();
   }
 
-  editcomment(
-      {ctx,
-      errorcomment,
-      commentcontrolleredit,
-      editcommentwait,
-      editcommentaction,
-      commentid,
-      page}) async {
-    DBController dbController = Get.find();
-    MainController mainController = Get.find();
-    showDialog(
-        context: ctx,
-        builder: (_) {
-          return GetBuilder<MainController>(
-            init: mainController,
-            builder: (_) => AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFieldMZ(
-                      onChanged: (x) => null,
-                      label: "",
-                      textEditingController: commentcontrolleredit,
-                      error: errorcomment),
-                ],
-              ),
-              actions: [
-                Visibility(
-                    visible: !editcommentwait,
-                    child: IconButton(
-                        onPressed: () async {
-                          errorcomment = null;
-                          if (commentcontrolleredit.text.isEmpty) {
-                            errorcomment = "لايمكن أن يكون فارغا";
-                            update();
-                          } else {
-                            try {
-                              editcommentwait = true;
-                              update();
-                              page == Tasks
-                                  ? await dbController.editcommenttask(
-                                      comment: Tasks.commentcontrolleredit.text,
-                                      id: commentid)
-                                  : page == Whattodo
-                                      ? await dbController.editcommenttodo(
-                                          comment: Whattodo
-                                              .commentcontrolleredit.text,
-                                          id: commentid)
-                                      : null;
-                              Get.back();
-                            } catch (e) {
-                              errorcomment = "لايمكن الوصول للمخدم";
-                              update();
-                            }
-                            editcommentwait = false;
-                            update();
-                          }
-                        },
-                        icon: const Icon(Icons.edit))),
-                Visibility(
-                    visible: editcommentwait,
-                    child: const LinearProgressIndicator())
-              ],
-            ),
-          );
-        });
-
+  taskstatuschg(x) async {
+    Tasks.taskstatus = x;
     update();
   }
 
-  taskstatuschg(x) async {
-    Tasks.taskstatus = x;
+  deletecomment({e, required Function actiondeletecomment}) async {
+    Comment.errmsg = null;
+    try {
+      Comment.wait = true;
+      update();
+      await Future.delayed(Duration(seconds: 2));
+      await actiondeletecomment();
+    } catch (e) {
+      // Comment.errmsg = 'لايمكن الوصول للمخدم';
+      Comment.errmsg = "$e";
+    }
+    Comment.wait = false;
     update();
   }
 

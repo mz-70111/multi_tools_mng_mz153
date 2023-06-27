@@ -581,7 +581,6 @@ $taskid,
 "${DateTime.now()}"
 );
 ''');
-
     await gettable(list: Tasks.mylista, table: 'tasks', tableid: 'task_id');
     update();
   }
@@ -682,19 +681,17 @@ delete from users_office where uf_user_id=$id;''');
     update();
   }
 
-  deletecommenttodo({commentid}) async {
+  deletecomment(
+      {e,
+      table,
+      commentIdname,
+      commentId,
+      maintablename,
+      maintableidname}) async {
     await DB().customquery(query: '''
-delete from users_todo_comments where utdc_id=$commentid;''');
-    await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
-
-    update();
-  }
-
-  deletecommenttask({commentid}) async {
-    await DB().customquery(query: '''
-delete from users_tasks_comments where where utc_id=$commentid;''');
-
-    await gettable(list: Tasks.mylista, table: 'tasks', tableid: 'task_id');
+delete from $table where $commentIdname=$commentId;''');
+    await gettable(
+        list: Whattodo.mylista, table: maintablename, tableid: maintableidname);
   }
 
   edituser({id}) async {
@@ -820,12 +817,13 @@ where utdc_id=$id
     update();
   }
 
-  editcommenttask({comment, id}) async {
+  editcommenttask({id}) async {
     await DB().customquery(query: '''
 update users_tasks_comments set
-comments="$comment"
+comments="${Tasks.commentcontrolleredit.text}"
 where utc_id=$id;
 ''');
+    print(Tasks.commentcontrolleredit.text);
     await gettable(list: Tasks.mylista, table: 'tasks', tableid: 'task_id');
     Home.searchlist = [
       ...DB.officetable,
