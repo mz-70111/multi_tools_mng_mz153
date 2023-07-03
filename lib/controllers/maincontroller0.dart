@@ -37,13 +37,14 @@ class MainController extends GetxController {
     }
     PersonPanel.dropend = PersonPanel.dropend == 0.0 ? -150.0 : 0.0;
     MoreTools.dropend = 1000;
-
+    Get.back();
     update();
   }
 
   notifilistshow() {
     Notificationm.dropend = Notificationm.dropend == 0.0 ? -150.0 : 0.0;
     MoreTools.dropend = 1000;
+    Get.back();
     update();
   }
 
@@ -55,6 +56,7 @@ class MainController extends GetxController {
         MoreTools.dropend == 0.0 ? MediaQuery.of(ctx).size.height : 0.0;
     Notificationm.dropend = -150.0;
     PersonPanel.dropend = -150.0;
+    Get.back();
     update();
   }
 
@@ -80,6 +82,7 @@ class MainController extends GetxController {
   }
 
   navbar(x) async {
+    Get.back();
     for (var i in BottomNBMZ.pageslist) {
       i['color'] = [
         Colors.transparent,
@@ -412,12 +415,15 @@ class MainController extends GetxController {
       listofFeildmz,
       itemnameController,
       required ScrollController scrollcontroller}) async {
+    for (var i in listofFeildmz) {
+      i['error'] = null;
+    }
     var checkdublicateoffice = false;
     bool duplicateCheck = true;
     AddPanel.errormsg = null;
     if (itemnameController.isEmpty) {
       listofFeildmz[0]['error'] = 'لا يمكن ان يكون الاسم فارغا';
-      scrollcontroller.jumpTo(scrollcontroller.position.minScrollExtent);
+      scrollcontroller.jumpTo(0);
     } else if (page == Office) {
       try {
         AddPanel.wait = true;
@@ -717,6 +723,9 @@ class MainController extends GetxController {
   }
 
   editItemMainController({e, page, listofFeildmz}) async {
+    for (var i in listofFeildmz) {
+      i['error'] = null;
+    }
     var checkdublicateoffice = false;
     var checkdublicateuseroftask = false;
     Editpanel.errormsg = null;
@@ -1172,7 +1181,7 @@ class MainController extends GetxController {
     update();
   }
 
-  addusertotask({userid}) async {
+  addusertotask({userid, required ScrollController scrollcontroller}) async {
     Editpanel.errormsg = AddPanel.errormsg = null;
     Tasks.usersfortasks.clear();
     try {
@@ -1186,6 +1195,8 @@ class MainController extends GetxController {
             'لايوجد اي موظف في المكتب الذي تملك صلاحية الاشراف عليه';
       } else {
         Tasks.usersfortaskswidget.add({'i': 0, 'name': Tasks.usersfortasks[0]});
+        scrollcontroller
+            .jumpTo(scrollcontroller.position.maxScrollExtent + 100);
       }
     } catch (e) {
       Editpanel.errormsg = AddPanel.errormsg = "لايمكن الوصول للمخدم";
@@ -1217,14 +1228,29 @@ class MainController extends GetxController {
 
   deletecomment({e, required Function actiondeletecomment}) async {
     Comment.errmsg = null;
+    update();
     try {
       Comment.wait = true;
       update();
-      await Future.delayed(Duration(seconds: 2));
       await actiondeletecomment();
+      Get.back();
     } catch (e) {
-      // Comment.errmsg = 'لايمكن الوصول للمخدم';
-      Comment.errmsg = "$e";
+      Comment.errmsg = 'لايمكن الوصول للمخدم';
+    }
+    Comment.wait = false;
+    update();
+  }
+
+  editcomment({e, required Function actioneditcomment}) async {
+    Comment.errmsg = null;
+    update();
+    try {
+      Comment.wait = true;
+      update();
+      await actioneditcomment();
+      Get.back();
+    } catch (e) {
+      Comment.errmsg = 'لايمكن الوصول للمخدم';
     }
     Comment.wait = false;
     update();
@@ -1414,7 +1440,6 @@ class MainController extends GetxController {
   //choosedate
   choosedate({ctx, beginorend, officeid}) async {
     DBController dbController = Get.find();
-
     DateTime? date = await showDatePicker(
         context: ctx,
         initialDate: DateTime.now(),
@@ -1422,8 +1447,8 @@ class MainController extends GetxController {
         lastDate: DateTime.now());
     if (date != null) {
       beginorend == 'begin'
-          ? MYPAGE.sortbydatebegin = date
-          : MYPAGE.sortbydateend = date;
+          ? Tasks.sortbydatebegin = date
+          : Tasks.sortbydateend = date;
     }
     Home.selectall = false;
 
@@ -1431,8 +1456,8 @@ class MainController extends GetxController {
       if (i.keys.toList().first == 'office_id' && i['check'] == true) {
         for (var j in Home.searchlist) {
           if (j['task_office_id'] == i['office_id']) {
-            if (MYPAGE.sortbydatebegin.isBefore(j['createdate']) &&
-                MYPAGE.sortbydateend
+            if (Tasks.sortbydatebegin.isBefore(j['createdate']) &&
+                Tasks.sortbydateend
                     .add(const Duration(days: 1))
                     .isAfter(j['createdate'])) {
               j['check'] = true;
@@ -1451,8 +1476,8 @@ class MainController extends GetxController {
         if (withoutoffice == 0) {
           for (var j in Home.searchlist) {
             if (j.keys.toList().first == 'task_id') {
-              if (MYPAGE.sortbydatebegin.isBefore(j['createdate']) &&
-                  MYPAGE.sortbydateend
+              if (Tasks.sortbydatebegin.isBefore(j['createdate']) &&
+                  Tasks.sortbydateend
                       .add(const Duration(days: 1))
                       .isAfter(j['createdate'])) {
                 j['check'] = true;

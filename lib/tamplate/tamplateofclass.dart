@@ -182,31 +182,6 @@ class Usersoftasks extends StatelessWidget {
   }
 }
 
-showADDEDITINFO({
-  required context,
-  required begin,
-  required end,
-  required content,
-  required listofFeildmz,
-  dialogend,
-}) {
-  return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) {
-        dialogend = 0;
-        return TweenMZ.translatey(
-            begin: begin,
-            end: end,
-            duration: 300,
-            child0: Directionality(
-                textDirection: TextDirection.rtl,
-                child: AlertDialog(
-                  content: content,
-                )));
-      });
-}
-
 class Comment extends StatelessWidget {
   const Comment({
     super.key,
@@ -320,7 +295,7 @@ class Comment extends StatelessWidget {
   }
 }
 
-deletecommentT({e, ctx, actiondelete}) {
+deletecommentT({ctx, actiondelete}) {
   MainController mainController = Get.find();
   showDialog(
       context: ctx,
@@ -358,7 +333,7 @@ deletecommentT({e, ctx, actiondelete}) {
       });
 }
 
-editcommentT({e, ctx, actiondelete}) {
+editcommentT({ctx, actionedit, controller}) {
   MainController mainController = Get.find();
   showDialog(
       context: ctx,
@@ -369,7 +344,13 @@ editcommentT({e, ctx, actiondelete}) {
             scrollable: true,
             content: Column(
               children: [
-                const Text("هل أنت متأكد من حذف التعليق"),
+                TextFieldMZ(
+                    maxlines: 2,
+                    label: "تعديل التعليق",
+                    textEditingController: controller,
+                    onChanged: (x) {
+                      null;
+                    }),
                 Visibility(
                     visible: Comment.errmsg == null ? false : true,
                     child: Text("${Comment.errmsg}"))
@@ -380,10 +361,10 @@ editcommentT({e, ctx, actiondelete}) {
                   visible: !Comment.wait,
                   child: IconButton(
                       onPressed: () async {
-                        mainController.deletecomment(
-                            actiondeletecomment: () => actiondelete());
+                        mainController.editcomment(
+                            actioneditcomment: () => actionedit());
                       },
-                      icon: const Icon(Icons.delete))),
+                      icon: const Icon(Icons.save))),
               Visibility(
                   visible: Comment.wait,
                   child: const SizedBox(
@@ -488,8 +469,7 @@ class MYPAGE extends StatelessWidget {
   final bool mainAddvisible;
   final ScrollController scrollController;
   //static
-  static DateTime sortbydatebegin = DateTime.parse('2022-10-01');
-  static DateTime sortbydateend = DateTime.now();
+
   static String selectedOffice = "جميع المكاتب";
   static double dialogeBegin = 1000;
   static double dialogeEnd = 0;
@@ -561,9 +541,6 @@ class MYPAGE extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
-                                      SizedBox(
-                                          height:
-                                              AppBar().preferredSize.height),
                                       Row(
                                         children: [
                                           Visibility(
@@ -634,7 +611,7 @@ class MYPAGE extends StatelessWidget {
                                                           icon: const Icon(
                                                               Icons.date_range),
                                                           label: Text(
-                                                            "من ${df.DateFormat('yyyy-MM-dd').format(sortbydatebegin)}",
+                                                            "من ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydatebegin)}",
                                                             style:
                                                                 const TextStyle(
                                                                     fontSize:
@@ -654,7 +631,7 @@ class MYPAGE extends StatelessWidget {
                                                                 Icons
                                                                     .date_range),
                                                             label: Text(
-                                                              "إلى ${df.DateFormat('yyyy-MM-dd').format(sortbydateend)}",
+                                                              "إلى ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydateend)}",
                                                               style:
                                                                   const TextStyle(
                                                                       fontSize:
@@ -769,7 +746,6 @@ class MYPAGE extends StatelessWidget {
                                   child: const Icon(Icons.add),
                                 ),
                               ))),
-                      Positioned(top: 0, right: 0, child: UserName()),
 
                       //moretools
                       Positioned(bottom: 0, left: 0, child: MoreTools()),
@@ -905,23 +881,18 @@ class ADDEDITINFOItem extends StatelessWidget {
   final ScrollController scrollController;
   final bool editpanelvisible;
   static bool addeditvisible = true;
+  static bool firstpage = true;
   @override
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      child: GetBuilder<MainController>(
+        init: mainController,
+        builder: (_) => Column(children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                onPressed: () {
-                  Get.back();
-                },
-                icon: const Icon(Icons.arrow_back),
-              ),
               Visibility(
                   visible: editpanelvisible,
                   child: Expanded(
@@ -939,16 +910,23 @@ class ADDEDITINFOItem extends StatelessWidget {
             ],
           ),
           const Divider(),
-          Expanded(
-            child: SingleChildScrollView(
-              controller: scrollController,
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                ...textFeildmzlista
-                    .map((e) => Visibility(
+          Visibility(
+            visible: firstpage,
+            child: Expanded(
+              child: GridView(
+                  padding: const EdgeInsets.all(8),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    mainAxisExtent: 90,
+                    mainAxisSpacing: 0,
+                    crossAxisSpacing: 0,
+                    maxCrossAxisExtent: 600,
+                  ),
+                  children: [
+                    ...textFeildmzlista.map((e) => Visibility(
                           visible: addeditvisible,
-                          child: GetBuilder<MainController>(
-                            init: mainController,
-                            builder: (_) => TextFieldMZ(
+                          child: SizedBox(
+                            width: 100,
+                            child: TextFieldMZ(
                               onChanged: (x) => null,
                               label: e['label'],
                               textEditingController: e['controller'],
@@ -962,14 +940,23 @@ class ADDEDITINFOItem extends StatelessWidget {
                                   icon: Icon(e['icon'])),
                             ),
                           ),
-                        ))
-                    .toList(),
-                Visibility(visible: addeditvisible, child: customWidget),
-                Visibility(visible: !addeditvisible, child: getinfo()),
-              ]),
+                        )),
+                  ]),
             ),
           ),
-        ],
+          Visibility(
+              visible: addeditvisible,
+              child: Visibility(
+                  visible: !firstpage,
+                  child: Expanded(
+                      child: SingleChildScrollView(child: customWidget)))),
+          Visibility(
+              visible: !addeditvisible,
+              child: Visibility(
+                  visible: firstpage,
+                  child: Expanded(
+                      child: SingleChildScrollView(child: getinfo())))),
+        ]),
       ),
     );
   }
@@ -1046,23 +1033,21 @@ addItemWidget(
   initialdataforAdd(
       textfeildlista: textfeildlista,
       customInitdataforAdd: customInitdataforAdd);
-  showDialog(
+  showBottomSheet(
       context: ctx,
       builder: (_) {
-        return AlertDialog(
-          content: GetBuilder<MainController>(
-            init: mainController,
-            builder: (_) => ADDEDITINFOItem(
-              getinfo: () => const SizedBox(),
-              addpanel: AddPanel(
-                addlabel: addlabel,
-                action: action,
-              ),
-              editpanelvisible: false,
-              textFeildmzlista: textfeildlista,
-              customWidget: customWidgetofADD,
-              scrollController: scrollController,
+        return GetBuilder<MainController>(
+          init: mainController,
+          builder: (_) => ADDEDITINFOItem(
+            getinfo: () => const SizedBox(),
+            addpanel: AddPanel(
+              addlabel: addlabel,
+              action: action,
             ),
+            editpanelvisible: false,
+            textFeildmzlista: textfeildlista,
+            customWidget: customWidgetofADD,
+            scrollController: scrollController,
           ),
         );
       });
@@ -1222,207 +1207,152 @@ infoEditItemWidget(
       });
 }
 
-class UserName extends StatelessWidget {
-  const UserName({super.key});
-  @override
-  Widget build(BuildContext context) {
-    MainController mainController = Get.find();
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.indigoAccent),
-              borderRadius:
-                  BorderRadius.only(bottomLeft: Radius.elliptical(10, 20))),
-          child: Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: GetBuilder<MainController>(
-                init: mainController,
-                builder: (_) => Column(
+getprivileges() {
+  List priv = DB.userstable[DB.userstable
+          .indexWhere((element) => element['username'] == Home.logininfo)]
+      ['privilege'];
+  List off = DB.userstable[DB.userstable
+          .indexWhere((element) => element['username'] == Home.logininfo)]
+      ['office'];
+  String p = '';
+  for (var i = 0; i < priv.length; i++) {
+    p +=
+        "\n    * ${priv[i]} ${off[i] == '=' ? '' : off[i] == '_' ? '' : DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == off[i])]['officename']}";
+  }
+  DB.userstable[DB.userstable.indexWhere(
+              (element) => element['username'] == Home.logininfo)]['addping'] ==
+          1
+      ? p += "\n -إضافة بينغ"
+      : null;
+  DB.userstable[DB.userstable.indexWhere(
+              (element) => element['username'] == Home.logininfo)]['pbx'] ==
+          1
+      ? p += "\n -وصول لتسجيلات المقسم"
+      : null;
+  DB.userstable[DB.userstable.indexWhere(
+              (element) => element['username'] == Home.logininfo)]['addtodo'] ==
+          1
+      ? p += "\n -إضافة إجرائية"
+      : null;
+  return p;
+}
+
+List infoList = [];
+showinfo({ctx}) {
+  MainController mainController = Get.find();
+  mainController.cloasedp();
+  infoList.clear();
+  infoList = [
+    [
+      'اسم المستخدم',
+      TextEditingController(
+          text: DB.userstable[DB.userstable.indexWhere(
+              (element) => element['username'] == Home.logininfo)]['username']),
+      true
+    ],
+    [
+      'الاسم الكامل',
+      TextEditingController(
+          text: DB.userstable[DB.userstable.indexWhere(
+              (element) => element['username'] == Home.logininfo)]['fullname']),
+      false
+    ],
+    [
+      'الايميل',
+      TextEditingController(
+          text: DB.userstable[DB.userstable.indexWhere(
+              (element) => element['username'] == Home.logininfo)]['email']),
+      false
+    ],
+    [
+      'الموبايل',
+      TextEditingController(
+          text: DB.userstable[DB.userstable.indexWhere(
+              (element) => element['username'] == Home.logininfo)]['mobile']),
+      false
+    ],
+  ];
+  DBController dbController = Get.find();
+  String? errormsg;
+  bool wait = false;
+  showDialog(
+      context: ctx,
+      builder: (_) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            scrollable: true,
+            content: GetBuilder<MainController>(
+              init: mainController,
+              builder: (_) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        IconButton(
-                            onPressed: () {
-                              showinfo(ctx: context);
-                            },
-                            icon: const Icon(Icons.info)),
-                        Text(
-                          DB.userstable[DB.userstable.indexWhere((element) =>
-                                  element['username'] == Home.logininfo)]
-                              ['fullname'],
-                          textAlign: TextAlign.center,
+                        Visibility(
+                          visible: !wait,
+                          child: IconButton(
+                              onPressed: () async {
+                                wait = true;
+                                errormsg = '';
+                                mainController.update();
+                                try {
+                                  await dbController.updatepersonalinfo(
+                                      fullname: infoList[1][1].text ?? '_',
+                                      email: infoList[2][1].text,
+                                      mobile: infoList[3][1].text,
+                                      id: DB.userstable[DB.userstable
+                                          .indexWhere((element) =>
+                                              element['username'] ==
+                                              Home.logininfo)]['user_id']);
+                                  DB.userstable[DB.userstable.indexWhere(
+                                          (element) =>
+                                              element['username'] ==
+                                              Home.logininfo)]['fullname'] =
+                                      infoList[1][1].text;
+                                  DB.userstable[DB.userstable.indexWhere(
+                                          (element) =>
+                                              element['username'] ==
+                                              Home.logininfo)]['email'] =
+                                      infoList[2][1].text;
+                                  DB.userstable[DB.userstable.indexWhere(
+                                          (element) =>
+                                              element['username'] ==
+                                              Home.logininfo)]['mobile'] =
+                                      infoList[3][1].text;
+                                  Get.back();
+                                } catch (e) {
+                                  errormsg = 'لا يمكن الوصول للمخدم';
+                                  mainController.update();
+                                }
+                                wait = false;
+                                mainController.update();
+                              },
+                              icon: const Icon(Icons.save)),
                         ),
+                        Visibility(
+                            visible: wait,
+                            child: SizedBox(
+                              width: 100,
+                              child: LinearProgressIndicator(),
+                            )),
+                        Visibility(
+                            visible: errormsg == null ? false : true,
+                            child: Text("$errormsg")),
                       ],
                     ),
-                  ],
-                ),
-              ),
+                    ...infoList.map((e) => TextFieldMZ(
+                          label: "${e[0]}",
+                          textEditingController: e[1],
+                          onChanged: (x) => null,
+                          readonly: e[2],
+                        )),
+                    Text("${getprivileges()}")
+                  ]),
             ),
           ),
-        ),
-        Container(
-          width: 300,
-          height: 10,
-          color: Colors.indigoAccent,
-        ),
-      ],
-    );
-  }
-
-  getprivileges() {
-    List priv = DB.userstable[DB.userstable
-            .indexWhere((element) => element['username'] == Home.logininfo)]
-        ['privilege'];
-    List off = DB.userstable[DB.userstable
-            .indexWhere((element) => element['username'] == Home.logininfo)]
-        ['office'];
-    String p = '';
-    for (var i = 0; i < priv.length; i++) {
-      p +=
-          "\n    * ${priv[i]} ${off[i] == '=' ? '' : off[i] == '_' ? '' : DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == off[i])]['officename']}";
-    }
-    DB.userstable[DB.userstable.indexWhere(
-                    (element) => element['username'] == Home.logininfo)]
-                ['addping'] ==
-            1
-        ? p += "\n -إضافة بينغ"
-        : null;
-    DB.userstable[DB.userstable.indexWhere(
-                (element) => element['username'] == Home.logininfo)]['pbx'] ==
-            1
-        ? p += "\n -وصول لتسجيلات المقسم"
-        : null;
-    DB.userstable[DB.userstable.indexWhere(
-                    (element) => element['username'] == Home.logininfo)]
-                ['addtodo'] ==
-            1
-        ? p += "\n -إضافة إجرائية"
-        : null;
-    return p;
-  }
-
-  static List infoList = [];
-  showinfo({ctx}) {
-    UserName.infoList.clear();
-    infoList = [
-      [
-        'اسم المستخدم',
-        TextEditingController(
-            text: DB.userstable[DB.userstable.indexWhere(
-                    (element) => element['username'] == Home.logininfo)]
-                ['username']),
-        true
-      ],
-      [
-        'الاسم الكامل',
-        TextEditingController(
-            text: DB.userstable[DB.userstable.indexWhere(
-                    (element) => element['username'] == Home.logininfo)]
-                ['fullname']),
-        false
-      ],
-      [
-        'الايميل',
-        TextEditingController(
-            text: DB.userstable[DB.userstable.indexWhere(
-                (element) => element['username'] == Home.logininfo)]['email']),
-        false
-      ],
-      [
-        'الموبايل',
-        TextEditingController(
-            text: DB.userstable[DB.userstable.indexWhere(
-                (element) => element['username'] == Home.logininfo)]['mobile']),
-        false
-      ],
-    ];
-    MainController mainController = Get.find();
-    DBController dbController = Get.find();
-    String? errormsg;
-    bool wait = false;
-    showDialog(
-        context: ctx,
-        builder: (_) {
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: AlertDialog(
-              scrollable: true,
-              content: GetBuilder<MainController>(
-                init: mainController,
-                builder: (_) => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Visibility(
-                            visible: !wait,
-                            child: IconButton(
-                                onPressed: () async {
-                                  wait = true;
-                                  errormsg = '';
-                                  mainController.update();
-                                  try {
-                                    await dbController.updatepersonalinfo(
-                                        fullname: infoList[1][1].text ?? '_',
-                                        email: infoList[2][1].text,
-                                        mobile: infoList[3][1].text,
-                                        id: DB.userstable[DB.userstable
-                                            .indexWhere((element) =>
-                                                element['username'] ==
-                                                Home.logininfo)]['user_id']);
-                                    DB.userstable[DB.userstable.indexWhere(
-                                            (element) =>
-                                                element['username'] ==
-                                                Home.logininfo)]['fullname'] =
-                                        infoList[1][1].text;
-                                    DB.userstable[DB.userstable.indexWhere(
-                                            (element) =>
-                                                element['username'] ==
-                                                Home.logininfo)]['email'] =
-                                        infoList[2][1].text;
-                                    DB.userstable[DB.userstable.indexWhere(
-                                            (element) =>
-                                                element['username'] ==
-                                                Home.logininfo)]['mobile'] =
-                                        infoList[3][1].text;
-                                    Get.back();
-                                  } catch (e) {
-                                    errormsg = 'لا يمكن الوصول للمخدم';
-                                    mainController.update();
-                                  }
-                                  wait = false;
-                                  mainController.update();
-                                },
-                                icon: const Icon(Icons.save)),
-                          ),
-                          Visibility(
-                              visible: wait,
-                              child: SizedBox(
-                                width: 100,
-                                child: LinearProgressIndicator(),
-                              )),
-                          Visibility(
-                              visible: errormsg == null ? false : true,
-                              child: Text("$errormsg")),
-                        ],
-                      ),
-                      ...infoList.map((e) => TextFieldMZ(
-                            label: "${e[0]}",
-                            textEditingController: e[1],
-                            onChanged: (x) => null,
-                            readonly: e[2],
-                          )),
-                      Text("${getprivileges()}")
-                    ]),
-              ),
-            ),
-          );
-        });
-  }
+        );
+      });
 }
 
 //login

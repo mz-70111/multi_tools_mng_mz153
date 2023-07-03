@@ -134,7 +134,7 @@ class Employ extends StatelessWidget {
     };
     Widget customWidgetofADD() => GetBuilder<MainController>(
           init: mainController,
-          builder: (_) => Column(mainAxisSize: MainAxisSize.min, children: [
+          builder: (_) => Column(children: [
             Row(
               children: [
                 Checkbox(

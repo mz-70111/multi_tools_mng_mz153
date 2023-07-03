@@ -6,7 +6,7 @@ import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 class DB {
   DBController dbController = Get.find();
   ConnectionSettings settings = ConnectionSettings(
-      host: '127.0.0.1',
+      host: '192.168.30.8',
       port: 3306,
       user: 'mz',
       password: 'mzrootmz',
@@ -19,7 +19,8 @@ class DB {
       usersOffice = [];
   createuserstable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists users
 (
 user_id int(11) unique primary key auto_increment,
@@ -38,7 +39,8 @@ pbx tinyint(1) default 0
 );
 ''');
     String cpassword = codepassword(word: 'admin');
-    await conn.query('''
+    await conn.query(
+        '''
 insert into users(user_id,username,fullname,password,admin)values(1,'admin','admin','$cpassword',1);
 ''');
     await conn.close();
@@ -46,7 +48,8 @@ insert into users(user_id,username,fullname,password,admin)values(1,'admin','adm
 
   createofficetable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists office
 (
 office_id int(11) unique primary key auto_increment,
@@ -62,7 +65,8 @@ color varchar(255)
 
   createusersofficetable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists users_office
 (
 uf_id int(11) unique primary key auto_increment,
@@ -78,7 +82,8 @@ privilege varchar(255)
 
   createtaskstable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists tasks
 (
 task_id int(11) unique primary key auto_increment,
@@ -106,7 +111,8 @@ foreign key (task_office_id) references office(office_id)
 
   createuserstasktable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists users_tasks
 (
 ut_id int(11) unique primary key auto_increment,
@@ -121,7 +127,8 @@ foreign key (ut_task_id) references tasks(task_id)
 
   createuserstasksCommentstable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists users_tasks_comments
 (
 utc_id int(11) unique primary key auto_increment,
@@ -138,7 +145,8 @@ commentdate TIMESTAMP  NULL DEFAULT NULL
 
   createtodotable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists todo
 (
 todo_id int(11) unique primary key auto_increment,
@@ -155,7 +163,8 @@ foreign key (todo_office_id) references office(office_id)
 
   createuserstodo() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists users_todo
 (
 utd_id int(11) unique primary key auto_increment,
@@ -172,7 +181,8 @@ foreign key (utd_todo_id) references todo(todo_id)
 
   createuserstodoCommentstable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists users_todo_comments
 (
 utdc_id int(11) unique primary key auto_increment,
@@ -189,7 +199,8 @@ commentdate TIMESTAMP  NULL DEFAULT NULL
 
   createuserstodoRatestable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists users_todo_rates
 (
 utdr_id int(11) unique primary key auto_increment,
@@ -212,7 +223,8 @@ rates int(11)
 
   createschedueldtable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists sched
 (
 sched_id int(11) unique primary key auto_increment,
@@ -229,7 +241,8 @@ reminddate int
 
   createuserschedtable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists users_sched
 (
 us_id int(11) unique primary key auto_increment,
@@ -248,7 +261,8 @@ foreign key (us_sched_id) references sched(sched_id)
 
   createuserschedlogtable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
+    await conn.query(
+        '''
 create table if not exists users_sched_log
 (
 us_idlog int(11) unique primary key auto_increment,

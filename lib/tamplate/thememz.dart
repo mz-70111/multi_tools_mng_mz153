@@ -6,7 +6,7 @@ class ThemeMZ {
   static String mode = ThemeController().getmode() ?? 'light';
   IconData modeicon() => mode == 'light' ? Icons.sunny : Icons.dark_mode;
   List<Color> appbarbk() => mode == 'light'
-      ? [Colors.indigoAccent, Colors.indigo, Colors.white]
+      ? [Colors.indigo, Colors.indigoAccent, Colors.indigo]
       : [Colors.indigoAccent, Colors.indigo, Colors.black];
   ThemeData theme() => mode == 'light' ? lthememz : dthememz;
   static homemaincontentwidth(ctx) => Home.searchvis == true

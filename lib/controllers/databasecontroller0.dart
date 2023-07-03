@@ -37,6 +37,7 @@ class DBController extends GetxController {
       // await DB().createuserschedtable();
       // await DB().createuserschedlogtable();
     } catch (e) {
+      print(e);
       "$e".contains('timed out')
           ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
           : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
@@ -682,16 +683,34 @@ delete from users_office where uf_user_id=$id;''');
   }
 
   deletecomment(
-      {e,
-      table,
+      {table, commentIdname, commentId, maintablename, maintableidname}) async {
+    await DB().customquery(query: '''
+delete from $table where $commentIdname=$commentId;''');
+    await gettable(
+        list: Whattodo.mylista, table: maintablename, tableid: maintableidname);
+  }
+
+  editcomment(
+      {table,
+      comment,
       commentIdname,
       commentId,
       maintablename,
       maintableidname}) async {
     await DB().customquery(query: '''
-delete from $table where $commentIdname=$commentId;''');
+update $table set 
+comments="$comment"
+where $commentIdname=$commentId
+''');
     await gettable(
         list: Whattodo.mylista, table: maintablename, tableid: maintableidname);
+    Home.searchlist = [
+      ...DB.officetable,
+      ...DB.userstable,
+      ...DB.tasktable,
+      ...DB.todotable
+    ];
+    update();
   }
 
   edituser({id}) async {
@@ -798,39 +817,6 @@ where office_id=$id;
             .indexWhere((element) => element['office_id'] == id)] =
         Office.mylista[
             Office.mylista.indexWhere((element) => element['office_id'] == id)];
-    update();
-  }
-
-  editcommenttodo({comment, id}) async {
-    await DB().customquery(query: '''
-update users_todo_comments set 
-comments="$comment"
-where utdc_id=$id
-''');
-    await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
-    Home.searchlist = [
-      ...DB.officetable,
-      ...DB.userstable,
-      ...DB.tasktable,
-      ...DB.todotable
-    ];
-    update();
-  }
-
-  editcommenttask({id}) async {
-    await DB().customquery(query: '''
-update users_tasks_comments set
-comments="${Tasks.commentcontrolleredit.text}"
-where utc_id=$id;
-''');
-    print(Tasks.commentcontrolleredit.text);
-    await gettable(list: Tasks.mylista, table: 'tasks', tableid: 'task_id');
-    Home.searchlist = [
-      ...DB.officetable,
-      ...DB.userstable,
-      ...DB.tasktable,
-      ...DB.todotable
-    ];
     update();
   }
 

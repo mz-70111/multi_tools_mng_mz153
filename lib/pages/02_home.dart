@@ -84,9 +84,6 @@ class Home extends StatelessWidget {
                 builder: (_) => Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: AppBar().preferredSize.height,
-                    ),
                     Expanded(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -104,6 +101,12 @@ class Home extends StatelessWidget {
                                             CrossAxisAlignment.start,
                                         children: [
                                           TextFieldMZ(
+                                              suffixIcon: IconButton(
+                                                  onPressed: () {
+                                                    searchbydate(ctx: context);
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.date_range)),
                                               label: "بحث",
                                               onChanged: (x) {
                                                 mainController.search(
@@ -118,62 +121,6 @@ class Home extends StatelessWidget {
                                                       'todoname',
                                                     ]);
                                               }),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                  border: Border.all()),
-                                              child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    const Text(
-                                                        "بحث بحسب التاريخ"),
-                                                    const Text(
-                                                      "مخصص للمهام",
-                                                      style: TextStyle(
-                                                          color: Colors.grey,
-                                                          fontSize: 15),
-                                                    ),
-                                                    TextButton.icon(
-                                                      onPressed: () {
-                                                        mainController
-                                                            .choosedate(
-                                                                ctx: context,
-                                                                beginorend:
-                                                                    'begin');
-                                                        dbController.update();
-                                                      },
-                                                      icon: const Icon(
-                                                          Icons.date_range),
-                                                      label: Text(
-                                                        "من ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydatebegin)}",
-                                                        style: const TextStyle(
-                                                            fontSize: 15),
-                                                      ),
-                                                    ),
-                                                    TextButton.icon(
-                                                        onPressed: () {
-                                                          mainController
-                                                              .choosedate(
-                                                                  ctx: context,
-                                                                  beginorend:
-                                                                      'end');
-                                                          dbController.update();
-                                                        },
-                                                        icon: const Icon(
-                                                            Icons.date_range),
-                                                        label: Text(
-                                                          "إلى ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydateend)}",
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 15),
-                                                        )),
-                                                  ]),
-                                            ),
-                                          ),
                                           Expanded(
                                             child: SingleChildScrollView(
                                               child: Column(
@@ -317,7 +264,6 @@ class Home extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(top: 0, right: 0, child: UserName()),
             Positioned(bottom: 0, left: 0, child: MoreTools()),
             Positioned(left: 0, child: Notificationm()),
             Positioned(left: 0, child: PersonPanel()),
@@ -326,4 +272,51 @@ class Home extends StatelessWidget {
       ),
     );
   }
+}
+
+searchbydate({ctx}) {
+  MainController mainController = Get.find();
+  showDialog(
+      context: ctx,
+      builder: (_) {
+        return AlertDialog(
+          content: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: BoxDecoration(border: Border.all()),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text("بحث بحسب التاريخ"),
+                    const Text(
+                      "مخصص للمهام",
+                      style: TextStyle(color: Colors.grey, fontSize: 15),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        mainController.choosedate(
+                            ctx: ctx, beginorend: 'begin');
+                      },
+                      icon: const Icon(Icons.date_range),
+                      label: Text(
+                        "من ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydatebegin)}",
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                    ),
+                    TextButton.icon(
+                        onPressed: () {
+                          mainController.choosedate(
+                              ctx: ctx, beginorend: 'end');
+                        },
+                        icon: const Icon(Icons.date_range),
+                        label: Text(
+                          "إلى ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydateend)}",
+                          style: const TextStyle(fontSize: 15),
+                        )),
+                  ]),
+            ),
+          ),
+        );
+      });
 }

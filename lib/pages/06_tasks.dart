@@ -47,7 +47,7 @@ class Tasks extends StatelessWidget {
       'obscuretext': false,
       'hint': '',
       'td': TextDirection.rtl,
-      'maxlines': 3
+      'maxlines': 5
     },
   ];
   static DateTime sortbydatebegin = DateTime.parse('2022-10-01');
@@ -109,7 +109,7 @@ class Tasks extends StatelessWidget {
 
     Map addFunction = {
       'action': () => addtask(),
-      'addlabel': 'إضافة حساب جديد',
+      'addlabel': 'إضافة مهمة جديدة',
     };
     Widget customWidgetofADD() => GetBuilder<MainController>(
         init: mainController,
@@ -152,7 +152,8 @@ class Tasks extends StatelessWidget {
                           userid: DB.userstable[DB.userstable.indexWhere(
                                   (element) =>
                                       element['username'] == Home.logininfo)]
-                              ['user_id']);
+                              ['user_id'],
+                          scrollcontroller: scrollController);
                     },
                     icon: const Icon(Icons.add)),
                 const Text("تعيين موظف"),
@@ -343,7 +344,7 @@ class Tasks extends StatelessWidget {
           e: e,
           comment: comment,
           deletecomment: () => deletecomment(ctx: ctx, e: e),
-          editcomment: () => editcomment(),
+          editcomment: () => editcomment(ctx: ctx, e: e),
           table: 'users_tasks_comments',
           tableIdname: 'utc_task_id',
           tableId: e['task_id'],
@@ -470,7 +471,7 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
   deletecomment({e, ctx, actiondelete}) async {
     await deletecommentT(
         ctx: ctx,
-        actiondelete: () => dbController.deletecomment(
+        actiondelete: () async => await dbController.deletecomment(
             table: 'users_tasks_comments',
             commentIdname: 'utc_id',
             commentId: Comment.Ee['utc_id'],
@@ -478,5 +479,17 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
             maintablename: 'tasks'));
   }
 
-  editcomment() {}
+  editcomment({e, ctx, actionedit}) async {
+    commentcontrolleredit.text = Comment.Ee['comments'];
+    await editcommentT(
+        ctx: ctx,
+        controller: commentcontrolleredit,
+        actionedit: () async => await dbController.editcomment(
+            table: 'users_tasks_comments',
+            commentIdname: 'utc_id',
+            commentId: Comment.Ee['utc_id'],
+            maintableidname: e['task_id'],
+            maintablename: 'tasks',
+            comment: commentcontrolleredit.text));
+  }
 }

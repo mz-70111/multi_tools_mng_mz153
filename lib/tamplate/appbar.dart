@@ -9,6 +9,7 @@ import 'package:users_tasks_mz_153/db/database.dart';
 import 'package:users_tasks_mz_153/pages/00_login.dart';
 import 'package:users_tasks_mz_153/pages/01_homepage.dart';
 import 'package:users_tasks_mz_153/pages/02_home.dart';
+import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 import 'package:users_tasks_mz_153/tamplate/thememz.dart';
 import 'package:users_tasks_mz_153/tamplate/tweenmz.dart';
 
@@ -26,6 +27,14 @@ class PersonPanel extends StatelessWidget {
   static double dropend = -150.0;
   static String updatepassworderror = '';
   static List dropdbitem({ctx}) => [
+        {
+          'label': DB.userstable[DB.userstable.indexWhere(
+              (element) => element['username'] == Home.logininfo)]['fullname'],
+          'action': () {
+            showinfo(ctx: ctx);
+          },
+          'size': 150.0
+        },
         {
           'label': 'تغيير كلمة المرور',
           'action': () {
@@ -72,10 +81,15 @@ class PersonPanel extends StatelessWidget {
                                 color: Colors.indigoAccent.withOpacity(0.7),
                                 child: GetBuilder<ThemeController>(
                                   init: themeController,
-                                  builder: (_) => Text(
-                                    e['label'],
-                                    style:
-                                        ThemeMZ().theme().textTheme.labelMedium,
+                                  builder: (_) => Padding(
+                                    padding: EdgeInsets.only(right: 10),
+                                    child: Text(
+                                      e['label'],
+                                      style: ThemeMZ()
+                                          .theme()
+                                          .textTheme
+                                          .labelMedium,
+                                    ),
                                   ),
                                 ),
                               ),
