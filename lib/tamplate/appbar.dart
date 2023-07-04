@@ -55,10 +55,10 @@ class PersonPanel extends StatelessWidget {
   static List dropdbitemz = [];
   @override
   Widget build(BuildContext context) {
-    dropdbitemz = dropdbitem(ctx: context);
     return GetBuilder<MainController>(
         init: mainController,
         builder: (_) {
+          dropdbitemz = dropdbitem(ctx: context);
           return TweenMZ.translatey(
             begin: -150.0,
             end: dropend,

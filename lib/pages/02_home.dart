@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/themeController.dart';
 
@@ -299,9 +300,12 @@ searchbydate({ctx}) {
                             ctx: ctx, beginorend: 'begin');
                       },
                       icon: const Icon(Icons.date_range),
-                      label: Text(
-                        "من ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydatebegin)}",
-                        style: const TextStyle(fontSize: 15),
+                      label: GetBuilder<MainController>(
+                        init: mainController,
+                        builder: (_) => Text(
+                          "من ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydatebegin)}",
+                          style: const TextStyle(fontSize: 15),
+                        ),
                       ),
                     ),
                     TextButton.icon(
@@ -310,13 +314,24 @@ searchbydate({ctx}) {
                               ctx: ctx, beginorend: 'end');
                         },
                         icon: const Icon(Icons.date_range),
-                        label: Text(
-                          "إلى ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydateend)}",
-                          style: const TextStyle(fontSize: 15),
+                        label: GetBuilder<MainController>(
+                          init: mainController,
+                          builder: (_) => Text(
+                              "إلى ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydateend)}",
+                              style: const TextStyle(fontSize: 15)),
                         )),
                   ]),
             ),
           ),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  mainController.setdate();
+
+                  Get.back();
+                },
+                icon: const Icon(Icons.done))
+          ],
         );
       });
 }

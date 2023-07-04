@@ -514,6 +514,16 @@ class MYPAGE extends StatelessWidget {
                                     child: const Icon(Icons.refresh))
                               ]));
                         } else {
+                          if (checkifUserisinAnyOffice() == false &&
+                              page == Whattodo) {
+                            Future(() => mainController.snakbar(context,
+                                'لست عضوا في اي مكتب لا يمكنك اضافة إجرايئات'));
+                          }
+                          if (checkifUserisSupervisorinAnyOffice() == false &&
+                              page == Tasks) {
+                            Future(() => mainController.snakbar(context,
+                                'لست مشرفا في اي مكتب لا يمكنك اضافة مهام'));
+                          }
                           return GetBuilder<MainController>(
                               init: mainController,
                               builder: (_) {
@@ -569,6 +579,18 @@ class MYPAGE extends StatelessWidget {
                                               )),
                                           Expanded(
                                             child: TextFieldMZ(
+                                                suffixIcon: Visibility(
+                                                    visible: page == Tasks ||
+                                                            page == Whattodo
+                                                        ? true
+                                                        : false,
+                                                    child: IconButton(
+                                                        onPressed: () {
+                                                          searchbydate(
+                                                              ctx: context);
+                                                        },
+                                                        icon: Icon(
+                                                            Icons.date_range))),
                                                 label: "بحث",
                                                 onChanged: (word) {
                                                   mainController.search(
@@ -581,63 +603,6 @@ class MYPAGE extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                      Visibility(
-                                          visible:
-                                              page == Tasks || page == Whattodo,
-                                          child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all()),
-                                                  child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        const Text(
-                                                            "بحث بحسب التاريخ"),
-                                                        TextButton.icon(
-                                                          onPressed: () {
-                                                            mainController
-                                                                .choosedate(
-                                                                    ctx:
-                                                                        context,
-                                                                    beginorend:
-                                                                        'begin');
-                                                          },
-                                                          icon: const Icon(
-                                                              Icons.date_range),
-                                                          label: Text(
-                                                            "من ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydatebegin)}",
-                                                            style:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        15),
-                                                          ),
-                                                        ),
-                                                        TextButton.icon(
-                                                            onPressed: () {
-                                                              mainController
-                                                                  .choosedate(
-                                                                      ctx:
-                                                                          context,
-                                                                      beginorend:
-                                                                          'end');
-                                                            },
-                                                            icon: const Icon(
-                                                                Icons
-                                                                    .date_range),
-                                                            label: Text(
-                                                              "إلى ${df.DateFormat('yyyy-MM-dd').format(Tasks.sortbydateend)}",
-                                                              style:
-                                                                  const TextStyle(
-                                                                      fontSize:
-                                                                          15),
-                                                            ))
-                                                      ])))),
                                       Row(children: [
                                         ...mainColumn
                                             .map((e) => Expanded(
@@ -882,6 +847,7 @@ class ADDEDITINFOItem extends StatelessWidget {
   final bool editpanelvisible;
   static bool addeditvisible = true;
   static bool firstpage = true;
+  static String? errormsg;
   @override
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
@@ -889,74 +855,116 @@ class ADDEDITINFOItem extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: GetBuilder<MainController>(
         init: mainController,
-        builder: (_) => Column(children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Visibility(
-                  visible: editpanelvisible,
-                  child: Expanded(
-                      child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: editpanel,
-                  ))),
-              Visibility(
-                  visible: !editpanelvisible,
-                  child: Expanded(
-                      child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: addpanel,
-                  ))),
-            ],
-          ),
-          const Divider(),
-          Visibility(
-            visible: firstpage,
-            child: Expanded(
-              child: GridView(
-                  padding: const EdgeInsets.all(8),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    mainAxisExtent: 90,
-                    mainAxisSpacing: 0,
-                    crossAxisSpacing: 0,
-                    maxCrossAxisExtent: 600,
-                  ),
-                  children: [
-                    ...textFeildmzlista.map((e) => Visibility(
-                          visible: addeditvisible,
-                          child: SizedBox(
-                            width: 100,
-                            child: TextFieldMZ(
-                              onChanged: (x) => null,
-                              label: e['label'],
-                              textEditingController: e['controller'],
-                              error: e['error'],
-                              obscureText: e['obscuretext'],
-                              hint: e['hint'],
-                              textdirection: e['td'] ?? TextDirection.rtl,
-                              maxlines: e['maxlines'] ?? 1,
-                              suffixIcon: IconButton(
-                                  onPressed: e['action'],
-                                  icon: Icon(e['icon'])),
-                            ),
-                          ),
-                        )),
-                  ]),
+        builder: (_) => Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(children: [
+            Row(
+              children: [
+                Visibility(
+                    visible: editpanelvisible,
+                    child: Expanded(
+                        child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: editpanel))),
+                Visibility(
+                    visible: !editpanelvisible,
+                    child: Expanded(
+                        child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Visibility(
+                              visible: !firstpage,
+                              child: Expanded(
+                                child: Row(
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          mainController.firstbackpage();
+                                        },
+                                        child: const Text("السابق")),
+                                    const Expanded(child: SizedBox()),
+                                    addpanel,
+                                  ],
+                                ),
+                              )),
+                          Visibility(
+                            visible: firstpage,
+                            child: TextButton(
+                                onPressed: () {
+                                  mainController.firstbackpage();
+                                },
+                                child: const Text("التالي")),
+                          )
+                        ],
+                      ),
+                    ))),
+              ],
             ),
-          ),
-          Visibility(
+            Visibility(
+              visible: errormsg == null ? false : true,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: Text(
+                  errormsg ?? '',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
+              ),
+            ),
+            const Divider(),
+            Visibility(
               visible: addeditvisible,
               child: Visibility(
-                  visible: !firstpage,
-                  child: Expanded(
-                      child: SingleChildScrollView(child: customWidget)))),
-          Visibility(
-              visible: !addeditvisible,
-              child: Visibility(
-                  visible: firstpage,
-                  child: Expanded(
-                      child: SingleChildScrollView(child: getinfo())))),
-        ]),
+                visible: firstpage,
+                child: Expanded(
+                  child: GridView(
+                      padding: const EdgeInsets.all(8),
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                        mainAxisExtent: 100,
+                        mainAxisSpacing: 0,
+                        crossAxisSpacing: 0,
+                        maxCrossAxisExtent: 600,
+                      ),
+                      children: [
+                        ...textFeildmzlista.map((e) => SizedBox(
+                              width: 100,
+                              child: TextFieldMZ(
+                                onChanged: (x) => null,
+                                label: e['label'],
+                                textEditingController: e['controller'],
+                                error: e['error'],
+                                obscureText: e['obscuretext'],
+                                hint: e['hint'],
+                                textdirection: e['td'] ?? TextDirection.rtl,
+                                maxlines: e['maxlines'] ?? 1,
+                                suffixIcon: IconButton(
+                                    onPressed: e['action'],
+                                    icon: Icon(e['icon'])),
+                              ),
+                            )),
+                      ]),
+                ),
+              ),
+            ),
+            Visibility(
+                visible: addeditvisible,
+                child: Visibility(
+                    visible: !firstpage,
+                    child: Expanded(
+                        child: SingleChildScrollView(
+                            controller: scrollController,
+                            child: customWidget)))),
+            Visibility(
+                visible: !addeditvisible,
+                child: Visibility(
+                    visible: firstpage,
+                    child: Expanded(
+                        child: SingleChildScrollView(child: getinfo())))),
+          ]),
+        ),
       ),
     );
   }
@@ -967,7 +975,6 @@ class AddPanel extends StatelessWidget {
   const AddPanel({super.key, required this.action, required this.addlabel});
   final Function action;
   final String addlabel;
-  static String? errormsg;
   static bool wait = false;
   @override
   Widget build(BuildContext context) {
@@ -987,23 +994,13 @@ class AddPanel extends StatelessWidget {
             ),
             Visibility(
                 visible: wait,
-                child: const Expanded(
+                child: const SizedBox(
+                  width: 100,
                   child: LinearProgressIndicator(
                     color: Colors.grey,
                   ),
                 ))
           ],
-        ),
-        Visibility(
-          visible: errormsg == null ? false : true,
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.5,
-            child: Text(
-              errormsg ?? '',
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.redAccent),
-            ),
-          ),
         ),
       ]),
     );
@@ -1012,10 +1009,11 @@ class AddPanel extends StatelessWidget {
 
 initialdataforAdd({textfeildlista, customInitdataforAdd}) {
   for (var i in textfeildlista) {
+    ADDEDITINFOItem.firstpage = true;
     i['controller'].text = '';
     i['error'] = null;
   }
-  AddPanel.errormsg = null;
+  ADDEDITINFOItem.errormsg = null;
   ADDEDITINFOItem.addeditvisible = true;
   customInitdataforAdd();
   MainController().cloasedp();
@@ -1066,14 +1064,15 @@ class Editpanel extends StatelessWidget {
       required this.subeditvisible});
   final Function actionDelete, actionEdit, actionSave;
   final e;
-  static String? errormsg;
   static bool wait = false, savevisible = false;
   final page;
   final Function mainEditvisible, subeditvisible;
   @override
   Widget build(BuildContext context) {
+    MainController mainController = Get.find();
     List edititems() => [
           {
+            'visible1': true,
             'visible0': page == Employ
                 ? e['username'] == Home.logininfo
                     ? false
@@ -1085,6 +1084,7 @@ class Editpanel extends StatelessWidget {
             'color': Colors.redAccent
           },
           {
+            'visible1': true,
             'visible0': subeditvisible(),
             'visible': !savevisible,
             'icon': Icons.edit,
@@ -1092,24 +1092,43 @@ class Editpanel extends StatelessWidget {
             'color': Colors.indigoAccent
           },
           {
+            'visible1': !ADDEDITINFOItem.firstpage,
             'visible0': subeditvisible(),
             'visible': savevisible,
             'icon': Icons.save,
             'action': () => actionSave(),
             'color': Colors.indigoAccent
+          },
+          {
+            'visible1': ADDEDITINFOItem.firstpage,
+            'visible0': subeditvisible(),
+            'visible': savevisible,
+            'icon': Icons.arrow_circle_left,
+            'action': () => mainController.firstbackpage(),
+            'color': Colors.indigoAccent
+          },
+          {
+            'visible1': !ADDEDITINFOItem.firstpage,
+            'visible0': subeditvisible(),
+            'visible': savevisible,
+            'icon': Icons.arrow_circle_right,
+            'action': () => mainController.firstbackpage(),
+            'color': Colors.indigoAccent
           }
         ];
     return Visibility(
       visible: mainEditvisible(),
-      child: Row(
+      child: Column(
         children: [
           Visibility(
             visible: !wait,
-            child: Column(
-              children: [
-                Row(
-                    children: edititems()
-                        .map((e) => Visibility(
+            child: Directionality(
+              textDirection: TextDirection.ltr,
+              child: Row(
+                  children: edititems()
+                      .map((e) => Visibility(
+                            visible: e['visible1'],
+                            child: Visibility(
                               visible: e['visible0'],
                               child: Visibility(
                                 visible: e['visible'],
@@ -1120,25 +1139,15 @@ class Editpanel extends StatelessWidget {
                                       color: e['color'],
                                     )),
                               ),
-                            ))
-                        .toList()),
-                Visibility(
-                  visible: errormsg == null ? false : true,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: Text(
-                      errormsg ?? '',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.redAccent),
-                    ),
-                  ),
-                ),
-              ],
+                            ),
+                          ))
+                      .toList()),
             ),
           ),
           Visibility(
               visible: wait,
-              child: const Expanded(
+              child: const SizedBox(
+                width: 100,
                 child: LinearProgressIndicator(
                   color: Colors.grey,
                 ),
@@ -1151,10 +1160,11 @@ class Editpanel extends StatelessWidget {
 
 initialdataforEdit({customInitdataforEdit, textfeildlista}) {
   for (var i in textfeildlista) {
+    ADDEDITINFOItem.firstpage = true;
     i['controller'].text = '';
     i['error'] = null;
   }
-  Editpanel.errormsg = null;
+  ADDEDITINFOItem.errormsg = null;
   Editpanel.savevisible = false;
   ADDEDITINFOItem.addeditvisible = false;
   customInitdataforEdit();
@@ -1181,27 +1191,25 @@ infoEditItemWidget(
   MainController mainController = Get.find();
   initialdataforEdit(
       customInitdataforEdit: customInitforEdit, textfeildlista: textfeildlista);
-  showDialog(
+  showBottomSheet(
       context: ctx,
       builder: (_) {
-        return AlertDialog(
-          content: GetBuilder<MainController>(
-            init: mainController,
-            builder: (_) => ADDEDITINFOItem(
-              editpanel: Editpanel(
-                  subeditvisible: subeditvisible,
-                  mainEditvisible: mainEditvisible,
-                  actionDelete: actionDelete,
-                  actionEdit: actionEdit,
-                  actionSave: actionSave,
-                  e: e,
-                  page: page),
-              editpanelvisible: true,
-              scrollController: scrollController,
-              textFeildmzlista: textfeildlista,
-              customWidget: customWidgetofEdit,
-              getinfo: getinfo,
-            ),
+        return GetBuilder<MainController>(
+          init: mainController,
+          builder: (_) => ADDEDITINFOItem(
+            editpanel: Editpanel(
+                subeditvisible: subeditvisible,
+                mainEditvisible: mainEditvisible,
+                actionDelete: actionDelete,
+                actionEdit: actionEdit,
+                actionSave: actionSave,
+                e: e,
+                page: page),
+            editpanelvisible: true,
+            scrollController: scrollController,
+            textFeildmzlista: textfeildlista,
+            customWidget: customWidgetofEdit,
+            getinfo: getinfo,
           ),
         );
       });
@@ -1240,6 +1248,7 @@ getprivileges() {
 List infoList = [];
 showinfo({ctx}) {
   MainController mainController = Get.find();
+  String? errormsg;
   mainController.cloasedp();
   infoList.clear();
   infoList = [
@@ -1248,32 +1257,35 @@ showinfo({ctx}) {
       TextEditingController(
           text: DB.userstable[DB.userstable.indexWhere(
               (element) => element['username'] == Home.logininfo)]['username']),
-      true
+      true,
+      null
     ],
     [
       'الاسم الكامل',
       TextEditingController(
           text: DB.userstable[DB.userstable.indexWhere(
               (element) => element['username'] == Home.logininfo)]['fullname']),
-      false
+      false,
+      null
     ],
     [
       'الايميل',
       TextEditingController(
           text: DB.userstable[DB.userstable.indexWhere(
               (element) => element['username'] == Home.logininfo)]['email']),
-      false
+      false,
+      null
     ],
     [
       'الموبايل',
       TextEditingController(
           text: DB.userstable[DB.userstable.indexWhere(
               (element) => element['username'] == Home.logininfo)]['mobile']),
-      false
+      false,
+      null
     ],
   ];
   DBController dbController = Get.find();
-  String? errormsg;
   bool wait = false;
   showDialog(
       context: ctx,
@@ -1293,46 +1305,53 @@ showinfo({ctx}) {
                           visible: !wait,
                           child: IconButton(
                               onPressed: () async {
+                                infoList[1][3] = null;
                                 wait = true;
-                                errormsg = '';
+                                errormsg = null;
                                 mainController.update();
-                                try {
-                                  await dbController.updatepersonalinfo(
-                                      fullname: infoList[1][1].text ?? '_',
-                                      email: infoList[2][1].text,
-                                      mobile: infoList[3][1].text,
-                                      id: DB.userstable[DB.userstable
-                                          .indexWhere((element) =>
-                                              element['username'] ==
-                                              Home.logininfo)]['user_id']);
-                                  DB.userstable[DB.userstable.indexWhere(
-                                          (element) =>
-                                              element['username'] ==
-                                              Home.logininfo)]['fullname'] =
-                                      infoList[1][1].text;
-                                  DB.userstable[DB.userstable.indexWhere(
-                                          (element) =>
-                                              element['username'] ==
-                                              Home.logininfo)]['email'] =
-                                      infoList[2][1].text;
-                                  DB.userstable[DB.userstable.indexWhere(
-                                          (element) =>
-                                              element['username'] ==
-                                              Home.logininfo)]['mobile'] =
-                                      infoList[3][1].text;
-                                  Get.back();
-                                } catch (e) {
-                                  errormsg = 'لا يمكن الوصول للمخدم';
+                                if (infoList[1][1].text.isEmpty) {
+                                  infoList[1][3] = 'لايمكن ان يكون الاسم فارغا';
+                                  wait = false;
+                                } else {
+                                  try {
+                                    await dbController.updatepersonalinfo(
+                                        fullname: infoList[1][1].text,
+                                        email: infoList[2][1].text,
+                                        mobile: infoList[3][1].text,
+                                        id: DB.userstable[DB.userstable
+                                            .indexWhere((element) =>
+                                                element['username'] ==
+                                                Home.logininfo)]['user_id']);
+                                    DB.userstable[DB.userstable.indexWhere(
+                                            (element) =>
+                                                element['username'] ==
+                                                Home.logininfo)]['fullname'] =
+                                        infoList[1][1].text;
+                                    DB.userstable[DB.userstable.indexWhere(
+                                            (element) =>
+                                                element['username'] ==
+                                                Home.logininfo)]['email'] =
+                                        infoList[2][1].text;
+                                    DB.userstable[DB.userstable.indexWhere(
+                                            (element) =>
+                                                element['username'] ==
+                                                Home.logininfo)]['mobile'] =
+                                        infoList[3][1].text;
+
+                                    Get.back();
+                                  } catch (e) {
+                                    errormsg = 'لا يمكن الوصول للمخدم';
+                                    mainController.update();
+                                  }
+                                  wait = false;
                                   mainController.update();
                                 }
-                                wait = false;
-                                mainController.update();
                               },
                               icon: const Icon(Icons.save)),
                         ),
                         Visibility(
                             visible: wait,
-                            child: SizedBox(
+                            child: const SizedBox(
                               width: 100,
                               child: LinearProgressIndicator(),
                             )),
@@ -1346,6 +1365,7 @@ showinfo({ctx}) {
                           textEditingController: e[1],
                           onChanged: (x) => null,
                           readonly: e[2],
+                          error: e[3],
                         )),
                     Text("${getprivileges()}")
                   ]),

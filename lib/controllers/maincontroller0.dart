@@ -282,9 +282,10 @@ class MainController extends GetxController {
     update();
   }
 
-  changenotifitask({taskIndex, notifi, id}) async {
-    await DBController()
-        .changetasknotifi(notifi: notifi == true ? 1 : 0, id: id);
+  changenotifitask({notifi, id}) async {
+    DBController dbController = Get.find();
+    await dbController.changetasknotifi(notifi: notifi == true ? 1 : 0, id: id);
+    print(id);
     update();
   }
 
@@ -420,10 +421,11 @@ class MainController extends GetxController {
     }
     var checkdublicateoffice = false;
     bool duplicateCheck = true;
-    AddPanel.errormsg = null;
+    ADDEDITINFOItem.errormsg = null;
     if (itemnameController.isEmpty) {
-      listofFeildmz[0]['error'] = 'لا يمكن ان يكون الاسم فارغا';
-      scrollcontroller.jumpTo(0);
+      listofFeildmz[0]['error'] =
+          ADDEDITINFOItem.errormsg = 'لا يمكن ان يكون الاسم فارغا';
+      ADDEDITINFOItem.firstpage = true;
     } else if (page == Office) {
       try {
         AddPanel.wait = true;
@@ -437,10 +439,14 @@ class MainController extends GetxController {
         Get.back();
       } catch (e) {
         "$e".contains('timed out')
-            ? AddPanel.errormsg = 'لا يمكن الوصول للمخدم'
+            ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
             : "$e".contains('Duplicat')
-                ? AddPanel.errormsg = 'اسم محجوز مسبقا'
-                : AddPanel.errormsg = "لا يمكن الوصول للمخدم'";
+                ? {
+                    ADDEDITINFOItem.errormsg = 'اسم محجوز مسبقا',
+                    ADDEDITINFOItem.firstpage = true
+                  }
+                : ADDEDITINFOItem.errormsg = "لا يمكن الوصول للمخدم'";
+        ADDEDITINFOItem.firstpage = true;
       }
       AddPanel.wait = false;
 
@@ -448,16 +454,18 @@ class MainController extends GetxController {
     } else if (page == Employ) {
       checkdublicateoffice = false;
       if (Employ.employs[1]['controller'].text.isEmpty) {
-        Employ.employs[1]['error'] = 'لا يمكن ان يكون الاسم  فارغا';
-        scrollcontroller.jumpTo(scrollcontroller.position.minScrollExtent);
+        Employ.employs[1]['error'] =
+            ADDEDITINFOItem.errormsg = 'لا يمكن ان يكون الاسم  فارغا';
+        ADDEDITINFOItem.firstpage = true;
       } else if (Employ.employs[2]['controller'].text.isEmpty) {
-        Employ.employs[2]['error'] = 'لا يمكن ان يكون حقل كلمة المرور  فارغا';
-        scrollcontroller.jumpTo(scrollcontroller.position.minScrollExtent);
+        Employ.employs[2]['error'] =
+            ADDEDITINFOItem.errormsg = 'لا يمكن ان يكون حقل كلمة المرور  فارغا';
+        ADDEDITINFOItem.firstpage = true;
       } else if (Employ.employs[2]['controller'].text !=
           Employ.employs[3]['controller'].text) {
-        Employ.employs[2]['error'] =
-            Employ.employs[3]['error'] = "كلمة مرور غير متطابقة";
-        scrollcontroller.jumpTo(scrollcontroller.position.minScrollExtent);
+        Employ.employs[2]['error'] = Employ.employs[3]['error'] =
+            ADDEDITINFOItem.errormsg = "كلمة مرور غير متطابقة";
+        ADDEDITINFOItem.firstpage = true;
       } else if (Employ.privilege.isNotEmpty) {
         ch:
         for (var i in Employ.privilege) {
@@ -465,7 +473,7 @@ class MainController extends GetxController {
             if (i['office'] == j['office'] &&
                 Employ.privilege.indexOf(i) != Employ.privilege.indexOf(j)) {
               checkdublicateoffice = true;
-              AddPanel.errormsg = "لا يمكن اعطاء صلاحيتين في مكتب واحد";
+              ADDEDITINFOItem.errormsg = "لا يمكن اعطاء صلاحيتين في مكتب واحد";
               scrollcontroller
                   .jumpTo(scrollcontroller.position.minScrollExtent);
               break ch;
@@ -487,11 +495,13 @@ class MainController extends GetxController {
             Get.back();
           } catch (e) {
             "$e".contains('timed out')
-                ? AddPanel.errormsg = 'لا يمكن الوصول للمخدم'
+                ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
                 : "$e".contains('Duplicat')
-                    ? AddPanel.errormsg = 'اسم  محجوز مسبقا'
-                    : AddPanel.errormsg = "لا يمكن الوصول للمخدم'";
-            scrollcontroller.jumpTo(0);
+                    ? {
+                        ADDEDITINFOItem.errormsg = 'اسم  محجوز مسبقا',
+                        ADDEDITINFOItem.firstpage = true
+                      }
+                    : ADDEDITINFOItem.errormsg = "لا يمكن الوصول للمخدم'";
           }
           AddPanel.wait = false;
           update();
@@ -512,20 +522,22 @@ class MainController extends GetxController {
             Get.back();
           } catch (e) {
             "$e".contains('timed out')
-                ? AddPanel.errormsg = 'لا يمكن الوصول للمخدم'
+                ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
                 : "$e".contains('Duplicat')
-                    ? AddPanel.errormsg = 'اسم  محجوز مسبقا'
-                    : AddPanel.errormsg = "لا يمكن الوصول للمخدم'";
-            scrollcontroller.jumpTo(0);
+                    ? {
+                        ADDEDITINFOItem.errormsg = 'اسم  محجوز مسبقا',
+                        ADDEDITINFOItem.firstpage = true
+                      }
+                    : ADDEDITINFOItem.errormsg = "لا يمكن الوصول للمخدم'";
           }
           AddPanel.wait = false;
           update();
         }
       }
     } else if (page == Tasks) {
-      AddPanel.errormsg = null;
+      ADDEDITINFOItem.errormsg = null;
       if (Tasks.usersfortaskswidget.isEmpty) {
-        AddPanel.errormsg =
+        ADDEDITINFOItem.errormsg =
             "لا يمكن أن تنشئ مهمة دون ان تعين لها موظف واحد على الأقل";
       } else {
         h:
@@ -535,7 +547,8 @@ class MainController extends GetxController {
                 Tasks.usersfortaskswidget.indexOf(i) !=
                     Tasks.usersfortaskswidget.indexOf(j)) {
               duplicateCheck = true;
-              AddPanel.errormsg = "لايمكن تعيين نفس الموظف للمهمة نفسها مرتين";
+              ADDEDITINFOItem.errormsg =
+                  "لايمكن تعيين نفس الموظف للمهمة نفسها مرتين";
               break h;
             } else {
               duplicateCheck = false;
@@ -544,6 +557,7 @@ class MainController extends GetxController {
         }
         if (duplicateCheck == false) {
           try {
+            AddPanel.wait = true;
             update();
             for (var i in DB.tasktable) {
               for (var l in Home.searchlist) {
@@ -559,18 +573,22 @@ class MainController extends GetxController {
             Get.back();
           } catch (e) {
             "$e".contains('timed out')
-                ? AddPanel.errormsg = 'لا يمكن الوصول للمخدم'
+                ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
                 : "$e".contains('Duplicat')
-                    ? AddPanel.errormsg = 'اسم محجوز مسبقا'
-                    : AddPanel.errormsg = "لا يمكن الوصول للمخدم'";
+                    ? {
+                        ADDEDITINFOItem.errormsg = 'اسم محجوز مسبقا',
+                        ADDEDITINFOItem.firstpage = true
+                      }
+                    : ADDEDITINFOItem.errormsg = "لا يمكن الوصول للمخدم'";
           }
+          AddPanel.wait = false;
           update();
         }
       }
     } else if (page == Whattodo) {
-      Whattodo.errormsg = null;
+      ADDEDITINFOItem.errormsg = null;
       try {
-        Whattodo.addwaitvis = true;
+        AddPanel.wait = true;
         update();
         for (var i in DB.todotable) {
           for (var l in Home.searchlist) {
@@ -585,17 +603,18 @@ class MainController extends GetxController {
         }
         Get.back();
       } catch (e) {
-        Whattodo.addwaitvis = false;
         "$e".contains('timed out')
             ? Whattodo.errormsg = 'لا يمكن الوصول للمخدم'
             : "$e".contains('Duplicat')
-                ? Whattodo.errormsg = 'اسم محجوز مسبقا'
+                ? {
+                    Whattodo.errormsg = 'اسم محجوز مسبقا',
+                    ADDEDITINFOItem.firstpage = true
+                  }
                 : Whattodo.errormsg = "$e";
       }
-      Whattodo.addwaitvis = false;
+      AddPanel.wait = false;
       update();
     }
-
     Home.searchlist = [
       ...DB.officetable,
       ...DB.userstable,
@@ -626,7 +645,7 @@ class MainController extends GetxController {
                             ['taskname']
                         : page == Whattodo
                             ? name = Whattodo.mylista[Whattodo.mylista
-                                    .indexWhere((element) => element['todo_id'] == Whattodo.todoid)]
+                                    .indexWhere((element) => element['todo_id'] == e['todo_id'])]
                                 ['todoname']
                             : null;
           } catch (r) {
@@ -716,7 +735,7 @@ class MainController extends GetxController {
   }
 
   showeditpanel() {
-    Editpanel.errormsg = null;
+    ADDEDITINFOItem.errormsg = null;
     Editpanel.savevisible = true;
     ADDEDITINFOItem.addeditvisible = true;
     update();
@@ -728,36 +747,48 @@ class MainController extends GetxController {
     }
     var checkdublicateoffice = false;
     var checkdublicateuseroftask = false;
-    Editpanel.errormsg = null;
+    ADDEDITINFOItem.errormsg = null;
     for (var i in listofFeildmz) {
       i['error'] = null;
     }
     if (listofFeildmz[0]['controller'].text.isEmpty) {
-      listofFeildmz[0]['error'] = 'لا يمكن ان يكون اسم فارغا';
+      listofFeildmz[0]['error'] =
+          ADDEDITINFOItem.errormsg = 'لا يمكن ان يكون اسم فارغا';
+      ADDEDITINFOItem.firstpage = true;
+      ADDEDITINFOItem.addeditvisible = true;
     } else {
       if (page == Office) {
         try {
           Editpanel.wait = true;
           update();
           await DBController().editoffice(id: e['office_id']);
+          ADDEDITINFOItem.addeditvisible = false;
+          Editpanel.savevisible = false;
         } catch (e) {
           "$e".contains('timed out')
-              ? Editpanel.errormsg = 'لا يمكن الوصول للمخدم'
+              ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
               : "$e".contains('Duplicat')
-                  ? Editpanel.errormsg = 'اسم محجوز مسبقا'
-                  : Editpanel.errormsg = "$e";
+                  ? {
+                      ADDEDITINFOItem.errormsg = 'اسم محجوز مسبقا',
+                      ADDEDITINFOItem.firstpage = true
+                    }
+                  : ADDEDITINFOItem.errormsg = "$e";
+          ADDEDITINFOItem.addeditvisible = true;
+          Editpanel.savevisible = true;
         }
         Editpanel.wait = false;
-        Editpanel.savevisible = false;
-        ADDEDITINFOItem.addeditvisible = false;
+        ADDEDITINFOItem.firstpage = true;
         update();
       } else if (page == Employ) {
         if (Employ.employs[1]['controller'].text.isEmpty) {
-          Employ.employs[1]['error'] = 'لا يمكن ان يكون الاسم  فارغا';
+          Employ.employs[1]['error'] =
+              ADDEDITINFOItem.errormsg = 'لا يمكن ان يكون الاسم  فارغا';
+          ADDEDITINFOItem.firstpage = true;
         } else if (Employ.employs[2]['controller'].text !=
             Employ.employs[3]['controller'].text) {
-          Employ.employs[2]['error'] =
-              Employ.employs[3]['error'] = "كلمة مرور غير متطابقة";
+          Employ.employs[2]['error'] = Employ.employs[3]['error'] =
+              ADDEDITINFOItem.errormsg = "كلمة مرور غير متطابقة";
+          ADDEDITINFOItem.firstpage = true;
         } else if (Employ.privilege.isNotEmpty) {
           ch:
           for (var i in Employ.privilege) {
@@ -765,7 +796,8 @@ class MainController extends GetxController {
               if (i['office'] == j['office'] &&
                   Employ.privilege.indexOf(i) != Employ.privilege.indexOf(j)) {
                 checkdublicateoffice = true;
-                Editpanel.errormsg = "لا يمكن اعطاء صلاحيتين في مكتب واحد";
+                ADDEDITINFOItem.errormsg =
+                    "لا يمكن اعطاء صلاحيتين في مكتب واحد";
                 break ch;
               }
             }
@@ -783,17 +815,23 @@ class MainController extends GetxController {
                 }
               }
               await DBController().edituser(id: e['user_id']);
+              ADDEDITINFOItem.addeditvisible = false;
+              Editpanel.savevisible = false;
             } catch (e) {
               "$e".contains('timed out')
-                  ? Editpanel.errormsg = 'لا يمكن الوصول للمخدم'
+                  ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
                   : "$e".contains('Duplicat')
-                      ? Editpanel.errormsg =
-                          'اسم المستخدم  او الاسم الكامل محجوز مسبقا'
-                      : Editpanel.errormsg = "$e";
+                      ? {
+                          ADDEDITINFOItem.errormsg =
+                              'اسم المستخدم  او الاسم الكامل محجوز مسبقا',
+                          ADDEDITINFOItem.firstpage = true
+                        }
+                      : ADDEDITINFOItem.errormsg = "$e";
+              ADDEDITINFOItem.addeditvisible = true;
+              Editpanel.savevisible = true;
             }
             Editpanel.wait = false;
-            Editpanel.savevisible = false;
-            ADDEDITINFOItem.addeditvisible = false;
+            ADDEDITINFOItem.firstpage = true;
             update();
           }
         } else {
@@ -809,23 +847,29 @@ class MainController extends GetxController {
               }
             }
             await DBController().edituser(id: e['user_id']);
+            ADDEDITINFOItem.addeditvisible = false;
+            Editpanel.savevisible = false;
           } catch (e) {
             "$e".contains('timed out')
-                ? Editpanel.errormsg = 'لا يمكن الوصول للمخدم'
+                ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
                 : "$e".contains('Duplicat')
-                    ? Editpanel.errormsg =
-                        'اسم المستخدم  او الاسم الكامل محجوز مسبقا'
-                    : Editpanel.errormsg = "$e";
+                    ? {
+                        ADDEDITINFOItem.errormsg =
+                            'اسم المستخدم  او الاسم الكامل محجوز مسبقا',
+                        ADDEDITINFOItem.firstpage = true
+                      }
+                    : ADDEDITINFOItem.errormsg = "$e";
+            ADDEDITINFOItem.addeditvisible = true;
+            Editpanel.savevisible = true;
           }
           Editpanel.wait = false;
-          Editpanel.savevisible = false;
-          ADDEDITINFOItem.addeditvisible = false;
+          ADDEDITINFOItem.firstpage = true;
           update();
         }
       } else if (page == Tasks) {
         Tasks.extratimecontrollererror = null;
         if (Tasks.usersfortaskswidget.isEmpty) {
-          Editpanel.errormsg =
+          ADDEDITINFOItem.errormsg =
               "لا يمكن أن تنشئ مهمة دون ان تعين لها موظف واحد على الأقل";
         } else {
           if (Tasks.extratimecontroller.text.isEmpty) {
@@ -838,7 +882,7 @@ class MainController extends GetxController {
                   Tasks.usersfortaskswidget.indexOf(i) !=
                       Tasks.usersfortaskswidget.indexOf(j)) {
                 checkdublicateuseroftask = true;
-                Editpanel.errormsg =
+                ADDEDITINFOItem.errormsg =
                     "لايمكن تعيين نفس الموظف للمهمة نفسها مرتين";
                 break h;
               } else {
@@ -847,52 +891,55 @@ class MainController extends GetxController {
             }
           }
           if (checkdublicateuseroftask == false) {
-            update();
             Tasks.extratimecontroller.text.isEmpty ? "0" : null;
-            try {
-              int.parse(Tasks.extratimecontroller.text);
-            } catch (o) {
-              Tasks.extratimecontrollererror = "أدخل قيمة عددية صحيحة فقط";
-            }
             try {
               Editpanel.wait = true;
               update();
               await DBController().edittask(id: e['task_id']);
+              ADDEDITINFOItem.addeditvisible = false;
+              Editpanel.savevisible = false;
+              ADDEDITINFOItem.firstpage = true;
             } catch (e) {
               "$e".contains('timed out')
-                  ? Editpanel.errormsg = 'لا يمكن الوصول للمخدم'
+                  ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
                   : "$e".contains('Duplicat')
-                      ? Editpanel.errormsg = 'اسم محجوز مسبقا'
+                      ? {
+                          ADDEDITINFOItem.errormsg = 'اسم محجوز مسبقا',
+                          ADDEDITINFOItem.firstpage = true
+                        }
                       : "$e".contains('FormatExcep')
-                          ? Editpanel.errormsg = 'أدخل قيمة عددية صحيحة'
-                          : Editpanel.errormsg = "$e";
+                          ? ADDEDITINFOItem.errormsg =
+                              Tasks.extratimecontrollererror =
+                                  "أدخل قيمة عددية صحيحة"
+                          : ADDEDITINFOItem.errormsg = "$e";
+              ADDEDITINFOItem.addeditvisible = true;
+              Editpanel.savevisible = true;
             }
             Editpanel.wait = false;
-            Editpanel.savevisible = false;
-            ADDEDITINFOItem.addeditvisible = false;
             update();
           }
         }
       } else if (page == Whattodo) {
         try {
-          Whattodo.addwaitvis = true;
+          Editpanel.wait = true;
           update();
-          await DBController().edittodo(
-              useredit:
-                  "${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}",
-              todoname: Whattodo.todos[0]['controller'].text,
-              tododetails: Whattodo.todos[1]['controller'].text,
-              id: Whattodo.todoid);
-          Get.back();
+          await DBController().edittodo(id: e['todo_id']);
+          ADDEDITINFOItem.addeditvisible = false;
+          Editpanel.savevisible = false;
+          ADDEDITINFOItem.firstpage = true;
         } catch (e) {
-          Whattodo.addwaitvis = false;
           "$e".contains('timed out')
-              ? Whattodo.errormsg = 'لا يمكن الوصول للمخدم'
+              ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
               : "$e".contains('Duplicat')
-                  ? Whattodo.errormsg = 'اسم محجوز مسبقا'
-                  : Whattodo.errormsg = "$e";
+                  ? {
+                      ADDEDITINFOItem.errormsg = 'اسم محجوز مسبقا',
+                      ADDEDITINFOItem.firstpage = true
+                    }
+                  : ADDEDITINFOItem.errormsg = "$e";
+          ADDEDITINFOItem.addeditvisible = true;
+          Editpanel.savevisible = true;
         }
-        Whattodo.addwaitvis = false;
+        Editpanel.wait = false;
         update();
       }
     }
@@ -961,7 +1008,11 @@ class MainController extends GetxController {
             if (i['check'] == true) {
               if (j.keys.toList().first == 'task_id') {
                 if (j['userstask_name'].contains(i['fullname'])) {
-                  searchbydatesearch(j);
+                  if (calcdaterang(date: j['createdate']) == true) {
+                    j['check'] = true;
+                  } else {
+                    j['check'] = false;
+                  }
                 }
               }
               if (j.keys.toList().first == 'todo_id') {
@@ -985,12 +1036,11 @@ class MainController extends GetxController {
                 j['check'] = true;
               }
               if (i['office_id'] == j['task_office_id']) {
-                if (j['task_office_id'] == i['office_id']) {
-                  searchbydatesearch(j);
+                if (calcdaterang(date: j['createdate']) == true) {
+                  j['check'] = true;
+                } else {
+                  j['check'] = false;
                 }
-              }
-              if (i['office_id'] == j['todo_office_id']) {
-                j['check'] = true;
               }
             }
           }
@@ -1000,6 +1050,21 @@ class MainController extends GetxController {
       null;
     }
     update();
+  }
+
+  calcdaterang({date}) {
+    bool result = false;
+    String resultstbegin =
+        Tasks.sortbydatebegin.toString().substring(0, 10).replaceAll('-', '');
+    String resultstend =
+        Tasks.sortbydateend.toString().substring(0, 10).replaceAll('-', '');
+    if (int.parse(resultstbegin) <=
+            int.parse(date.toString().substring(0, 10).replaceAll('-', '')) &&
+        int.parse(resultstend) >=
+            int.parse(date.toString().substring(0, 10).replaceAll('-', ''))) {
+      result = true;
+    }
+    return result;
   }
 //E
 
@@ -1021,7 +1086,7 @@ class MainController extends GetxController {
       });
       scrollController.jumpTo(scrollController.position.maxScrollExtent + 100);
     } else {
-      AddPanel.errormsg = 'لم تقم بإضافة أي مكتب';
+      ADDEDITINFOItem.errormsg = 'لم تقم بإضافة أي مكتب';
     }
     update();
   }
@@ -1182,7 +1247,7 @@ class MainController extends GetxController {
   }
 
   addusertotask({userid, required ScrollController scrollcontroller}) async {
-    Editpanel.errormsg = AddPanel.errormsg = null;
+    ADDEDITINFOItem.errormsg = null;
     Tasks.usersfortasks.clear();
     try {
       await getofficeUsers(
@@ -1191,7 +1256,7 @@ class MainController extends GetxController {
                   element['officename'] == Tasks.taskofficeNameselected)]
               ['office_id']);
       if (Tasks.usersfortasks.isEmpty) {
-        Editpanel.errormsg = AddPanel.errormsg =
+        ADDEDITINFOItem.errormsg =
             'لايوجد اي موظف في المكتب الذي تملك صلاحية الاشراف عليه';
       } else {
         Tasks.usersfortaskswidget.add({'i': 0, 'name': Tasks.usersfortasks[0]});
@@ -1199,7 +1264,7 @@ class MainController extends GetxController {
             .jumpTo(scrollcontroller.position.maxScrollExtent + 100);
       }
     } catch (e) {
-      Editpanel.errormsg = AddPanel.errormsg = "لايمكن الوصول للمخدم";
+      ADDEDITINFOItem.errormsg = "لايمكن الوصول للمخدم";
     }
     update();
   }
@@ -1377,7 +1442,6 @@ class MainController extends GetxController {
 
   mustchgpass() async {
     DBController dbController = Get.find();
-
     if (LogIn.newpassword.text.isEmpty) {
       LogIn.errorMSglogin = 'لا يجب أن تكون كلمة المرور فارغة';
     } else if (LogIn.newpassword.text != LogIn.confirmnewpassword.text) {
@@ -1438,8 +1502,7 @@ class MainController extends GetxController {
   }
 
   //choosedate
-  choosedate({ctx, beginorend, officeid}) async {
-    DBController dbController = Get.find();
+  choosedate({ctx, beginorend}) async {
     DateTime? date = await showDatePicker(
         context: ctx,
         initialDate: DateTime.now(),
@@ -1450,56 +1513,46 @@ class MainController extends GetxController {
           ? Tasks.sortbydatebegin = date
           : Tasks.sortbydateend = date;
     }
-    Home.selectall = false;
+    update();
+  }
 
-    for (var i in Home.searchlist) {
-      if (i.keys.toList().first == 'office_id' && i['check'] == true) {
-        for (var j in Home.searchlist) {
-          if (j['task_office_id'] == i['office_id']) {
-            if (Tasks.sortbydatebegin.isBefore(j['createdate']) &&
-                Tasks.sortbydateend
-                    .add(const Duration(days: 1))
-                    .isAfter(j['createdate'])) {
-              j['check'] = true;
-            } else {
-              j['check'] = false;
-            }
-          }
-        }
+  setdate() {
+    DBController dbController = Get.find();
+    var officecheckon = false;
+    Home.selectall = false;
+    for (var k in Home.searchlist) {
+      if (k.keys.toList().first == 'office_id' && k['check'] == true) {
+        officecheckon = true;
+        break;
       } else {
-        var withoutoffice = 0;
-        for (var o in Home.searchlist) {
-          if (o.keys.toList().first == 'office_id' && o['check'] == true) {
-            withoutoffice = 1;
-          }
-        }
-        if (withoutoffice == 0) {
-          for (var j in Home.searchlist) {
-            if (j.keys.toList().first == 'task_id') {
-              if (Tasks.sortbydatebegin.isBefore(j['createdate']) &&
-                  Tasks.sortbydateend
-                      .add(const Duration(days: 1))
-                      .isAfter(j['createdate'])) {
-                j['check'] = true;
-              } else {
-                j['check'] = false;
+        officecheckon = false;
+      }
+    }
+    for (var j in Home.searchlist) {
+      if (j.keys.toList().first == 'task_id') {
+        if (officecheckon == true) {
+          for (var i in Home.searchlist) {
+            if (i.keys.toList().first == 'office_id') {
+              if (j['task_office_id'] == i['office_id'] && i['check'] == true) {
+                if (calcdaterang(date: j['createdate']) == true) {
+                  j['check'] = true;
+                } else {
+                  j['check'] = false;
+                }
               }
             }
           }
+        } else {
+          if (calcdaterang(date: j['createdate']) == true) {
+            j['check'] = true;
+          } else {
+            j['check'] = false;
+          }
         }
       }
-      dbController.update();
-      update();
     }
-  }
+    dbController.update();
 
-  searchbydatesearch(j) async {
-    if (Tasks.sortbydatebegin.isBefore(j['createdate']) &&
-        Tasks.sortbydateend
-            .add(const Duration(days: 1))
-            .isAfter(j['createdate'])) {
-      j['check'] = true;
-    }
     update();
   }
 
@@ -1511,6 +1564,7 @@ class MainController extends GetxController {
 
   snakbar(ctx, String mymsg) {
     SnackBar mysnak = SnackBar(
+      duration: Duration(seconds: 1),
       content: Text(mymsg),
       backgroundColor: Colors.indigoAccent,
       elevation: 10,
@@ -1630,6 +1684,13 @@ class MainController extends GetxController {
       ...DB.tasktable,
       ...DB.todotable
     ];
+    update();
+  }
+
+  firstbackpage() {
+    ADDEDITINFOItem.firstpage =
+        ADDEDITINFOItem.firstpage == true ? false : true;
+    ADDEDITINFOItem.errormsg = null;
     update();
   }
 }

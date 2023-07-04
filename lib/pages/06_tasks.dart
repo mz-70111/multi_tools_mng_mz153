@@ -1,5 +1,3 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:teledart/teledart.dart';
@@ -7,7 +5,6 @@ import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
 import 'package:users_tasks_mz_153/pages/02_home.dart';
-import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 import 'package:intl/intl.dart' as df;
 
@@ -29,6 +26,7 @@ class Tasks extends StatelessWidget {
       taskstatus == true ? " > منجزة <" : "> غير منجزة <";
   static List usersfortasks = [];
   static List usersfortaskswidget = [];
+  static bool status = true;
   static List<Map> tasks = [
     {
       'label': 'اسم المهمة',
@@ -79,10 +77,11 @@ class Tasks extends StatelessWidget {
       'taskname',
       'status',
       'userstask_name',
+      'notifi'
     ];
     List itemResult = [];
     List colors = [];
-    Widget itemsWidget() {
+    Widget itemsWidget({notifichange}) {
       colors.clear();
       colors.add(DB.officetable[DB.officetable
               .indexWhere((element) => element['office_id'] == itemResult[0])]
@@ -95,11 +94,36 @@ class Tasks extends StatelessWidget {
             children: [
               ...colors.map((c) =>
                   Container(height: 40, width: 10, color: Color(int.parse(c)))),
-              Expanded(child: Text("# ${itemResult[1]}_ ${itemResult[2]}")),
-              Expanded(child: Text(itemResult[3] == 1 ? "منجزة" : "غير منجزة")),
               Expanded(
-                  child:
-                      Column(children: [...itemResult[4].map((t) => Text(t))]))
+                  child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Text(
+                        "# ${itemResult[1]}_ ${itemResult[2]}",
+                        style: TextStyle(fontSize: 13),
+                      )),
+                      Expanded(
+                          child: Text(
+                              itemResult[3] == 1 ? "منجزة" : "غير منجزة",
+                              style: TextStyle(fontSize: 13))),
+                      Expanded(
+                          child: Column(children: [
+                        ...itemResult[4]
+                            .map((t) => Text(t, style: TextStyle(fontSize: 13)))
+                      ]))
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Switch(
+                          value: itemResult[5] == 1 ? true : false,
+                          onChanged: (x) => notifichange())
+                    ],
+                  )
+                ],
+              )),
             ],
           ),
         ),
@@ -221,7 +245,9 @@ class Tasks extends StatelessWidget {
       mainColumn: mainColumn,
       items: itemskey,
       itemsResult: itemResult,
-      itemsWidget: () => itemsWidget(),
+      itemsWidget: () => itemsWidget(notifichange: (x) {
+        changenotifitask(notifi: x, e: MYPAGE.eE);
+      }),
       notifi: const SizedBox(),
       addlabel: addFunction['addlabel'],
       action: addFunction['action'],
@@ -447,7 +473,15 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
     e['taskdetails'] = Tasks.tasks[1]['controller'].text;
     e['notifi'] = Tasks.notifi == true ? 1 : 0;
     e['duration'] = Tasks.duration.toInt();
-    e['extratime'] = int.parse(Tasks.extratimecontroller.text);
+    try {
+      e['extratime'] = int.parse(Tasks.extratimecontroller.text);
+    } catch (e) {
+      null;
+    }
+    e['userstask_name'].clear();
+    for (var i in usersfortaskswidget) {
+      e['userstask_name'].add(i['name']);
+    }
   }
 
   deletetask({ctx, e}) async {
@@ -456,6 +490,7 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
   }
 
   addcomment({e}) async {
+    MainController mainController = Get.find();
     if (e['commentcontroller'].text.isNotEmpty) {
       await mainController.addcomment(
         e: e,
@@ -491,5 +526,10 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
             maintableidname: e['task_id'],
             maintablename: 'tasks',
             comment: commentcontrolleredit.text));
+  }
+
+  changenotifitask({e, notifi}) async {
+    MainController mainController = Get.find();
+    await mainController.changenotifitask(id: e['task_id'], notifi: notifi);
   }
 }

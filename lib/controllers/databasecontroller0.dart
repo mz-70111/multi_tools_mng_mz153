@@ -23,21 +23,20 @@ class DBController extends GetxController {
     await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
     try {
-      // await DB().createuserstable();
-      // await DB().createofficetable();
-      // await DB().createusersofficetable();
-      // await DB().createtaskstable();
-      // await DB().createuserstasktable();
-      // await DB().createuserstasksCommentstable();
-      // await DB().createtodotable();
-      // await DB().createuserstodo();
-      // await DB().createuserstodoCommentstable();
-      // await DB().createuserstodoRatestable();
-      // await DB().createschedueldtable();
-      // await DB().createuserschedtable();
-      // await DB().createuserschedlogtable();
+      await DB().createuserstable();
+      await DB().createofficetable();
+      await DB().createusersofficetable();
+      await DB().createtaskstable();
+      await DB().createuserstasktable();
+      await DB().createuserstasksCommentstable();
+      await DB().createtodotable();
+      await DB().createuserstodo();
+      await DB().createuserstodoCommentstable();
+      await DB().createuserstodoRatestable();
+      await DB().createschedueldtable();
+      await DB().createuserschedtable();
+      await DB().createuserschedlogtable();
     } catch (e) {
-      print(e);
       "$e".contains('timed out')
           ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
           : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
@@ -50,10 +49,8 @@ class DBController extends GetxController {
     } else {
       LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
     }
-
     LogIn.loginwait = false;
     super.onInit();
-
     update();
   }
 
@@ -820,16 +817,16 @@ where office_id=$id;
     update();
   }
 
-  edittodo({todoname, useredit, tododetails, id}) async {
+  edittodo({id}) async {
     await DB().customquery(query: '''
   update users_todo set
-  editby_id="$useredit"
+  editby_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}
   where utd_todo_id=$id;
   ''');
     await DB().customquery(query: '''
 update todo set
-todoname="$todoname",
-tododetails="$tododetails",
+todoname="${Whattodo.todos[0]['controller'].text}",
+tododetails="${Whattodo.todos[1]['controller'].text}",
 editdate="${DateTime.now()}",
 todo_office_id=${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Whattodo.todooffice)]['office_id']}
 where: 'where todo_id=$id;
@@ -852,7 +849,7 @@ taskdetails="${Tasks.tasks[1]['controller'].text}",
 status=${Tasks.taskstatus},
 duration=${Tasks.duration.toInt()},
 editdate="${DateTime.now()}",
-extratime="${int.parse(Tasks.extratimecontroller.text)}",
+extratime=${int.parse(Tasks.extratimecontroller.text)},
 editby="${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']}",
 editby_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']},
 task_office_id=${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Tasks.taskofficeNameselected)]['office_id']}

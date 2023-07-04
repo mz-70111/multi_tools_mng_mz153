@@ -10,36 +10,15 @@ import 'package:users_tasks_mz_153/tamplate/bottomnavbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 import 'package:intl/intl.dart' as df;
 
-MainController mainController = Get.find();
-
-// ignore: must_be_immutable
 class Whattodo extends StatelessWidget {
   Whattodo({super.key});
-  ThemeController themeController = Get.find();
   DBController dbController = Get.find();
-  static DateTime sortbydatebegin = DateTime.parse('2022-10-01');
-  static DateTime sortbydateend = DateTime.now();
   static TextEditingController todoname = TextEditingController();
   static TextEditingController tododetails = TextEditingController();
-  static bool editvisible = false;
-  static bool editsavevisible = true;
-  static bool addwaitvis = false;
-  static bool notifi = false;
-  static bool selectall = false;
-  static bool deletewait = false;
   static String? errormsg;
   static String officelistvalue = 'مخصص';
-  List temp = [];
-  static late int todoid;
-  static double dialogeBegin = 1000;
-  static double dialogeEnd = 0;
-  static double wid = 50, hi = 50;
   static List<Map> mylista = [];
-  static String timedayvalue = 'غير محدد';
-  static String timemonthvalue = 'غير محدد';
-  static String timeyearvalue = 'غير محدد';
-  static String? errorcomment;
-  static bool editcommentwait = false;
+  static String? extratimecontrollererror;
   static TextEditingController commentcontrolleredit = TextEditingController();
 
   static List<Map> todos = [
@@ -79,82 +58,82 @@ class Whattodo extends StatelessWidget {
           ],
         )
       ];
-  static List easyedittodo({e, ctx}) => [
-        {
-          'invisible': true,
-          'visible': DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                          ['user_id'] ==
-                      e['createby_id'] ||
-                  DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                          ['admin'] ==
-                      1 ||
-                  mainController.checkifuserSupervisor(
-                          officeid: e['todo_office_id'],
-                          userid: DB.userstable[DB.userstable.indexWhere(
-                                  (element) => element['username'] == Home.logininfo)]
-                              ['user_id']) ==
-                      true
-              ? true
-              : false,
-          'icon': Icons.delete,
-          'action': () async {
-            todoid = e['todo_id'];
-            await mainController.deleteItemMainController(
-              ctx: ctx,
-              page: Whattodo,
-            );
-          },
-          'color': Colors.redAccent,
-        },
-        {
-          'invisible': editsavevisible,
-          'visible': DB.userstable[DB.userstable.indexWhere(
-                              (element) => element['username'] == Home.logininfo)]
-                          ['user_id'] ==
-                      e['createby_id'] ||
-                  mainController.checkifuserSupervisor(
-                          officeid: e['todo_office_id'],
-                          userid: DB.userstable[DB.userstable.indexWhere(
-                                  (element) =>
-                                      element['username'] == Home.logininfo)]
-                              ['user_id']) ==
-                      true
-              ? true
-              : false,
-          'icon': Icons.edit,
-          'action': () async {
-            todoid = e['todo_id'];
-            await mainController.showeditpanel();
-          },
-          'color': Colors.indigoAccent,
-        },
-        {
-          'invisible': !editsavevisible,
-          'visible': DB.userstable[DB.userstable.indexWhere(
-                              (element) => element['username'] == Home.logininfo)]
-                          ['user_id'] ==
-                      e['createby_id'] ||
-                  mainController.checkifuserSupervisor(
-                          officeid: e['todo_office_id'],
-                          userid: DB.userstable[DB.userstable.indexWhere(
-                                  (element) =>
-                                      element['username'] == Home.logininfo)]
-                              ['user_id']) ==
-                      true
-              ? true
-              : false,
-          'icon': Icons.save,
-          'action': () async {
-            todoid = e['todo_id'];
-            await mainController.editItemMainController(
-              e: e,
-              page: Whattodo,
-              // pagelisttextfeild: todos,
-            );
-          },
-          'color': Colors.indigoAccent
-        }
-      ];
+  // static List easyedittodo({e, ctx}) => [
+  //       {
+  //         'invisible': true,
+  //         'visible': DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+  //                         ['user_id'] ==
+  //                     e['createby_id'] ||
+  //                 DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+  //                         ['admin'] ==
+  //                     1 ||
+  //                 mainController.checkifuserSupervisor(
+  //                         officeid: e['todo_office_id'],
+  //                         userid: DB.userstable[DB.userstable.indexWhere(
+  //                                 (element) => element['username'] == Home.logininfo)]
+  //                             ['user_id']) ==
+  //                     true
+  //             ? true
+  //             : false,
+  //         'icon': Icons.delete,
+  //         'action': () async {
+  //           todoid = e['todo_id'];
+  //           await mainController.deleteItemMainController(
+  //             ctx: ctx,
+  //             page: Whattodo,
+  //           );
+  //         },
+  //         'color': Colors.redAccent,
+  //       },
+  //       {
+  //         'invisible': editsavevisible,
+  //         'visible': DB.userstable[DB.userstable.indexWhere(
+  //                             (element) => element['username'] == Home.logininfo)]
+  //                         ['user_id'] ==
+  //                     e['createby_id'] ||
+  //                 mainController.checkifuserSupervisor(
+  //                         officeid: e['todo_office_id'],
+  //                         userid: DB.userstable[DB.userstable.indexWhere(
+  //                                 (element) =>
+  //                                     element['username'] == Home.logininfo)]
+  //                             ['user_id']) ==
+  //                     true
+  //             ? true
+  //             : false,
+  //         'icon': Icons.edit,
+  //         'action': () async {
+  //           todoid = e['todo_id'];
+  //           await mainController.showeditpanel();
+  //         },
+  //         'color': Colors.indigoAccent,
+  //       },
+  //       {
+  //         'invisible': !editsavevisible,
+  //         'visible': DB.userstable[DB.userstable.indexWhere(
+  //                             (element) => element['username'] == Home.logininfo)]
+  //                         ['user_id'] ==
+  //                     e['createby_id'] ||
+  //                 mainController.checkifuserSupervisor(
+  //                         officeid: e['todo_office_id'],
+  //                         userid: DB.userstable[DB.userstable.indexWhere(
+  //                                 (element) =>
+  //                                     element['username'] == Home.logininfo)]
+  //                             ['user_id']) ==
+  //                     true
+  //             ? true
+  //             : false,
+  //         'icon': Icons.save,
+  //         'action': () async {
+  //           todoid = e['todo_id'];
+  //           await mainController.editItemMainController(
+  //             e: e,
+  //             page: Whattodo,
+  //             // pagelisttextfeild: todos,
+  //           );
+  //         },
+  //         'color': Colors.indigoAccent
+  //       }
+  //     ];
   static List customWidgetofEdit({ctx}) => [
         //   Row(
         //     children: [
@@ -182,30 +161,30 @@ class Whattodo extends StatelessWidget {
       }
     }
   ];
-  Widget actionadd({action}) => Column(children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Visibility(
-              visible: !addwaitvis,
-              child: TextButton.icon(
-                  onPressed: action,
-                  icon: const Icon(Icons.add),
-                  label: const Text("إضافة إجرائية جديدة")),
-            ),
-            Visibility(
-                visible: addwaitvis, child: const CircularProgressIndicator())
-          ],
-        ),
-        Visibility(
-          visible: Whattodo.errormsg == null ? false : true,
-          child: Text(
-            Whattodo.errormsg ?? '',
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.redAccent),
-          ),
-        ),
-      ]);
+  // Widget actionadd({action}) => Column(children: [
+  //       Row(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: [
+  //           Visibility(
+  //             visible: !addwaitvis,
+  //             child: TextButton.icon(
+  //                 onPressed: action,
+  //                 icon: const Icon(Icons.add),
+  //                 label: const Text("إضافة إجرائية جديدة")),
+  //           ),
+  //           Visibility(
+  //               visible: addwaitvis, child: const CircularProgressIndicator())
+  //         ],
+  //       ),
+  //   Visibility(
+  //     visible: Whattodo.errormsg == null ? false : true,
+  //     child: Text(
+  //       Whattodo.errormsg ?? '',
+  //       textAlign: TextAlign.center,
+  //       style: const TextStyle(color: Colors.redAccent),
+  //     ),
+  //   ),
+  // ]);
   static List easyedittodocomment({ctx, commentid, commenttext, usercomment}) =>
       [
         {
@@ -264,14 +243,7 @@ class Whattodo extends StatelessWidget {
                     ),
                   );
                 } else {
-                  if (!(DB.userstable[DB.userstable.indexWhere((element) =>
-                                  element['username'] == Home.logininfo)]
-                              ['privilege']
-                          .contains("موظف") ||
-                      DB.userstable[DB.userstable.indexWhere((element) =>
-                                  element['username'] == Home.logininfo)]
-                              ['privilege']
-                          .contains("مشرف"))) {
+                  if (checkifUserisinAnyOffice() == false) {
                     Future(() => mainController.snakbar(context,
                         'لست عضوا في اي مكتب لا يمكنك اضافة إجرايئات'));
                   }
@@ -294,23 +266,23 @@ class Whattodo extends StatelessWidget {
                           officelist.add(i['officename']);
                         }
                         checkallvaluetrue.clear();
-                        temp.clear();
+                        // temp.clear();
                         for (var j in Home.searchlist) {
                           if (j['check'] == true) {
                             checkallvaluetrue.add('1');
                             if (j.keys.toList().first == 'office_id') {
-                              temp.add(j['officename']);
+                              // temp.add(j['officename']);
                             }
                           }
                         }
-                        if (checkallvaluetrue.length ==
-                            Home.searchlist.length) {
-                          officelistvalue = 'جميع النتائج';
-                        } else if (temp.length == 1) {
-                          officelistvalue = temp[0];
-                        } else {
-                          officelistvalue = 'مخصص';
-                        }
+                        // if (checkallvaluetrue.length ==
+                        //     Home.searchlist.length) {
+                        //   officelistvalue = 'جميع النتائج';
+                        // } else if (temp.length == 1) {
+                        //   officelistvalue = temp[0];
+                        // } else {
+                        //   officelistvalue = 'مخصص';
+                        // }
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,43 +326,6 @@ class Whattodo extends StatelessWidget {
                                       }),
                                 ),
                               ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                decoration: BoxDecoration(border: Border.all()),
-                                child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Text("بحث بحسب التاريخ"),
-                                      TextButton.icon(
-                                        onPressed: () {
-                                          mainController.choosedate(
-                                              ctx: context,
-                                              beginorend: 'begin');
-                                        },
-                                        icon: const Icon(Icons.date_range),
-                                        label: Text(
-                                          "من ${df.DateFormat('yyyy-MM-dd').format(sortbydatebegin)}",
-                                          style: const TextStyle(fontSize: 15),
-                                        ),
-                                      ),
-                                      TextButton.icon(
-                                          onPressed: () {
-                                            mainController.choosedate(
-                                                ctx: context,
-                                                beginorend: 'end');
-                                          },
-                                          icon: const Icon(Icons.date_range),
-                                          label: Text(
-                                            "إلى ${df.DateFormat('yyyy-MM-dd').format(sortbydateend)}",
-                                            style:
-                                                const TextStyle(fontSize: 15),
-                                          )),
-                                    ]),
-                              ),
                             ),
                             Expanded(
                               child: Column(
@@ -508,7 +443,7 @@ class Whattodo extends StatelessWidget {
   getinfo({e, ctx}) {
     // buildcomment(mylista: mylista);
     return Visibility(
-      visible: !editvisible,
+      // visible: !editvisible,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -565,8 +500,8 @@ class Whattodo extends StatelessWidget {
 
   dialogeditinfo({ctx, e}) {
     mainController.cloasedp();
-    editvisible = false;
-    editsavevisible = true;
+    // editvisible = false;
+    // editsavevisible = true;
     // initialdataforEdit(e);
     //   showdialogeADDEDITINFO(
     //       context: ctx,
@@ -661,7 +596,7 @@ class Whattodo extends StatelessWidget {
 
     initialdataforEdit(e) {
       Whattodo.errormsg = null;
-      todoid = e['todo_id'];
+      // todoid = e['todo_id'];
       todoofficelist.clear();
       for (var i in DB.userstable[DB.userstable
               .indexWhere((element) => element['username'] == Home.logininfo)]
