@@ -27,7 +27,6 @@ class Tasks extends StatelessWidget {
   static String tasknotifi0() => notifi == true ? " > مفعلة <" : ">ملغاة <";
   static List usersfortasks = [];
   static List usersfortaskswidget = [];
-  static bool status = true;
   static List<Map> tasks = [
     {
       'label': 'اسم المهمة',
@@ -486,6 +485,7 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
     e['taskdetails'] = Tasks.tasks[1]['controller'].text;
     e['notifi'] = Tasks.notifi == true ? 1 : 0;
     e['duration'] = Tasks.duration.toInt();
+    e['status'] = Tasks.taskstatus == true ? 1 : 0;
     try {
       e['extratime'] = int.parse(Tasks.extratimecontroller.text);
     } catch (e) {

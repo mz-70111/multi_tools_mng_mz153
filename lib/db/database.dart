@@ -6,7 +6,7 @@ import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 class DB {
   DBController dbController = Get.find();
   ConnectionSettings settings = ConnectionSettings(
-      host: '127.0.0.1',
+      host: '192.168.1.106',
       port: 3306,
       user: 'mz',
       password: 'mzrootmz',
