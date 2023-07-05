@@ -1285,10 +1285,12 @@ class MainController extends GetxController {
   }
 
   tasknotifichg({x, e}) async {
-    await DB().customquery(
-        query:
-            "update tasks set notifi=${x == true ? 1 : 0} where task_id=${e['task_id']}");
-    e['notifi'] = x == true ? 1 : 0;
+    try {
+      await DB().customquery(
+          query:
+              "update tasks set notifi=${x == true ? 1 : 0} where task_id=${e['task_id']}");
+      e['notifi'] = x == true ? 1 : 0;
+    } catch (t) {}
     update();
   }
 

@@ -1032,29 +1032,44 @@ addItemWidget(
     action,
     required Widget customWidgetofADD,
     customInitdataforAdd,
-    scrollController}) {
-  MainController mainController = Get.find();
-  initialdataforAdd(
-      textfeildlista: textfeildlista,
-      customInitdataforAdd: customInitdataforAdd);
-  showBottomSheet(
-      context: ctx,
-      builder: (_) {
-        return GetBuilder<MainController>(
-          init: mainController,
-          builder: (_) => ADDEDITINFOItem(
-            getinfo: () => const SizedBox(),
-            addpanel: AddPanel(
-              addlabel: addlabel,
-              action: action,
+    scrollController}) async {
+  try {
+    await DB().customquery(query: 'select * from users where user_id=1');
+
+    MainController mainController = Get.find();
+    initialdataforAdd(
+        textfeildlista: textfeildlista,
+        customInitdataforAdd: customInitdataforAdd);
+    showBottomSheet(
+        context: ctx,
+        builder: (_) {
+          return GetBuilder<MainController>(
+            init: mainController,
+            builder: (_) => ADDEDITINFOItem(
+              getinfo: () => const SizedBox(),
+              addpanel: AddPanel(
+                addlabel: addlabel,
+                action: action,
+              ),
+              editpanelvisible: false,
+              textFeildmzlista: textfeildlista,
+              customWidget: customWidgetofADD,
+              scrollController: scrollController,
             ),
-            editpanelvisible: false,
-            textFeildmzlista: textfeildlista,
-            customWidget: customWidgetofADD,
-            scrollController: scrollController,
-          ),
-        );
-      });
+          );
+        });
+  } catch (e) {
+    return showDialog(
+        context: ctx,
+        builder: (_) {
+          return const AlertDialog(
+            content: Text(
+              "لا يمكن الوصول للمخدم",
+              textAlign: TextAlign.center,
+            ),
+          );
+        });
+  }
 }
 
 //editpanel
@@ -1197,33 +1212,47 @@ infoEditItemWidget(
     deletevisible0,
     page,
     subeditvisible,
-    customeditpanelitem}) {
-  MainController mainController = Get.find();
-  initialdataforEdit(
-      customInitdataforEdit: customInitforEdit, textfeildlista: textfeildlista);
-  showBottomSheet(
-      context: ctx,
-      builder: (_) {
-        return GetBuilder<MainController>(
-          init: mainController,
-          builder: (_) => ADDEDITINFOItem(
-            editpanel: Editpanel(
-                subeditvisible: subeditvisible,
-                mainEditvisible: mainEditvisible,
-                actionDelete: actionDelete,
-                actionEdit: actionEdit,
-                actionSave: actionSave,
-                customeditpanelitem: customeditpanelitem,
-                e: e,
-                page: page),
-            editpanelvisible: true,
-            scrollController: scrollController,
-            textFeildmzlista: textfeildlista,
-            customWidget: customWidgetofEdit,
-            getinfo: getinfo,
-          ),
-        );
-      });
+    customeditpanelitem}) async {
+  try {
+    await DB().customquery(query: 'select * from users where user_id=1');
+    MainController mainController = Get.find();
+    initialdataforEdit(
+        customInitdataforEdit: customInitforEdit,
+        textfeildlista: textfeildlista);
+    showBottomSheet(
+        context: ctx,
+        builder: (_) {
+          return GetBuilder<MainController>(
+              init: mainController,
+              builder: (_) => ADDEDITINFOItem(
+                    editpanel: Editpanel(
+                        subeditvisible: subeditvisible,
+                        mainEditvisible: mainEditvisible,
+                        actionDelete: actionDelete,
+                        actionEdit: actionEdit,
+                        actionSave: actionSave,
+                        customeditpanelitem: customeditpanelitem,
+                        e: e,
+                        page: page),
+                    editpanelvisible: true,
+                    scrollController: scrollController,
+                    textFeildmzlista: textfeildlista,
+                    customWidget: customWidgetofEdit,
+                    getinfo: getinfo,
+                  ));
+        });
+  } catch (e) {
+    return showDialog(
+        context: ctx,
+        builder: (_) {
+          return const AlertDialog(
+            content: Text(
+              "لا يمكن الوصول للمخدم",
+              textAlign: TextAlign.center,
+            ),
+          );
+        });
+  }
 }
 
 getprivileges() {
@@ -1415,16 +1444,15 @@ getlogin() {
 }
 
 getofficeUsers({required List list, officeid}) async {
-  try {
-    var t = await DB().customquery(
-        query:
-            'select uf_user_id from users_office where uf_office_id=$officeid');
-    list.clear();
-    for (var j in t) {
-      list.add(DB.userstable[DB.userstable
-          .indexWhere((element) => element['user_id'] == j[0])]['fullname']);
-    }
-  } catch (e) {}
+  var t = await DB().customquery(
+      query:
+          'select uf_user_id from users_office where uf_office_id=$officeid');
+  list.clear();
+  for (var j in t) {
+    list.add(DB.userstable[DB.userstable
+        .indexWhere((element) => element['user_id'] == j[0])]['fullname']);
+  }
+
   return list;
 }
 
