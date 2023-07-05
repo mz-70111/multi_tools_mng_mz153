@@ -282,13 +282,6 @@ class MainController extends GetxController {
     update();
   }
 
-  changenotifitask({notifi, id}) async {
-    DBController dbController = Get.find();
-    await dbController.changetasknotifi(notifi: notifi == true ? 1 : 0, id: id);
-    print(id);
-    update();
-  }
-
   directsendTask({ctx, officeid, e}) async {
     String mymsg = Tasks.mymsgTask(e: e);
     mymsg +=
@@ -1288,6 +1281,14 @@ class MainController extends GetxController {
 
   taskstatuschg(x) async {
     Tasks.taskstatus = x;
+    update();
+  }
+
+  tasknotifichg({x, e}) async {
+    await DB().customquery(
+        query:
+            "update tasks set notifi=${x == true ? 1 : 0} where task_id=${e['task_id']}");
+    e['notifi'] = x == true ? 1 : 0;
     update();
   }
 

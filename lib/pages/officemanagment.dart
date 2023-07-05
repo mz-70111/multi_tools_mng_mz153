@@ -122,34 +122,34 @@ class Office extends StatelessWidget {
         children: [customWidgetofADD(ctx: ctx, pickcolor: pickcolor)]);
 
     return MYPAGE(
-      mylista: mylista,
-      table: 'office',
-      tableId: 'office_id',
-      page: Office,
-      searchRange: const ['officename'],
-      mainColumn: mainColumn,
-      items: itemskey,
-      itemsResult: itemResult,
-      itemsWidget: () => itemsWidget(),
-      notifi: const SizedBox(),
-      addlabel: addFunction['addlabel'],
-      action: addFunction['action'],
-      customInitdataforAdd: () => customInitforAdd(),
-      customWidgetofADD: customWidgetofADD(
-          ctx: context, pickcolor: () => pickcolor(ctx: context)),
-      textfeildlista: offices,
-      scrollController: scrollController,
-      mainEditvisible: () => checkifUserisAdmin() == true ? true : false,
-      subeditvisible: () => true,
-      mainAddvisible: checkifUserisAdmin() == true ? true : false,
-      customWidgetofEdit: customWidgetofEdit(
-          ctx: context, pickcolor: () => pickcolor(ctx: context)),
-      customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
-      getinfo: () => getinfo(e: MYPAGE.eE, ctx: context),
-      actionSave: () => editOfficeSaveAction(e: MYPAGE.eE),
-      actionEdit: () => mainController.showeditpanel(),
-      actionDelete: () => deleteOffice(ctx: context, e: MYPAGE.eE),
-    );
+        mylista: mylista,
+        table: 'office',
+        tableId: 'office_id',
+        page: Office,
+        searchRange: const ['officename'],
+        mainColumn: mainColumn,
+        items: itemskey,
+        itemsResult: itemResult,
+        itemsWidget: () => itemsWidget(),
+        notifi: const SizedBox(),
+        addlabel: addFunction['addlabel'],
+        action: addFunction['action'],
+        customInitdataforAdd: () => customInitforAdd(),
+        customWidgetofADD: customWidgetofADD(
+            ctx: context, pickcolor: () => pickcolor(ctx: context)),
+        textfeildlista: offices,
+        scrollController: scrollController,
+        mainEditvisible: () => checkifUserisAdmin() == true ? true : false,
+        subeditvisible: () => true,
+        mainAddvisible: checkifUserisAdmin() == true ? true : false,
+        customWidgetofEdit: customWidgetofEdit(
+            ctx: context, pickcolor: () => pickcolor(ctx: context)),
+        customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
+        getinfo: () => getinfo(e: MYPAGE.eE, ctx: context),
+        actionSave: () => editOfficeSaveAction(e: MYPAGE.eE),
+        actionEdit: () => mainController.showeditpanel(),
+        actionDelete: () => deleteOffice(ctx: context, e: MYPAGE.eE),
+        customeditpanelitem: () => const SizedBox());
   }
 
   pickcolor({ctx}) {

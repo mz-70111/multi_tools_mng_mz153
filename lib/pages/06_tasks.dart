@@ -24,6 +24,7 @@ class Tasks extends StatelessWidget {
   static bool taskstatus = false, notifi = true;
   static String taskstatus0() =>
       taskstatus == true ? " > منجزة <" : "> غير منجزة <";
+  static String tasknotifi0() => notifi == true ? " > مفعلة <" : ">ملغاة <";
   static List usersfortasks = [];
   static List usersfortaskswidget = [];
   static bool status = true;
@@ -81,7 +82,7 @@ class Tasks extends StatelessWidget {
     ];
     List itemResult = [];
     List colors = [];
-    Widget itemsWidget({notifichange}) {
+    Widget itemsWidget() {
       colors.clear();
       colors.add(DB.officetable[DB.officetable
               .indexWhere((element) => element['office_id'] == itemResult[0])]
@@ -93,36 +94,34 @@ class Tasks extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             children: [
               ...colors.map((c) =>
-                  Container(height: 40, width: 10, color: Color(int.parse(c)))),
+                  Container(height: 50, width: 10, color: Color(int.parse(c)))),
               Expanded(
-                  child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                          child: Text(
-                        "# ${itemResult[1]}_ ${itemResult[2]}",
-                        style: TextStyle(fontSize: 13),
-                      )),
-                      Expanded(
-                          child: Text(
-                              itemResult[3] == 1 ? "منجزة" : "غير منجزة",
-                              style: TextStyle(fontSize: 13))),
-                      Expanded(
-                          child: Column(children: [
-                        ...itemResult[4]
-                            .map((t) => Text(t, style: TextStyle(fontSize: 13)))
-                      ]))
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Switch(
-                          value: itemResult[5] == 1 ? true : false,
-                          onChanged: (x) => notifichange())
-                    ],
-                  )
-                ],
+                  child: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          "# ${itemResult[1]}_ ${itemResult[2]}",
+                          style: const TextStyle(fontSize: 13),
+                        )),
+                        Expanded(
+                            child: Text(
+                                itemResult[3] == 1 ? "منجزة" : "غير منجزة",
+                                style: const TextStyle(fontSize: 13))),
+                        Expanded(
+                            child: Column(children: [
+                          ...itemResult[4].map((t) =>
+                              Text(t, style: const TextStyle(fontSize: 13)))
+                        ]))
+                      ],
+                    ),
+                    Text(itemResult[5] == 1 ? "إشعار مفعل" : "إشعار ملغى")
+                  ],
+                ),
               )),
             ],
           ),
@@ -245,9 +244,7 @@ class Tasks extends StatelessWidget {
       mainColumn: mainColumn,
       items: itemskey,
       itemsResult: itemResult,
-      itemsWidget: () => itemsWidget(notifichange: (x) {
-        changenotifitask(notifi: x, e: MYPAGE.eE);
-      }),
+      itemsWidget: () => itemsWidget(),
       notifi: const SizedBox(),
       addlabel: addFunction['addlabel'],
       action: addFunction['action'],
@@ -257,14 +254,12 @@ class Tasks extends StatelessWidget {
       customWidgetofEdit: customWidgetofEdit(),
       textfeildlista: tasks,
       scrollController: scrollController,
-      mainEditvisible: () {
-        return (checkifUserisAdmin() == true ||
-                checkifUserisSupervisorinOffice(
-                        officeid: MYPAGE.eE['task_office_id']) ==
-                    true)
-            ? true
-            : false;
-      },
+      mainEditvisible: () => (checkifUserisAdmin() == true ||
+              checkifUserisSupervisorinOffice(
+                      officeid: MYPAGE.eE['task_office_id']) ==
+                  true)
+          ? true
+          : false,
       subeditvisible: () => checkifUserisSupervisorinOffice(
                   officeid: MYPAGE.eE['task_office_id']) ==
               true
@@ -281,6 +276,24 @@ class Tasks extends StatelessWidget {
       actionSave: () => edittask(e: MYPAGE.eE),
       actionEdit: () => mainController.showeditpanel(),
       actionDelete: () => deletetask(ctx: context, e: MYPAGE.eE),
+      customeditpanelitem: () => Visibility(
+        visible: (checkifUserisAdmin() == true ||
+                checkifUserisSupervisorinOffice(
+                        officeid: MYPAGE.eE['task_office_id']) ==
+                    true)
+            ? true
+            : false,
+        child: Row(
+          children: [
+            Text(MYPAGE.eE['notifi'] == 1 ? "إشعار مفعل" : "إشعار ملغى"),
+            Switch(
+                value: MYPAGE.eE['notifi'] == 1 ? true : false,
+                onChanged: (x) {
+                  mainController.tasknotifichg(x: x, e: MYPAGE.eE);
+                }),
+          ],
+        ),
+      ),
     );
   }
 
@@ -526,10 +539,5 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
             maintableidname: e['task_id'],
             maintablename: 'tasks',
             comment: commentcontrolleredit.text));
-  }
-
-  changenotifitask({e, notifi}) async {
-    MainController mainController = Get.find();
-    await mainController.changenotifitask(id: e['task_id'], notifi: notifi);
   }
 }

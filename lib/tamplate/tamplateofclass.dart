@@ -447,7 +447,8 @@ class MYPAGE extends StatelessWidget {
       required this.items,
       required this.itemsResult,
       required this.itemsWidget,
-      required this.subeditvisible});
+      required this.subeditvisible,
+      required this.customeditpanelitem});
   final List<Map> mylista;
   final String table, tableId, addlabel;
   final Type page;
@@ -465,7 +466,8 @@ class MYPAGE extends StatelessWidget {
       actionDelete,
       itemsWidget,
       mainEditvisible,
-      subeditvisible;
+      subeditvisible,
+      customeditpanelitem;
   final bool mainAddvisible;
   final ScrollController scrollController;
   //static
@@ -589,7 +591,7 @@ class MYPAGE extends StatelessWidget {
                                                           searchbydate(
                                                               ctx: context);
                                                         },
-                                                        icon: Icon(
+                                                        icon: const Icon(
                                                             Icons.date_range))),
                                                 label: "بحث",
                                                 onChanged: (word) {
@@ -643,31 +645,35 @@ class MYPAGE extends StatelessWidget {
                                                           onPressed: () {
                                                             eE = e;
                                                             infoEditItemWidget(
-                                                              page: page,
-                                                              mainEditvisible: () =>
-                                                                  mainEditvisible(),
-                                                              subeditvisible: () =>
-                                                                  subeditvisible(),
-                                                              e: e,
-                                                              ctx: context,
-                                                              scrollController:
-                                                                  scrollController,
-                                                              customInitforEdit:
-                                                                  () =>
-                                                                      customInitforEdit(),
-                                                              textfeildlista:
-                                                                  textfeildlista,
-                                                              customWidgetofEdit:
-                                                                  customWidgetofEdit,
-                                                              getinfo: () =>
-                                                                  getinfo(),
-                                                              actionSave: () =>
-                                                                  actionSave(),
-                                                              actionEdit: () =>
-                                                                  actionEdit(),
-                                                              actionDelete: () =>
-                                                                  actionDelete(),
-                                                            );
+                                                                page: page,
+                                                                mainEditvisible:
+                                                                    () =>
+                                                                        mainEditvisible(),
+                                                                subeditvisible:
+                                                                    () =>
+                                                                        subeditvisible(),
+                                                                e: e,
+                                                                ctx: context,
+                                                                scrollController:
+                                                                    scrollController,
+                                                                customInitforEdit:
+                                                                    () =>
+                                                                        customInitforEdit(),
+                                                                textfeildlista:
+                                                                    textfeildlista,
+                                                                customWidgetofEdit:
+                                                                    customWidgetofEdit,
+                                                                getinfo: () =>
+                                                                    getinfo(),
+                                                                actionSave: () =>
+                                                                    actionSave(),
+                                                                actionEdit: () =>
+                                                                    actionEdit(),
+                                                                actionDelete: () =>
+                                                                    actionDelete(),
+                                                                customeditpanelitem:
+                                                                    () =>
+                                                                        customeditpanelitem());
                                                           },
                                                           icon: const Icon(Icons
                                                               .info_outline)),
@@ -1061,12 +1067,14 @@ class Editpanel extends StatelessWidget {
       required this.e,
       required this.mainEditvisible,
       required this.page,
-      required this.subeditvisible});
-  final Function actionDelete, actionEdit, actionSave;
+      required this.subeditvisible,
+      required this.customeditpanelitem});
+  final Function actionDelete, actionEdit, actionSave, customeditpanelitem;
   final e;
   static bool wait = false, savevisible = false;
   final page;
   final Function mainEditvisible, subeditvisible;
+
   @override
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
@@ -1124,24 +1132,25 @@ class Editpanel extends StatelessWidget {
             visible: !wait,
             child: Directionality(
               textDirection: TextDirection.ltr,
-              child: Row(
-                  children: edititems()
-                      .map((e) => Visibility(
-                            visible: e['visible1'],
-                            child: Visibility(
-                              visible: e['visible0'],
-                              child: Visibility(
-                                visible: e['visible'],
-                                child: IconButton(
-                                    onPressed: e['action'],
-                                    icon: Icon(
-                                      e['icon'],
-                                      color: e['color'],
-                                    )),
-                              ),
-                            ),
-                          ))
-                      .toList()),
+              child: Row(children: [
+                ...edititems().map((e) => Visibility(
+                      visible: e['visible1'],
+                      child: Visibility(
+                        visible: e['visible0'],
+                        child: Visibility(
+                          visible: e['visible'],
+                          child: IconButton(
+                              onPressed: e['action'],
+                              icon: Icon(
+                                e['icon'],
+                                color: e['color'],
+                              )),
+                        ),
+                      ),
+                    )),
+                const Expanded(child: SizedBox()),
+                customeditpanelitem(),
+              ]),
             ),
           ),
           Visibility(
@@ -1187,7 +1196,8 @@ infoEditItemWidget(
     editvisible0,
     deletevisible0,
     page,
-    subeditvisible}) {
+    subeditvisible,
+    customeditpanelitem}) {
   MainController mainController = Get.find();
   initialdataforEdit(
       customInitdataforEdit: customInitforEdit, textfeildlista: textfeildlista);
@@ -1203,6 +1213,7 @@ infoEditItemWidget(
                 actionDelete: actionDelete,
                 actionEdit: actionEdit,
                 actionSave: actionSave,
+                customeditpanelitem: customeditpanelitem,
                 e: e,
                 page: page),
             editpanelvisible: true,

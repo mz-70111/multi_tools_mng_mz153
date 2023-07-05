@@ -842,7 +842,6 @@ where: 'where todo_id=$id;
   edittask({id}) async {
     await DB()
         .customquery(query: 'delete from users_tasks where ut_task_id=$id');
-
     await DB().customquery(query: '''
 update tasks set taskname="${Tasks.tasks[0]['controller'].text}",
 taskdetails="${Tasks.tasks[1]['controller'].text}",
