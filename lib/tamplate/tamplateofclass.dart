@@ -925,33 +925,22 @@ class ADDEDITINFOItem extends StatelessWidget {
               child: Visibility(
                 visible: firstpage,
                 child: Expanded(
-                  child: GridView(
-                      padding: const EdgeInsets.all(8),
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                        mainAxisExtent: 100,
-                        mainAxisSpacing: 0,
-                        crossAxisSpacing: 0,
-                        maxCrossAxisExtent: 600,
-                      ),
-                      children: [
-                        ...textFeildmzlista.map((e) => SizedBox(
-                              width: 100,
-                              child: TextFieldMZ(
-                                onChanged: (x) => null,
-                                label: e['label'],
-                                textEditingController: e['controller'],
-                                error: e['error'],
-                                obscureText: e['obscuretext'],
-                                hint: e['hint'],
-                                textdirection: e['td'] ?? TextDirection.rtl,
-                                maxlines: e['maxlines'] ?? 1,
-                                suffixIcon: IconButton(
-                                    onPressed: e['action'],
-                                    icon: Icon(e['icon'])),
-                              ),
-                            )),
-                      ]),
+                  child: SingleChildScrollView(
+                    child: Column(children: [
+                      ...textFeildmzlista.map((e) => TextFieldMZ(
+                            onChanged: (x) => null,
+                            label: e['label'],
+                            textEditingController: e['controller'],
+                            error: e['error'],
+                            obscureText: e['obscuretext'],
+                            hint: e['hint'],
+                            textdirection: e['td'] ?? TextDirection.rtl,
+                            maxlines: e['maxlines'] ?? 1,
+                            suffixIcon: IconButton(
+                                onPressed: e['action'], icon: Icon(e['icon'])),
+                          )),
+                    ]),
+                  ),
                 ),
               ),
             ),
