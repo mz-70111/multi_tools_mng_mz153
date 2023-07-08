@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
-import 'package:users_tasks_mz_153/main.dart';
 import 'package:users_tasks_mz_153/pages/00_login.dart';
 import 'package:users_tasks_mz_153/pages/01_homepage.dart';
 import 'package:users_tasks_mz_153/pages/02_home.dart';
@@ -597,13 +597,13 @@ class MainController extends GetxController {
         Get.back();
       } catch (e) {
         "$e".contains('timed out')
-            ? Whattodo.errormsg = 'لا يمكن الوصول للمخدم'
+            ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
             : "$e".contains('Duplicat')
                 ? {
-                    Whattodo.errormsg = 'اسم محجوز مسبقا',
+                    ADDEDITINFOItem.errormsg = 'اسم محجوز مسبقا',
                     ADDEDITINFOItem.firstpage = true
                   }
-                : Whattodo.errormsg = "$e";
+                : ADDEDITINFOItem.errormsg = "$e";
       }
       AddPanel.wait = false;
       update();
@@ -1262,6 +1262,23 @@ class MainController extends GetxController {
     update();
   }
 
+  addimagetotodo({required ScrollController scrollcontroller}) async {
+    x() async {
+      FilePickerResult? filepick =
+          await FilePicker.platform.pickFiles(type: FileType.image);
+      PlatformFile file;
+      if (filepick != null) {
+        file = filepick.files.single;
+        print(file.size / 10424);
+      }
+    }
+
+    x();
+
+    Tasks.usersfortasks.clear();
+    update();
+  }
+
   addcomment({e, addcommentaction}) async {
     e['error'] = null;
     try {
@@ -1318,6 +1335,7 @@ class MainController extends GetxController {
       await actioneditcomment();
       Get.back();
     } catch (e) {
+      print(e);
       Comment.errmsg = 'لايمكن الوصول للمخدم';
     }
     Comment.wait = false;
@@ -1561,7 +1579,7 @@ class MainController extends GetxController {
 
 //todo
   chooseofficetodo(x) {
-    Whattodo.todooffice = x;
+    Whattodo.todoofficeNameselected = x;
     update();
   }
 

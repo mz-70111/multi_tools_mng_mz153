@@ -23,19 +23,19 @@ class DBController extends GetxController {
     await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
     try {
-      await DB().createuserstable();
-      await DB().createofficetable();
-      await DB().createusersofficetable();
-      await DB().createtaskstable();
-      await DB().createuserstasktable();
-      await DB().createuserstasksCommentstable();
-      await DB().createtodotable();
-      await DB().createuserstodo();
-      await DB().createuserstodoCommentstable();
-      await DB().createuserstodoRatestable();
-      await DB().createschedueldtable();
-      await DB().createuserschedtable();
-      await DB().createuserschedlogtable();
+      // await DB().createuserstable();
+      // await DB().createofficetable();
+      // await DB().createusersofficetable();
+      // await DB().createtaskstable();
+      // await DB().createuserstasktable();
+      // await DB().createuserstasksCommentstable();
+      // await DB().createtodotable();
+      // await DB().createuserstodo();
+      // await DB().createuserstodoCommentstable();
+      // await DB().createschedueldtable();
+      // await DB().createuserschedtable();
+      // await DB().createuserschedlogtable();
+      // await DB().createtodoimagetable();
     } catch (e) {
       "$e".contains('timed out')
           ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
@@ -72,9 +72,7 @@ class DBController extends GetxController {
         comment = [],
         commentdate = [],
         commentId = [],
-        usersR = [],
-        usersIdR = [],
-        rate = [];
+        images = [];
 
     list.clear();
     desctable = await DB().customquery(query: 'desc $table;');
@@ -196,31 +194,14 @@ class DBController extends GetxController {
         });
         zz = await DB().customquery(
             query:
-                'select * from users_todo_rates where utdr_todo_id=${i['todo_id']}');
-        usersR.clear();
-        usersIdR.clear();
-        rate.clear();
+                'select * from todo_images where ti_todo_id=${i['todo_id']}');
+        images.clear();
         for (var o in zz) {
-          usersIdR.add(o[1]);
-          usersR.add(o[1] != null
-              ? DB.userstable[DB.userstable
-                      .indexWhere((element) => element['user_id'] == o[1])]
-                  ['fullname']
-              : null);
-          rate.add(o[3]);
+          images.add(o[2]);
         }
 
         list[list.indexOf(i)].addAll({
-          'users_id_rate': [...usersIdR],
-          'users_r': [...usersR],
-          'rate': [...rate],
-          'rate_widget': [
-            {'icon': Icons.star_border},
-            {'icon': Icons.star_border},
-            {'icon': Icons.star_border},
-            {'icon': Icons.star_border},
-            {'icon': Icons.star_border}
-          ]
+          'images': [...images]
         });
       } else if (i.keys.toList().first == 'task_id') {
         xx = await DB().customquery(
@@ -407,7 +388,7 @@ values
 "${Whattodo.todos[0]['controller'].text}",
 "${Whattodo.todos[1]['controller'].text}",
 "${DateTime.now()}",
-${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Whattodo.todooffice)]['office_id']}
+${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Whattodo.todoofficeNameselected)]['office_id']}
 );
 ''');
     var todoid;
@@ -451,14 +432,25 @@ $todoid
         'createby': DB.userstable[DB.userstable
             .indexWhere((element) => element['user_id'] == i[1])]['fullname'],
         'commentdate': [],
-        'rate': [],
-        'rate_widget': [],
         'comment': [],
         'waitsend': true,
         'error': null,
         'commentcontroller': TextEditingController(),
       });
     }
+
+    var imagest = await DB().customquery(
+        query:
+            'select * from todo_images where ti_todo_id=(select Max(ti_todo_id) from todo_images where ti_id=(Select max(ti_id)from todo_images));');
+    var images = [];
+    images.clear();
+    for (var i in imagest) {
+      images.add(i[2]);
+    }
+    Whattodo.mylista[Whattodo.mylista.length - 1].addAll({
+      'images': [...images],
+    });
+
     DB.todotable.add(Whattodo.mylista[Whattodo.mylista.length - 1]);
     update();
   }
@@ -538,8 +530,6 @@ $taskid
       'userstask_id': [...users],
       'userstask_name': [...usersname],
       'commentdate': [],
-      'rate': [],
-      'rate_widget': [],
       'comment': [],
       'waitsend': true,
       'error': null,
@@ -828,8 +818,8 @@ update todo set
 todoname="${Whattodo.todos[0]['controller'].text}",
 tododetails="${Whattodo.todos[1]['controller'].text}",
 editdate="${DateTime.now()}",
-todo_office_id=${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Whattodo.todooffice)]['office_id']}
-where: 'where todo_id=$id;
+todo_office_id=${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Whattodo.todoofficeNameselected)]['office_id']}
+where todo_id=$id;
 ''');
     await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
     DB.todotable[

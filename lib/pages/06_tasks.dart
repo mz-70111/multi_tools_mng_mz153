@@ -379,7 +379,6 @@ class Tasks extends StatelessWidget {
                   " أنجزت بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['donedate'] ?? DateTime.now())}"),
             ])),
         Comment(
-          e: e,
           comment: comment,
           deletecomment: () => deletecomment(ctx: ctx, e: e),
           editcomment: () => editcomment(ctx: ctx, e: e),

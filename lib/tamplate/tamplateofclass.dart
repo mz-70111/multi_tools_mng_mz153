@@ -189,7 +189,6 @@ class Comment extends StatelessWidget {
     required this.comment,
     required this.deletecomment,
     required this.editcomment,
-    required this.e,
     required this.tableId,
     required this.tableIdname,
     required this.userIdname,
@@ -200,7 +199,6 @@ class Comment extends StatelessWidget {
   final List<Map> comment;
   final Function deletecomment;
   final Function editcomment;
-  final e;
   static var Ee;
   static bool wait = false;
   static String? errmsg;
@@ -219,10 +217,22 @@ class Comment extends StatelessWidget {
         null;
       }
     }), builder: (_, snap) {
-      List editcommentpanel = [
-        {'icon': Icons.delete, 'action': () => deletecomment()},
-        {'icon': Icons.edit, 'action': () => editcomment()}
-      ];
+      List editcommentpanel(ee) => [
+            {
+              'icon': Icons.delete,
+              'action': () {
+                Ee = ee;
+                return deletecomment();
+              }
+            },
+            {
+              'icon': Icons.edit,
+              'action': () {
+                Ee = ee;
+                return editcomment();
+              }
+            }
+          ];
       if (snap.hasData) {
         return ExpansionTile(title: const Text("التعليقات"), children: [
           ...comment.map((e) {
@@ -245,8 +255,7 @@ class Comment extends StatelessWidget {
                               ? true
                               : false,
                           child: Row(
-                              children: editcommentpanel.map((ed) {
-                            Ee = e;
+                              children: editcommentpanel(e).map((ed) {
                             return Visibility(
                               visible: ed['icon'] == Icons.delete
                                   ? true
@@ -266,7 +275,7 @@ class Comment extends StatelessWidget {
                         ),
                         Text(
                           e[userIdname] != null
-                              ? "${DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == e['utc_user_id'])]['fullname']}"
+                              ? "${DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == e[userIdname])]['fullname']}"
                               : "حساب محذوف",
                           softWrap: true,
                         ),
@@ -295,7 +304,9 @@ class Comment extends StatelessWidget {
   }
 }
 
-deletecommentT({ctx, actiondelete}) {
+deletecommentT({e, ctx, actiondelete}) {
+  Comment.errmsg = null;
+
   MainController mainController = Get.find();
   showDialog(
       context: ctx,
@@ -333,7 +344,9 @@ deletecommentT({ctx, actiondelete}) {
       });
 }
 
-editcommentT({ctx, actionedit, controller}) {
+editcommentT({e, ctx, actionedit, controller}) {
+  Comment.errmsg = null;
+
   MainController mainController = Get.find();
   showDialog(
       context: ctx,
@@ -582,8 +595,7 @@ class MYPAGE extends StatelessWidget {
                                           Expanded(
                                             child: TextFieldMZ(
                                                 suffixIcon: Visibility(
-                                                    visible: page == Tasks ||
-                                                            page == Whattodo
+                                                    visible: page == Tasks
                                                         ? true
                                                         : false,
                                                     child: IconButton(
@@ -1024,7 +1036,6 @@ addItemWidget(
     scrollController}) async {
   try {
     await DB().customquery(query: 'select * from users where user_id=1');
-
     MainController mainController = Get.find();
     initialdataforAdd(
         textfeildlista: textfeildlista,
@@ -1048,6 +1059,7 @@ addItemWidget(
           );
         });
   } catch (e) {
+    print(e);
     return showDialog(
         context: ctx,
         builder: (_) {
