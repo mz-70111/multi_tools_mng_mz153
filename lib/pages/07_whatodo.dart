@@ -97,8 +97,11 @@ class Whattodo extends StatelessWidget {
     Widget customWidgetofADD() => GetBuilder<MainController>(
         init: mainController,
         builder: (_) => Column(mainAxisSize: MainAxisSize.min, children: [
-              Row(children: [
-                const Text("اختيار مكتب"),
+              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("اختيار مكتب"),
+                ),
                 DropdownButton(
                     value: todoofficeNameselected,
                     items: todoofficelist
@@ -116,9 +119,23 @@ class Whattodo extends StatelessWidget {
                     icon: const Icon(Icons.add)),
                 const Text("إضافة صورة"),
               ]),
-              Column(
-                children: Whattodo.images.map((e) => Text(e)).toList(),
-              ),
+              Column(children: [
+                ...Whattodo.images
+                    .map((img) => Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                mainController.deleteimagetodo(
+                                    Whattodo.images.indexOf(img));
+                              },
+                              icon: const Icon(Icons.close),
+                            ),
+                            Image.file(img),
+                          ],
+                        ))
+                    .toList(),
+              ])
             ]));
     Widget customWidgetofEdit() =>
         Column(mainAxisSize: MainAxisSize.min, children: [
@@ -178,6 +195,15 @@ class Whattodo extends StatelessWidget {
               # ${e['todo_id']} ${e['todoname']}
               ${e['tododetails']}
               '''),
+        Column(
+          children: [
+            ...e['images']
+                .map((i) async => Image(
+                    image: await mainController.convertimagestodoTodecode(
+                        image: i)))
+                .toList()
+          ],
+        ),
         const Divider(),
         Text(e['createby_id'] != null
             ? 'تم إنشاءها بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['createdate'])} بواسطة ${DB.userstable[DB.userstable.indexWhere((y) => y['user_id'] == e['createby_id'])]['fullname']}'

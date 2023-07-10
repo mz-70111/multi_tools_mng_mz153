@@ -6,7 +6,7 @@ import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 class DB {
   DBController dbController = Get.find();
   ConnectionSettings settings = ConnectionSettings(
-      host: '192.168.50.50',
+      host: '192.168.1.106',
       port: 3306,
       user: 'mz',
       password: 'mzrootmz',
@@ -147,7 +147,7 @@ tododetails varchar(255),
 createdate TIMESTAMP NULL DEFAULT NULL,
 editdate TIMESTAMP NULL DEFAULT NULL,
 todo_office_id int(11),
-foreign key (todo_office_id) references office(office_id),
+foreign key (todo_office_id) references office(office_id)
 );
 ''');
     await conn.close();

@@ -20,23 +20,24 @@ class DBController extends GetxController {
     LogIn.obscuretext = true;
     LogIn.loginwait = true;
     LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
-    await SharedPreferences.getInstance();
+    LogIn.Pref = await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
     try {
-      // await DB().createuserstable();
-      // await DB().createofficetable();
-      // await DB().createusersofficetable();
-      // await DB().createtaskstable();
-      // await DB().createuserstasktable();
-      // await DB().createuserstasksCommentstable();
-      // await DB().createtodotable();
-      // await DB().createuserstodo();
-      // await DB().createuserstodoCommentstable();
-      // await DB().createschedueldtable();
-      // await DB().createuserschedtable();
-      // await DB().createuserschedlogtable();
-      // await DB().createtodoimagetable();
+      await DB().createuserstable();
+      await DB().createofficetable();
+      await DB().createusersofficetable();
+      await DB().createtaskstable();
+      await DB().createuserstasktable();
+      await DB().createuserstasksCommentstable();
+      await DB().createtodotable();
+      await DB().createuserstodo();
+      await DB().createuserstodoCommentstable();
+      await DB().createschedueldtable();
+      await DB().createuserschedtable();
+      await DB().createuserschedlogtable();
+      await DB().createtodoimagetable();
     } catch (e) {
+      print(e);
       "$e".contains('timed out')
           ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
           : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
@@ -437,6 +438,17 @@ $todoid
         'error': null,
         'commentcontroller': TextEditingController(),
       });
+    }
+
+    for (var i in Whattodo.images) {
+      await DB().customquery(query: '''
+insert into todo_images
+(images,ti_todo_id)values
+(
+"${await mainController.convertimagestodoTocode(image: i)}",
+$todoid
+);
+''');
     }
 
     var imagest = await DB().customquery(

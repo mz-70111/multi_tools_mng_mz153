@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -1089,6 +1091,26 @@ class MainController extends GetxController {
     update();
   }
 
+  convertimagestodoTocode({image}) async {
+    List imglistaftercode = [];
+    imglistaftercode.clear();
+    Uint8List imagebytes = await image.readAsBytes();
+    String base64string = base64.encode(imagebytes);
+    return base64string;
+  }
+
+  convertimagestodoTodecode({image}) async {
+    List imglistaftercode = [];
+    imglistaftercode.clear();
+    Uint8List imagei = base64.decode("$image");
+    return imagei;
+  }
+
+  deleteimagetodo(index) {
+    Whattodo.images.removeAt(index);
+    update();
+  }
+
   selectpriv(value, index) {
     Employ.privilege[index]['privilege'] = value;
     update();
@@ -1264,18 +1286,18 @@ class MainController extends GetxController {
 
   addimagetotodo({required ScrollController scrollcontroller}) async {
     x() async {
+      File result;
       FilePickerResult? filepick =
           await FilePicker.platform.pickFiles(type: FileType.image);
       PlatformFile file;
       if (filepick != null) {
         file = filepick.files.single;
-        print(file.size / 10424);
+        result = File(file.path!);
+        Whattodo.images.add(result);
       }
     }
 
-    x();
-
-    Tasks.usersfortasks.clear();
+    await x();
     update();
   }
 
