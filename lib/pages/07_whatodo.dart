@@ -20,6 +20,8 @@ class Whattodo extends StatelessWidget {
   static List images = [];
   static List<Map> mylista = [], comment = [];
   static TextEditingController commentcontrolleredit = TextEditingController();
+  static List imagcode = [];
+  static int x = 0;
   static List<Map> todos = [
     {
       'label': 'اسم الإجرائية',
@@ -94,7 +96,7 @@ class Whattodo extends StatelessWidget {
 
     Map addFunction = {
       'action': () => addtodo(),
-      'addlabel': 'إضافة مهمة جديدة',
+      'addlabel': 'إضافة إجرائية جديدة',
     };
     Widget customWidgetofADD() => GetBuilder<MainController>(
         init: mainController,
@@ -270,6 +272,7 @@ class Whattodo extends StatelessWidget {
   }
 
   customInitforEdit({e}) async {
+    imagcode.clear();
     for (var i in Whattodo.todos) {
       i['error'] = null;
     }
@@ -287,6 +290,7 @@ class Whattodo extends StatelessWidget {
     Whattodo.tododetails.text = e['tododetails'];
     images.clear();
     for (var i in e['images']) {
+      imagcode.add(i);
       images.add(mainController.convertimagestodoTodecode(image: i));
     }
   }
@@ -314,12 +318,14 @@ class Whattodo extends StatelessWidget {
         .indexWhere((y) => y['username'] == Home.logininfo)]['user_id'];
     e['editdate'] = DateTime.now();
     e['images'].clear();
+    var y = 0;
 
     for (var i in images) {
-      try {
+      if (i.runtimeType == Image) {
+        e['images'].add(imagcode[y]);
+        y++;
+      } else {
         e['images'].add(await mainController.convertimagestodoTocode(image: i));
-      } catch (e) {
-        print(e);
       }
     }
   }

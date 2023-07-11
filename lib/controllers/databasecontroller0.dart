@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,26 +24,25 @@ class DBController extends GetxController {
     LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
     LogIn.Pref = await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
-    // try {
-    //   await DB().createuserstable();
-    //   await DB().createofficetable();
-    //   await DB().createusersofficetable();
-    //   await DB().createtaskstable();
-    //   await DB().createuserstasktable();
-    //   await DB().createuserstasksCommentstable();
-    //   await DB().createtodotable();
-    //   await DB().createuserstodo();
-    //   await DB().createuserstodoCommentstable();
-    //   await DB().createschedueldtable();
-    //   await DB().createuserschedtable();
-    //   await DB().createuserschedlogtable();
-    //   await DB().createtodoimagetable();
-    // } catch (e) {
-    //   print(e);
-    //   "$e".contains('timed out')
-    //       ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
-    //       : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
-    // }
+    try {
+      await DB().createuserstable();
+      await DB().createofficetable();
+      await DB().createusersofficetable();
+      await DB().createtaskstable();
+      await DB().createuserstasktable();
+      await DB().createuserstasksCommentstable();
+      await DB().createtodotable();
+      await DB().createuserstodo();
+      await DB().createuserstodoCommentstable();
+      await DB().createschedueldtable();
+      await DB().createuserschedtable();
+      await DB().createuserschedlogtable();
+      await DB().createtodoimagetable();
+    } catch (e) {
+      "$e".contains('timed out')
+          ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
+          : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
+    }
     if (LogIn.autologin.isNotEmpty) {
       LogIn.username.text = LogIn.autologin[0];
       LogIn.password.text = LogIn.autologin[1];
@@ -441,7 +442,8 @@ $todoid
     }
 
     for (var i in Whattodo.images) {
-      await DB().customquery(query: '''
+      try {
+        await DB().customquery(query: '''
 insert into todo_images
 (images,ti_todo_id)values
 (
@@ -449,6 +451,8 @@ insert into todo_images
 $todoid
 );
 ''');
+      } on Exception {
+      } catch (e) {}
     }
 
     var imagest = await DB().customquery(
@@ -639,9 +643,9 @@ delete from office where office_id=$id;''');
     await DB().customquery(query: '''
 delete from users_todo_comments where utdc_todo_id=$id;''');
     await DB().customquery(query: '''
-delete from users_todo_rates where utdr_todo_id=$id;''');
-    await DB().customquery(query: '''
 delete from users_todo where utd_todo_id=$id; ''');
+    await DB().customquery(query: '''
+delete from todo_images where ti_todo_id=$id; ''');
     await DB().customquery(query: '''
 delete from todo where todo_id=$id; ''');
 
@@ -836,8 +840,13 @@ where todo_id=$id;
     await DB().customquery(query: '''
 delete from todo_images where ti_todo_id=$id;
 ''');
+    Whattodo.x = -1;
     for (var i in Whattodo.images) {
-      await DB().customquery(query: '''
+      if (i.runtimeType == Image) {
+        Whattodo.x++;
+      }
+      try {
+        await DB().customquery(query: '''
 insert into todo_images
 (images,ti_todo_id)values
 (
@@ -845,6 +854,9 @@ insert into todo_images
 $id
 );
 ''');
+      } on Exception {
+        print('xxx');
+      } catch (e) {}
     }
     await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
     DB.todotable[

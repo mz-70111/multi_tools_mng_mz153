@@ -903,6 +903,8 @@ class MainController extends GetxController {
           ADDEDITINFOItem.addeditvisible = false;
           Editpanel.savevisible = false;
           ADDEDITINFOItem.firstpage = true;
+        } on Exception {
+          print('errrrr');
         } catch (e) {
           "$e".contains('timed out')
               ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
@@ -1074,8 +1076,7 @@ class MainController extends GetxController {
 
   convertimagestodoTocode({image}) async {
     if (image.runtimeType == Image) {
-      print(base64.decode(image));
-      return ();
+      return Whattodo.imagcode[Whattodo.x];
     } else {
       Uint8List imagebytes = await image.readAsBytes();
       String base64string = base64.encode(imagebytes);
@@ -1092,6 +1093,9 @@ class MainController extends GetxController {
   }
 
   deleteimagetodo(index) {
+    if (Whattodo.images[index].runtimeType == Image) {
+      Whattodo.imagcode.removeAt(index);
+    }
     Whattodo.images.removeAt(index);
     update();
   }
@@ -1277,7 +1281,7 @@ class MainController extends GetxController {
       PlatformFile file;
       if (filepick != null) {
         file = filepick.files.single;
-        if (file.size > 2000000000) {
+        if (file.size / 1024 / 1024 > 2000) {
           ADDEDITINFOItem.errormsg = "لا يمكن رفع صورة بحجم اكبر من 2 ميغا";
         } else {
           result = File(file.path!);
