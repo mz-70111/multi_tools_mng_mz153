@@ -6,7 +6,7 @@ import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 class DB {
   DBController dbController = Get.find();
   ConnectionSettings settings = ConnectionSettings(
-      host: '192.168.1.106',
+      host: '192.168.50.50',
       port: 3306,
       user: 'mz',
       password: 'mzrootmz',
@@ -161,7 +161,7 @@ create table if not exists todo_images
 ti_id int(11) unique primary key auto_increment,
 ti_todo_id int(11),
 foreign key (ti_todo_id) references todo(todo_id),
-images blob
+images LONGBLOB
 );
 ''');
     await conn.close();

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
@@ -131,7 +133,17 @@ class Whattodo extends StatelessWidget {
                               },
                               icon: const Icon(Icons.close),
                             ),
-                            Image.file(img),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Container(
+                                    decoration:
+                                        BoxDecoration(border: Border.all()),
+                                    child: img.runtimeType == Image
+                                        ? img
+                                        : Image.file(img)),
+                              ),
+                            ),
                           ],
                         ))
                     .toList(),
@@ -197,11 +209,25 @@ class Whattodo extends StatelessWidget {
               '''),
         Column(
           children: [
-            ...e['images']
-                .map((i) async => Image(
-                    image: await mainController.convertimagestodoTodecode(
-                        image: i)))
-                .toList()
+            ...e['images'].map((i) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Container(
+                                decoration: BoxDecoration(border: Border.all()),
+                                child: mainController.convertimagestodoTodecode(
+                                    image: i)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ))
           ],
         ),
         const Divider(),
@@ -215,9 +241,6 @@ class Whattodo extends StatelessWidget {
               : 'تم تعديلها بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['editdate'] ?? DateTime.now())} بواسطة حساب محذوف'),
         ),
         const Divider(),
-        Column(
-          children: [...e['images'].map((e) => Text(e))],
-        ),
         const Divider(),
         Comment(
           comment: comment,
@@ -260,12 +283,11 @@ class Whattodo extends StatelessWidget {
     todoofficeNameselected = DB.officetable[DB.officetable.indexWhere(
             (element) => element['office_id'] == e['todo_office_id'])]
         ['officename'];
-
     Whattodo.todoname.text = e['todoname'];
     Whattodo.tododetails.text = e['tododetails'];
     images.clear();
     for (var i in e['images']) {
-      images.add(i);
+      images.add(mainController.convertimagestodoTodecode(image: i));
     }
   }
 
@@ -285,15 +307,20 @@ class Whattodo extends StatelessWidget {
     updateafteredit(e: e);
   }
 
-  updateafteredit({e}) {
+  updateafteredit({e}) async {
     e['todoname'] = Whattodo.todos[0]['controller'].text;
     e['tododetails'] = Whattodo.todos[1]['controller'].text;
     e['editby_id'] = DB.userstable[DB.userstable
         .indexWhere((y) => y['username'] == Home.logininfo)]['user_id'];
     e['editdate'] = DateTime.now();
     e['images'].clear();
+
     for (var i in images) {
-      e['images'].add(i);
+      try {
+        e['images'].add(await mainController.convertimagestodoTocode(image: i));
+      } catch (e) {
+        print(e);
+      }
     }
   }
 

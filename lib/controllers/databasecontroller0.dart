@@ -22,26 +22,26 @@ class DBController extends GetxController {
     LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
     LogIn.Pref = await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
-    try {
-      await DB().createuserstable();
-      await DB().createofficetable();
-      await DB().createusersofficetable();
-      await DB().createtaskstable();
-      await DB().createuserstasktable();
-      await DB().createuserstasksCommentstable();
-      await DB().createtodotable();
-      await DB().createuserstodo();
-      await DB().createuserstodoCommentstable();
-      await DB().createschedueldtable();
-      await DB().createuserschedtable();
-      await DB().createuserschedlogtable();
-      await DB().createtodoimagetable();
-    } catch (e) {
-      print(e);
-      "$e".contains('timed out')
-          ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
-          : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
-    }
+    // try {
+    //   await DB().createuserstable();
+    //   await DB().createofficetable();
+    //   await DB().createusersofficetable();
+    //   await DB().createtaskstable();
+    //   await DB().createuserstasktable();
+    //   await DB().createuserstasksCommentstable();
+    //   await DB().createtodotable();
+    //   await DB().createuserstodo();
+    //   await DB().createuserstodoCommentstable();
+    //   await DB().createschedueldtable();
+    //   await DB().createuserschedtable();
+    //   await DB().createuserschedlogtable();
+    //   await DB().createtodoimagetable();
+    // } catch (e) {
+    //   print(e);
+    //   "$e".contains('timed out')
+    //       ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
+    //       : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
+    // }
     if (LogIn.autologin.isNotEmpty) {
       LogIn.username.text = LogIn.autologin[0];
       LogIn.password.text = LogIn.autologin[1];
@@ -833,6 +833,19 @@ editdate="${DateTime.now()}",
 todo_office_id=${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Whattodo.todoofficeNameselected)]['office_id']}
 where todo_id=$id;
 ''');
+    await DB().customquery(query: '''
+delete from todo_images where ti_todo_id=$id;
+''');
+    for (var i in Whattodo.images) {
+      await DB().customquery(query: '''
+insert into todo_images
+(images,ti_todo_id)values
+(
+"${await mainController.convertimagestodoTocode(image: i)}",
+$id
+);
+''');
+    }
     await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
     DB.todotable[
             DB.todotable.indexWhere((element) => element['todo_id'] == id)] =
@@ -896,34 +909,6 @@ where task_id=$id;
       ...DB.todotable
     ];
     update();
-  }
-
-  rates({userid, todoid, rate, index}) async {
-    if (Whattodo.mylista[index]['users_id_rate'].isEmpty ||
-        !Whattodo.mylista[index]['users_id_rate'].contains(userid)) {
-      await DB().customquery(query: '''
-insert into users_todo_rates
-(utdr_user_id,utdr_todo_id,rates)values
-(
-$userid,
-$todoid,
-$rate
-''');
-    } else {
-      await DB().customquery(query: '''
-update users_todo_rates
-set rates=$rate
-where utdr_user_id=$userid && utdr_todo_id=$todoid;
-''');
-    }
-
-    await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
-    Home.searchlist = [
-      ...DB.officetable,
-      ...DB.userstable,
-      ...DB.tasktable,
-      ...DB.todotable
-    ];
   }
 
   updatepersonalinfo({fullname, mobile, email, id}) async {

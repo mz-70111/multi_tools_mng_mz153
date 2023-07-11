@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_string_interpolations
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -199,27 +201,6 @@ class MainController extends GetxController {
 
   taskduration(x) {
     Tasks.duration = x;
-    update();
-  }
-
-  rate(index, ratting, userid, todoid) async {
-    for (var i in Whattodo.mylista[index]['rate_widget']) {
-      i['icon'] = Icons.star_border;
-    }
-    f:
-    for (var i in Whattodo.mylista[index]['rate_widget']) {
-      i['icon'] = Icons.star;
-      if (ratting == Whattodo.mylista[index]['rate_widget'].indexOf(i)) {
-        break f;
-      }
-    }
-    try {
-      await DBController().rates(
-          userid: userid, todoid: todoid, rate: ratting + 1, index: index);
-    } catch (e) {
-      null;
-    }
-
     update();
   }
 
@@ -1092,18 +1073,22 @@ class MainController extends GetxController {
   }
 
   convertimagestodoTocode({image}) async {
-    List imglistaftercode = [];
-    imglistaftercode.clear();
-    Uint8List imagebytes = await image.readAsBytes();
-    String base64string = base64.encode(imagebytes);
-    return base64string;
+    if (image.runtimeType == Image) {
+      print(base64.decode(image));
+      return ();
+    } else {
+      Uint8List imagebytes = await image.readAsBytes();
+      String base64string = base64.encode(imagebytes);
+      return base64string;
+    }
   }
 
-  convertimagestodoTodecode({image}) async {
-    List imglistaftercode = [];
-    imglistaftercode.clear();
-    Uint8List imagei = base64.decode("$image");
-    return imagei;
+  convertimagestodoTodecode({image}) {
+    Uint8List imagei;
+    image =
+        "${image.toString().length % 4 != 0 ? image.toString().substring(0, image.toString().length - image.toString().length % 4) : image}";
+    imagei = base64.decode(image);
+    return Image.memory(imagei);
   }
 
   deleteimagetodo(index) {
@@ -1292,8 +1277,14 @@ class MainController extends GetxController {
       PlatformFile file;
       if (filepick != null) {
         file = filepick.files.single;
-        result = File(file.path!);
-        Whattodo.images.add(result);
+        if (file.size > 2000000000) {
+          ADDEDITINFOItem.errormsg = "لا يمكن رفع صورة بحجم اكبر من 2 ميغا";
+        } else {
+          result = File(file.path!);
+          Whattodo.images.add(result);
+        }
+      } else {
+        null;
       }
     }
 
