@@ -362,9 +362,12 @@ class Office extends StatelessWidget {
   gettaskinfoOffice({ctx, e}) {
     List usershavenotask = [];
     String mymsg = '';
-
     for (var i in e['users'] ?? []) {
-      if (checkifUserisSupervisorinOffice(officeid: e['office_id']) == false) {
+      if (checkifUserisSupervisorinOffice(
+            officeid: e['office_id'],
+            userid: i,
+          ) ==
+          false) {
         if (!usershavenotask.contains(DB.userstable[DB.userstable
             .indexWhere((element) => element['user_id'] == i)]['fullname'])) {
           usershavenotask.add(DB.userstable[DB.userstable
@@ -392,7 +395,7 @@ ${Tasks.mymsgTask(e: j)}
     }
 
     for (var iii in usershavenotask) {
-      mymsg += '$iii ليس لديه مهمة في  ${e['officename']}\n';
+      mymsg += '$iii ليس لديه مهمة حاليا \n';
     }
 
     showDialog(
@@ -405,10 +408,14 @@ ${Tasks.mymsgTask(e: j)}
               content: SelectableText(mymsg),
               actions: [
                 Visibility(
-                  visible:
-                      checkifUserisSupervisorinOffice(officeid: e['office_id'])
-                          ? true
-                          : false,
+                  visible: checkifUserisSupervisorinOffice(
+                    officeid: e['office_id'],
+                    userid: DB.userstable[DB.userstable.indexWhere(
+                            (element) => element['username'] == Home.logininfo)]
+                        ['user_id'],
+                  )
+                      ? true
+                      : false,
                   child: TextButton.icon(
                       label: Text("إرسال اشعار الى ${e['officename']}"),
                       onPressed: () async {

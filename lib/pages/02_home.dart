@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/themeController.dart';
 
@@ -9,6 +8,7 @@ import 'package:users_tasks_mz_153/pages/officemanagment.dart';
 import 'package:users_tasks_mz_153/pages/employaccount.dart';
 import 'package:users_tasks_mz_153/pages/06_tasks.dart';
 import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
+import 'package:users_tasks_mz_153/pages/remind.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/bottomnavbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
@@ -65,13 +65,12 @@ class Home extends StatelessWidget {
     },
     {
       'visible': false,
-      'label': 'المهام المجدولة للتذكير',
+      'label': 'التذكير',
       'icon': Icons.work_history,
-      'page': null
+      'page': Remind()
     }
   ];
   Home({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,6 +119,7 @@ class Home extends StatelessWidget {
                                                       'officename',
                                                       'taskname',
                                                       'todoname',
+                                                      'remindname'
                                                     ]);
                                               }),
                                           Expanded(
@@ -149,26 +149,8 @@ class Home extends StatelessWidget {
                                                     ],
                                                   ),
                                                   ...searchlist.map((e) {
-                                                    String i;
-                                                    e.keys.toList().first ==
-                                                            'user_id'
-                                                        ? i = "${e['fullname']}"
-                                                        : e
-                                                                    .keys
-                                                                    .toList()
-                                                                    .first ==
-                                                                'office_id'
-                                                            ? i =
-                                                                e['officename']
-                                                            : e
-                                                                        .keys
-                                                                        .toList()
-                                                                        .first ==
-                                                                    'task_id'
-                                                                ? i =
-                                                                    "${e['taskname']} ${df.DateFormat("yyyy-MM-dd HH:mm").format(e['createdate'])}"
-                                                                : i = e[
-                                                                    'todoname'];
+                                                    String i = '';
+                                                    i = isearchlist(e: e);
 
                                                     return Visibility(
                                                       visible: e['visible'],
@@ -273,6 +255,22 @@ class Home extends StatelessWidget {
       ),
     );
   }
+}
+
+isearchlist({e}) {
+  String i;
+  e.keys.toList().first == 'user_id'
+      ? i = "${e['fullname']}"
+      : e.keys.toList().first == 'office_id'
+          ? i = e['officename']
+          : e.keys.toList().first == 'task_id'
+              ? i =
+                  "${e['taskname']} ${df.DateFormat("yyyy-MM-dd HH:mm").format(e['createdate'])}"
+              : e.keys.toList().first == 'todo_id'
+                  ? i = e['todoname']
+                  : i = e['remindname'];
+
+  return i;
 }
 
 searchbydate({ctx}) {

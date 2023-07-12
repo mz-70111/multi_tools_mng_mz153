@@ -10,22 +10,21 @@ import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 import 'package:intl/intl.dart' as df;
 
-class Whattodo extends StatelessWidget {
-  Whattodo({super.key});
+class Remind extends StatelessWidget {
+  Remind({super.key});
   DBController dbController = Get.find();
-  static TextEditingController todoname = TextEditingController();
-  static TextEditingController tododetails = TextEditingController();
-  static String? todoofficeNameselected;
-  static List todoofficelist = [];
-  static List images = [];
+  static TextEditingController remindname = TextEditingController();
+  static TextEditingController reminddetails = TextEditingController();
+  static String? remindofficeNameselected;
+  static List remindofficelist = [];
   static List<Map> mylista = [], comment = [];
   static TextEditingController commentcontrolleredit = TextEditingController();
   static List imagcode = [];
   static int x = 0;
-  static List<Map> todos = [
+  static List<Map> reminds = [
     {
-      'label': 'اسم الإجرائية',
-      'controller': todoname,
+      'label': 'عنوان التذكير',
+      'controller': remindname,
       'error': null,
       'icon': Icons.work,
       'obscuretext': false,
@@ -33,9 +32,9 @@ class Whattodo extends StatelessWidget {
     },
     {
       'label': 'التفاصيل',
-      'controller': tododetails,
+      'controller': reminddetails,
       'error': null,
-      'icon': Icons.api,
+      'icon': Icons.details,
       'obscuretext': false,
       'hint': '',
       'maxlines': 4
@@ -46,14 +45,34 @@ class Whattodo extends StatelessWidget {
   Widget build(BuildContext context) {
     List mainColumn = [
       {
-        'label': 'الإجرائية',
+        'label': 'عنوان التذكير',
         'icon': Icons.sort,
         'action': () {
-          mainController.sort(table: mylista, sortby: 'todoname');
+          mainController.sort(table: mylista, sortby: 'remindname');
+        }
+      },
+      {
+        'label': 'نوع التذكير',
+        'icon': Icons.sort,
+        'action': () {
+          mainController.sort(table: mylista, sortby: 'type');
+        }
+      },
+      {
+        'label': 'حالة التذكير',
+        'icon': Icons.sort,
+        'action': () {
+          mainController.sort(table: mylista, sortby: 'status');
         }
       },
     ];
-    List itemskey = ['todo_office_id', 'todo_id', 'todoname', 'tododetails'];
+    List itemskey = [
+      'remind_office_id',
+      'remind_id',
+      'remindname',
+      'type',
+      'status'
+    ];
     List itemResult = [];
     List colors = [];
     Widget itemsWidget() {
@@ -64,39 +83,37 @@ class Whattodo extends StatelessWidget {
       return Column(children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              ...colors.map((c) =>
-                  Container(height: 50, width: 10, color: Color(int.parse(c)))),
-              Expanded(
-                  child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: Text(
-                      "# ${itemResult[1]}_ ${itemResult[2]}",
-                      style: const TextStyle(fontSize: 13),
-                    )),
-                    Expanded(
-                        child: itemResult[3].length > 10
-                            ? Text(
-                                "${itemResult[3].toString().substring(0, 10)} ...")
-                            : Text(itemResult[3]))
-                  ],
-                ),
-              )),
-            ],
-          ),
+          child: Row(mainAxisSize: MainAxisSize.max, children: [
+            ...colors.map((c) =>
+                Container(height: 50, width: 10, color: Color(int.parse(c)))),
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                      child: Text(
+                    "# ${itemResult[1]}_ ${itemResult[2]}",
+                    style: const TextStyle(fontSize: 13),
+                  )),
+                  Expanded(child: Text(itemResult[3])),
+                  Expanded(
+                      child: Container(
+                    height: 20,
+                    color: itemResult[4] == 1 ? Colors.red : Colors.green,
+                  ))
+                ],
+              ),
+            )),
+          ]),
         ),
         const Divider(),
       ]);
     }
 
     Map addFunction = {
-      'action': () => addtodo(),
-      'addlabel': 'إضافة إجرائية جديدة',
+      'action': () => addremind(),
+      'addlabel': 'إضافة تذكير جديد',
     };
     Widget customWidgetofADD() => GetBuilder<MainController>(
         init: mainController,
@@ -107,49 +124,13 @@ class Whattodo extends StatelessWidget {
                   child: Text("اختيار مكتب"),
                 ),
                 DropdownButton(
-                    value: todoofficeNameselected,
-                    items: todoofficelist
+                    value: remindofficeNameselected,
+                    items: remindofficelist
                         .map((e) =>
                             DropdownMenuItem(value: "$e", child: Text(e)))
                         .toList(),
-                    onChanged: (x) => mainController.chooseofficetodo(x)),
+                    onChanged: (x) => mainController.chooseofficeremind(x)),
               ]),
-              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                IconButton(
-                    onPressed: () {
-                      mainController.addimagetotodo(
-                          scrollcontroller: scrollController);
-                    },
-                    icon: const Icon(Icons.add)),
-                const Text("إضافة صورة"),
-              ]),
-              Column(children: [
-                ...Whattodo.images
-                    .map((img) => Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                mainController.deleteimagetodo(
-                                    Whattodo.images.indexOf(img));
-                              },
-                              icon: const Icon(Icons.close),
-                            ),
-                            Expanded(
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Container(
-                                    decoration:
-                                        BoxDecoration(border: Border.all()),
-                                    child: img.runtimeType == Image
-                                        ? img
-                                        : Image.file(img)),
-                              ),
-                            ),
-                          ],
-                        ))
-                    .toList(),
-              ])
             ]));
     Widget customWidgetofEdit() =>
         Column(mainAxisSize: MainAxisSize.min, children: [
@@ -159,7 +140,7 @@ class Whattodo extends StatelessWidget {
         mylista: mylista,
         table: 'todo',
         tableId: 'todo_id',
-        page: Whattodo,
+        page: Remind,
         searchRange: const ['todoname', 'tododetails'],
         mainColumn: mainColumn,
         items: itemskey,
@@ -172,7 +153,7 @@ class Whattodo extends StatelessWidget {
         customWidgetofADD: customWidgetofADD(),
         customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
         customWidgetofEdit: customWidgetofEdit(),
-        textfeildlista: todos,
+        textfeildlista: reminds,
         scrollController: scrollController,
         mainEditvisible: () => (checkifUserisAdmin() == true ||
                 checkifUserisSupervisorinOffice(
@@ -207,7 +188,7 @@ class Whattodo extends StatelessWidget {
             ctx: context,
           );
         },
-        actionSave: () => edittodo(e: MYPAGE.eE),
+        actionSave: () => editremind(e: MYPAGE.eE),
         actionEdit: () => mainController.showeditpanel(),
         actionDelete: () => deletetodo(ctx: context, e: MYPAGE.eE),
         customeditpanelitem: () => const SizedBox());
@@ -218,34 +199,11 @@ class Whattodo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text("${e['todo_office_id'] ?? 'مكتب محذوف'}"),
+        Text("${e['remind_office_id'] ?? 'مكتب محذوف'}"),
         SelectableText('''
-              # ${e['todo_id']} ${e['todoname']}
-              ${e['tododetails']}
+              # ${e['remind_id']} ${e['remindname']}
+              ${e['reminddetails']}
               '''),
-        Column(
-          children: [
-            ...e['images'].map((i) => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Container(
-                                decoration: BoxDecoration(border: Border.all()),
-                                child: mainController.convertimagestodoTodecode(
-                                    image: i)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ))
-          ],
-        ),
         const Divider(),
         Text(e['createby_id'] != null
             ? 'تم إنشاءها بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['createdate'])} بواسطة ${DB.userstable[DB.userstable.indexWhere((y) => y['user_id'] == e['createby_id'])]['fullname']}'
@@ -274,7 +232,7 @@ class Whattodo extends StatelessWidget {
   }
 
   customInitforAdd() {
-    todoofficelist.clear();
+    remindofficelist.clear();
     for (var i in DB.officetable) {
       if (checkifUserisUserinOffice(officeid: i['office_id']) == true ||
           checkifUserisSupervisorinOffice(
@@ -284,19 +242,17 @@ class Whattodo extends StatelessWidget {
                     ['user_id'],
               ) ==
               true) {
-        todoofficelist.add(i['officename']);
+        remindofficelist.add(i['officename']);
       }
     }
-    todoofficeNameselected = todoofficelist[0];
-    images.clear();
+    remindofficeNameselected = remindofficelist[0];
   }
 
   customInitforEdit({e}) async {
-    imagcode.clear();
-    for (var i in Whattodo.todos) {
+    for (var i in Remind.reminds) {
       i['error'] = null;
     }
-    todoofficelist.clear();
+    remindofficelist.clear();
     for (var i in DB.officetable) {
       if (checkifUserisUserinOffice(officeid: i['office_id']) == true ||
           checkifUserisSupervisorinOffice(
@@ -306,60 +262,44 @@ class Whattodo extends StatelessWidget {
                     ['user_id'],
               ) ==
               true) {
-        todoofficelist.add(i['officename']);
+        remindofficelist.add(i['officename']);
       }
     }
-    todoofficeNameselected = DB.officetable[DB.officetable.indexWhere(
+    remindofficeNameselected = DB.officetable[DB.officetable.indexWhere(
             (element) => element['office_id'] == e['todo_office_id'])]
         ['officename'];
-    Whattodo.todoname.text = e['todoname'];
-    Whattodo.tododetails.text = e['tododetails'];
-    images.clear();
-    for (var i in e['images']) {
-      imagcode.add(i);
-      images.add(mainController.convertimagestodoTodecode(image: i));
-    }
+    Remind.remindname.text = e['remindname'];
+    Remind.reminddetails.text = e['reminddetails'];
   }
 
-  addtodo() async {
+  addremind() async {
     MainController mainController = Get.find();
     await mainController.addItemMainController(
-        page: Whattodo,
-        listofFeildmz: Whattodo.todos,
-        itemnameController: Whattodo.todoname.text,
-        scrollcontroller: Whattodo.scrollController);
+        page: Remind,
+        listofFeildmz: Remind.reminds,
+        itemnameController: Remind.remindname.text,
+        scrollcontroller: Remind.scrollController);
   }
 
-  edittodo({e}) async {
+  editremind({e}) async {
     MainController mainController = Get.find();
     await mainController.editItemMainController(
-        page: Whattodo, e: MYPAGE.eE, listofFeildmz: Whattodo.todos);
+        page: Remind, e: MYPAGE.eE, listofFeildmz: Remind.reminds);
     updateafteredit(e: e);
   }
 
   updateafteredit({e}) async {
-    e['todoname'] = Whattodo.todos[0]['controller'].text;
-    e['tododetails'] = Whattodo.todos[1]['controller'].text;
+    e['todoname'] = Remind.reminds[0]['controller'].text;
+    e['tododetails'] = Remind.reminds[1]['controller'].text;
     e['editby_id'] = DB.userstable[DB.userstable
         .indexWhere((y) => y['username'] == Home.logininfo)]['user_id'];
     e['editdate'] = DateTime.now();
     e['images'].clear();
-    var y = 0;
-
-    for (var i in images) {
-      if (i.runtimeType == Image) {
-        e['images'].add(imagcode[y]);
-        y++;
-      } else {
-        e['images'].add(await mainController.convertimagestodoTocode(image: i));
-      }
-    }
   }
 
   deletetodo({ctx, e}) async {
     MainController mainController = Get.find();
-    await mainController.deleteItemMainController(
-        ctx: ctx, e: e, page: Whattodo);
+    await mainController.deleteItemMainController(ctx: ctx, e: e, page: Remind);
   }
 
   addcomment({e}) async {

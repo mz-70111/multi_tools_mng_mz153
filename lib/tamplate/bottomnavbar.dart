@@ -129,13 +129,20 @@ class BottomNBMZ extends StatelessWidget {
   }
 }
 
+MainController mainController = Get.find();
+
 class MoreTools extends StatelessWidget {
   MoreTools({super.key});
   ThemeController themeController = Get.find();
-  MainController mainController = Get.find();
   static double dropend = 1000;
   static List moretoolslist = [
-    {'label': 'تذكير', 'action': () {}, 'size': 150.0},
+    {
+      'label': 'تذكير',
+      'action': () {
+        mainController.homemaincontent(6);
+      },
+      'size': 150.0
+    },
     {'label': 'ping', 'action': () {}, 'size': 150.0},
     {'label': 'مقسم', 'action': () {}, 'size': 150.0}
   ];

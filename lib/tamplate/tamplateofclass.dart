@@ -249,6 +249,10 @@ class Comment extends StatelessWidget {
                           visible: checkifUserisSame(userId: e[userIdname]) ==
                                       true ||
                                   checkifUserisSupervisorinOffice(
+                                          userid: DB.userstable[DB.userstable
+                                              .indexWhere((element) =>
+                                                  element['username'] ==
+                                                  Home.logininfo)]['user_id'],
                                           officeid: officeId) ==
                                       true ||
                                   checkifUserisAdmin() == true
@@ -796,16 +800,13 @@ checkifUserisSupervisorinAnyOffice() {
   return result;
 }
 
-checkifUserisSupervisorinOffice({officeid}) {
+checkifUserisSupervisorinOffice({officeid, required userid}) {
   bool result = false;
   for (var j in DB.userstable) {
     for (var l = 0; l < j['office'].length; l++) {
       if (j['office'][l] == officeid &&
           j['privilege'][l] == 'مشرف' &&
-          DB.userstable[DB.userstable.indexWhere(
-                      (element) => element['username'] == Home.logininfo)]
-                  ['user_id'] ==
-              j['user_id']) {
+          userid == j['user_id']) {
         result = true;
       }
     }

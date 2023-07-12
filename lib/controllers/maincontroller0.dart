@@ -16,6 +16,7 @@ import 'package:users_tasks_mz_153/pages/officemanagment.dart';
 import 'package:users_tasks_mz_153/pages/employaccount.dart';
 import 'package:users_tasks_mz_153/pages/06_tasks.dart';
 import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
+import 'package:users_tasks_mz_153/pages/remind.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/bottomnavbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
@@ -248,6 +249,7 @@ class MainController extends GetxController {
         if (i.keys.toList().first == 'office_id') {
           for (var j in Home.searchlist) {
             if (i['check'] == true) {
+              print(i['users']);
               if (i['users'].contains(j['user_id'])) {
                 j['check'] = true;
               }
@@ -257,11 +259,16 @@ class MainController extends GetxController {
               if (i['office_id'] == j['todo_office_id']) {
                 j['check'] = true;
               }
+              if (i['office_id'] == j['remind']) {
+                j['check'] = true;
+              }
             }
           }
         }
       }
-    } catch (r) {}
+    } catch (r) {
+      print(r);
+    }
     update();
   }
 
@@ -574,6 +581,35 @@ class MainController extends GetxController {
           }
         }
         await DBController().addtodo();
+        for (var i in Whattodo.todos) {
+          i['controller'].text = '';
+        }
+        Get.back();
+      } catch (e) {
+        "$e".contains('timed out')
+            ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
+            : "$e".contains('Duplicat')
+                ? {
+                    ADDEDITINFOItem.errormsg = 'اسم محجوز مسبقا',
+                    ADDEDITINFOItem.firstpage = true
+                  }
+                : ADDEDITINFOItem.errormsg = "$e";
+      }
+      AddPanel.wait = false;
+      update();
+    } else if (page == Remind) {
+      ADDEDITINFOItem.errormsg = null;
+      try {
+        AddPanel.wait = true;
+        update();
+        for (var i in DB.todotable) {
+          for (var l in Home.searchlist) {
+            if (l['office_id'] == i['remind_office_id']) {
+              l['check'] = true;
+            }
+          }
+        }
+        await DBController().addremind();
         for (var i in Whattodo.todos) {
           i['controller'].text = '';
         }
@@ -1025,6 +1061,7 @@ class MainController extends GetxController {
         }
       }
     } catch (r) {
+      print(r);
       null;
     }
     update();
@@ -1281,8 +1318,8 @@ class MainController extends GetxController {
       PlatformFile file;
       if (filepick != null) {
         file = filepick.files.single;
-        if (file.size / 1024 / 1024 > 2000) {
-          ADDEDITINFOItem.errormsg = "لا يمكن رفع صورة بحجم اكبر من 2 ميغا";
+        if (file.size / 1024 > 200) {
+          ADDEDITINFOItem.errormsg = "لا يمكن رفع صورة بحجم اكبر من  200kb";
         } else {
           result = File(file.path!);
           Whattodo.images.add(result);
@@ -1491,11 +1528,12 @@ class MainController extends GetxController {
         update();
         await dbController.updatepassword(
             newpass: LogIn.newpassword.text,
-            id: DB.userstable[DB.userstable.indexWhere(
-                    (element) => element['username'] == LogIn.username.text)]
+            id: DB.userstable[DB.userstable.indexWhere((element) =>
+                    element['username'] == LogIn.username.text.toLowerCase())]
                 ['user_id']);
         await setlogin(
-            username: LogIn.username.text, password: LogIn.newpassword.text);
+            username: LogIn.username.text.toLowerCase(),
+            password: LogIn.newpassword.text);
         Home.searchlist = [
           ...DB.officetable,
           ...DB.userstable,
@@ -1600,6 +1638,11 @@ class MainController extends GetxController {
     update();
   }
 
+  chooseofficeremind(x) {
+    Remind.remindofficeNameselected = x;
+    update();
+  }
+
   snakbar(ctx, String mymsg) {
     SnackBar mysnak = SnackBar(
       duration: Duration(seconds: 1),
@@ -1650,7 +1693,8 @@ class MainController extends GetxController {
               LogIn.oldpassvisible = false;
             } else {
               await setlogin(
-                  username: LogIn.username.text, password: LogIn.password.text);
+                  username: LogIn.username.text.toLowerCase(),
+                  password: LogIn.password.text);
               Home.searchlist = [
                 ...DB.officetable,
                 ...DB.userstable,

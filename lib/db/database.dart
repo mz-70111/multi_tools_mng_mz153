@@ -201,22 +201,6 @@ commentdate TIMESTAMP  NULL DEFAULT NULL
     await conn.close();
   }
 
-  createuserstodoRatestable() async {
-    MySqlConnection conn = await MySqlConnection.connect(settings);
-    await conn.query('''
-create table if not exists users_todo_rates
-(
-utdr_id int(11) unique primary key auto_increment,
-utdr_user_id int(11),
-foreign key (utdr_user_id) references users(user_id),
-utdr_todo_id int(11),
-foreign key (utdr_todo_id) references todo(todo_id),
-rates int(11)
-);
-''');
-    await conn.close();
-  }
-
   customquery({query}) async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
     var t = await conn.query(query);
@@ -224,55 +208,73 @@ rates int(11)
     return t;
   }
 
-  createschedueldtable() async {
+  createremindtable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
     await conn.query('''
-create table if not exists sched
+create table if not exists remind
 (
-sched_id int(11) unique primary key auto_increment,
-schedname varchar(255) unique,
-scheddetails varchar(255),
-notifigroup varchar(255),
+remind_id int(11) unique primary key auto_increment,
+remindname varchar(255) unique,
+reminddetails varchar(255),
+createdate TIMESTAMP NULL DEFAULT NULL,
+editdate TIMESTAMP NULL DEFAULT NULL,
 notifi tinyint(1) default 1,
+status tinyint(1) default 0,
 type varchar(255),
-reminddate int
+reminddate TIMESTAMP  NULL DEFAULT NULL,
+remind_office_id int(11),
+foreign key (remind_office_id) references office(office_id)
 );
 ''');
     await conn.close();
   }
 
-  createuserschedtable() async {
+  createusersremindtable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
     await conn.query('''
-create table if not exists users_sched
+create table if not exists users_remind
 (
-us_id int(11) unique primary key auto_increment,
-us_usercreate_id int(11),
-foreign key (us_usercreate_id) references users(user_id),
+ur_id int(11) unique primary key auto_increment,
+createby_id int(11),
+foreign key (createby_id) references users(user_id),
 createdate TIMESTAMP  NULL DEFAULT NULL,
-us_useredit_id int(11),
-foreign key (us_useredit_id) references users(user_id),
+editby_id int(11),
+foreign key (editby_id) references users(user_id),
 editdate TIMESTAMP  NULL DEFAULT NULL,
-us_sched_id int(11),
-foreign key (us_sched_id) references sched(sched_id)
+ur_remind_id int(11),
+foreign key (ur_remind_id) references remind(remind_id)
 );
 ''');
     await conn.close();
   }
 
-  createuserschedlogtable() async {
+  createremindlog() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
     await conn.query('''
-create table if not exists users_sched_log
+create table if not exists remind_log
 (
-us_idlog int(11) unique primary key auto_increment,
-us_user_idlog int(11),
-foreign key (us_user_idlog) references users(user_id),
-us_sched_idlog int(11),
-foreign key (us_sched_idlog) references sched(sched_id),
+rlog_id int(11) unique primary key auto_increment,
+rlog_remind_id int(11),
+foreign key (rlog_remind_id) references remind(remind_id),
+log varchar(255),
+logdate TIMESTAMP  NULL DEFAULT NULL
+);
+''');
+    await conn.close();
+  }
+
+  createusersremindCommentable() async {
+    MySqlConnection conn = await MySqlConnection.connect(settings);
+    await conn.query('''
+create table if not exists users_remind_commnents
+(
+urc_id int(11) unique primary key auto_increment,
+urc_user_id int(11),
+foreign key (urc_user_id) references users(user_id),
+urc_remind_id int(11),
+foreign key (urc_remind_id) references remind(remind_id),
 comment varchar(255),
-commentdate TIMESTAMP  NULL DEFAULT NULL,
-remindlog varchar(255)
+commentdate TIMESTAMP  NULL DEFAULT NULL
 );
 ''');
     await conn.close();

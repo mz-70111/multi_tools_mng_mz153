@@ -13,6 +13,7 @@ import 'package:users_tasks_mz_153/pages/officemanagment.dart';
 import 'package:users_tasks_mz_153/pages/employaccount.dart';
 import 'package:users_tasks_mz_153/pages/06_tasks.dart';
 import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
+import 'package:users_tasks_mz_153/pages/remind.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 
 class DBController extends GetxController {
@@ -24,25 +25,26 @@ class DBController extends GetxController {
     LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
     LogIn.Pref = await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
-    try {
-      await DB().createuserstable();
-      await DB().createofficetable();
-      await DB().createusersofficetable();
-      await DB().createtaskstable();
-      await DB().createuserstasktable();
-      await DB().createuserstasksCommentstable();
-      await DB().createtodotable();
-      await DB().createuserstodo();
-      await DB().createuserstodoCommentstable();
-      await DB().createschedueldtable();
-      await DB().createuserschedtable();
-      await DB().createuserschedlogtable();
-      await DB().createtodoimagetable();
-    } catch (e) {
-      "$e".contains('timed out')
-          ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
-          : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
-    }
+    // try {
+    //   await DB().createuserstable();
+    //   await DB().createofficetable();
+    //   await DB().createusersofficetable();
+    //   await DB().createtaskstable();
+    //   await DB().createuserstasktable();
+    //   await DB().createuserstasksCommentstable();
+    //   await DB().createtodotable();
+    //   await DB().createuserstodo();
+    //   await DB().createuserstodoCommentstable();
+    //   await DB().createremindtable();
+    //   await DB().createusersremindtable();
+    //   await DB().createusersremindCommentable();
+    //   await DB().createtodoimagetable();
+    //   await DB().createremindlog();
+    // } catch (e) {
+    //   "$e".contains('timed out')
+    //       ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
+    //       : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
+    // }
     if (LogIn.autologin.isNotEmpty) {
       LogIn.username.text = LogIn.autologin[0];
       LogIn.password.text = LogIn.autologin[1];
@@ -74,7 +76,9 @@ class DBController extends GetxController {
         comment = [],
         commentdate = [],
         commentId = [],
-        images = [];
+        images = [],
+        remindlog = [],
+        remindlogdate = [];
 
     list.clear();
     desctable = await DB().customquery(query: 'desc $table;');
@@ -253,6 +257,67 @@ class DBController extends GetxController {
           'waitsend': true,
           'error': null
         });
+      } else if (i.keys.toList().first == 'remind_id') {
+        xx = await DB().customquery(
+            query:
+                'select * from users_remind where ur_remind_id=${i['remind_id']}');
+        for (var t in xx) {
+          list[list.indexOf(i)].addAll({
+            'createby_id': t[1],
+            'createby': t[1] != null
+                ? DB.userstable[DB.userstable
+                        .indexWhere((element) => element['user_id'] == t[1])]
+                    ['fullname']
+                : null,
+            'editby_id': t[2],
+            'editby': t[2] != null
+                ? DB.userstable[DB.userstable
+                        .indexWhere((element) => element['user_id'] == t[2])]
+                    ['fullname']
+                : null,
+          });
+        }
+        yy = await DB().customquery(
+            query:
+                "select * from users_remind_comments where urc_remind_id=${i['remind_id']};");
+        usersC.clear();
+        usersIdC.clear();
+        comment.clear();
+        commentdate.clear();
+        commentId.clear();
+        for (var o in yy) {
+          commentId.add(o[0]);
+          commentdate.add(o[4]);
+          usersIdC.add(o[1]);
+          usersC.add(o[1] != null
+              ? DB.userstable[DB.userstable
+                      .indexWhere((element) => element['user_id'] == o[1])]
+                  ['fullname']
+              : null);
+          comment.add(o[3]);
+        }
+        list[list.indexOf(i)].addAll({
+          'comment_id': [...commentId],
+          'users_id_comment': [...usersIdC],
+          'users_c': [...usersC],
+          'comment': [...comment],
+          'commentdate': [...commentdate],
+          'commentcontroller': TextEditingController(),
+          'waitsend': true,
+          'error': null
+        });
+        zz = await DB().customquery(
+            query:
+                'select * from remind_log where rlog_remind_id=${i['remind_id']}');
+        remindlog.clear();
+        for (var o in zz) {
+          remindlog.add(o[2]);
+          remindlogdate.add(o[3]);
+        }
+        list[list.indexOf(i)].addAll({
+          'log': [...remindlog],
+          'logdate': [...remindlogdate]
+        });
       }
     }
     return list;
@@ -371,11 +436,13 @@ ${Office.notifi},
         'notifi': i[3],
         'sendstatus': i[4],
         'color': i[5],
+        'users': [],
         'check': true,
         'visible': true
       });
     }
     DB.officetable.add(Office.mylista[Office.mylista.length - 1]);
+    print(DB.officetable);
     MYPAGE.officelist
         .add(Office.mylista[Office.mylista.length - 1]['officename']);
     update();
@@ -449,6 +516,96 @@ insert into todo_images
 (
 "${await mainController.convertimagestodoTocode(image: i)}",
 $todoid
+);
+''');
+      } on Exception {
+      } catch (e) {}
+    }
+
+    var imagest = await DB().customquery(
+        query:
+            'select * from todo_images where ti_todo_id=(select Max(ti_todo_id) from todo_images where ti_id=(Select max(ti_id)from todo_images));');
+    var images = [];
+    images.clear();
+    for (var i in imagest) {
+      images.add(i[2]);
+    }
+    Whattodo.mylista[Whattodo.mylista.length - 1].addAll({
+      'images': [...images],
+    });
+
+    DB.todotable.add(Whattodo.mylista[Whattodo.mylista.length - 1]);
+    update();
+  }
+
+  addremind() async {
+    await DB().customquery(query: '''
+insert into remind
+(remindname,reminddetails,createdate,remind_office_id)
+values
+(
+"${Remind.reminds[0]['controller'].text}",
+"${Remind.reminds[1]['controller'].text}",
+"${DateTime.now()}",
+${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']}
+);
+''');
+    var remindid;
+    var remindidT = await DB().customquery(
+        query:
+            "select remind_id from remind where remind_id=(Select MAX(remind_id) from remind);");
+    for (var i in remindidT) {
+      remindid = i[0];
+    }
+    await DB().customquery(query: '''
+insert into users_remind
+(createby_id,ur_remind_id)
+values
+(
+${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == LogIn.username.text)]['user_id']},
+$remindid
+);
+''');
+    var t = await DB().customquery(
+        query:
+            'select * from remind where remind_id=(Select max(remind_id)from remind_id);');
+    Remind.mylista.add({});
+    for (var i in t) {
+      Remind.mylista[Remind.mylista.length - 1].addAll({
+        'remind_id': i[0],
+        'remindname': i[1],
+        'reminddetails': i[2],
+        'createdate': i[3],
+        'editdate': i[4],
+        'todo_office_id': i[5],
+        'visible': true,
+        'check': true
+      });
+    }
+    var tt = await DB().customquery(
+        query:
+            'select * from users_todo where utd_id=(Select max(utd_id)from users_todo);');
+    for (var i in tt) {
+      Whattodo.mylista[Whattodo.mylista.length - 1].addAll({
+        'createby_id': i[1],
+        'createby': DB.userstable[DB.userstable
+            .indexWhere((element) => element['user_id'] == i[1])]['fullname'],
+        'commentdate': [],
+        'comment': [],
+        'waitsend': true,
+        'error': null,
+        'commentcontroller': TextEditingController(),
+      });
+    }
+
+    for (var i in Whattodo.images) {
+      try {
+        await DB().customquery(query: '''
+insert into todo_images
+(images,ti_todo_id)values
+(
+"${await mainController.convertimagestodoTocode(image: i)}",
+$remindid
 );
 ''');
       } on Exception {
@@ -592,8 +749,7 @@ $taskid,
   deleteuser({id}) async {
     await DB().customquery(query: '''
 update users_todo_comments set utdc_user_id=null where utdc_user_id=$id;''');
-    await DB().customquery(query: '''
-delete from users_todo_rates where utdr_user_id=$id;''');
+
     await DB().customquery(query: '''
 update users_todo set editby_id=null where editby_id=$id;''');
     await DB().customquery(query: '''

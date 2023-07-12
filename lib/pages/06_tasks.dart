@@ -255,12 +255,20 @@ class Tasks extends StatelessWidget {
       scrollController: scrollController,
       mainEditvisible: () => (checkifUserisAdmin() == true ||
               checkifUserisSupervisorinOffice(
-                      officeid: MYPAGE.eE['task_office_id']) ==
+                    officeid: MYPAGE.eE['task_office_id'],
+                    userid: DB.userstable[DB.userstable.indexWhere(
+                            (element) => element['username'] == Home.logininfo)]
+                        ['user_id'],
+                  ) ==
                   true)
           ? true
           : false,
       subeditvisible: () => checkifUserisSupervisorinOffice(
-                  officeid: MYPAGE.eE['task_office_id']) ==
+                officeid: MYPAGE.eE['task_office_id'],
+                userid: DB.userstable[DB.userstable.indexWhere(
+                        (element) => element['username'] == Home.logininfo)]
+                    ['user_id'],
+              ) ==
               true
           ? true
           : false,
@@ -278,7 +286,12 @@ class Tasks extends StatelessWidget {
       customeditpanelitem: () => Visibility(
         visible: (checkifUserisAdmin() == true ||
                 checkifUserisSupervisorinOffice(
-                        officeid: MYPAGE.eE['task_office_id']) ==
+                      officeid: MYPAGE.eE['task_office_id'],
+                      userid: DB.userstable[DB.userstable.indexWhere(
+                              (element) =>
+                                  element['username'] == Home.logininfo)]
+                          ['user_id'],
+                    ) ==
                     true)
             ? true
             : false,
@@ -301,7 +314,7 @@ class Tasks extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text("$taskofficeNameselected"),
+        Text("${e['task_office_id'] ?? 'مكتب محذوف'}"),
         SelectableText('''
               # ${e['task_id']} ${e['taskname']}
               ${e['taskdetails']}
@@ -421,7 +434,12 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
     notifi = true;
     taskofficelist.clear();
     for (var i in DB.officetable) {
-      if (checkifUserisSupervisorinOffice(officeid: i['office_id']) == true) {
+      if (checkifUserisSupervisorinOffice(
+            officeid: i['office_id'],
+            userid: DB.userstable[DB.userstable.indexWhere(
+                (element) => element['username'] == Home.logininfo)]['user_id'],
+          ) ==
+          true) {
         taskofficelist.add(i['officename']);
       }
     }
@@ -439,7 +457,12 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
     Tasks.extratimecontrollererror = null;
     taskofficelist.clear();
     for (var i in DB.officetable) {
-      if (checkifUserisSupervisorinOffice(officeid: i['office_id']) == true) {
+      if (checkifUserisSupervisorinOffice(
+            officeid: i['office_id'],
+            userid: DB.userstable[DB.userstable.indexWhere(
+                (element) => element['username'] == Home.logininfo)]['user_id'],
+          ) ==
+          true) {
         taskofficelist.add(i['officename']);
       }
     }
