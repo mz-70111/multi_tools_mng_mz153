@@ -1643,6 +1643,16 @@ class MainController extends GetxController {
     update();
   }
 
+  chooseremindtype(x) {
+    Remind.typevalue = x;
+    update();
+  }
+
+  chooseremindrepeat(x) {
+    Remind.repeat = x;
+    update();
+  }
+
   snakbar(ctx, String mymsg) {
     SnackBar mysnak = SnackBar(
       duration: Duration(seconds: 1),

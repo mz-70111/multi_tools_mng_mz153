@@ -42,37 +42,42 @@ class TextFieldMZ extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Directionality(
         textDirection: textdirection,
-        child: TextField(
-          maxLines: maxlines,
-          controller: textEditingController,
-          obscureText: obscureText,
-          textAlign: TextAlign.center,
-          onChanged: (x) => onChanged(x),
-          readOnly: readonly,
-          decoration: InputDecoration(
-              suffixIcon: suffixIcon,
-              label: Text(label!),
-              hintText: hint,
-              errorStyle: TextStyle(
-                  color: ThemeMZ.mode == 'light'
-                      ? Colors.red
-                      : Colors.amberAccent),
-              labelStyle: ThemeMZ().theme().textTheme.labelMedium,
-              border: const OutlineInputBorder(),
-              errorText: error,
-              focusedErrorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: ThemeMZ.mode == 'light'
-                          ? Colors.red
-                          : Colors.amberAccent)),
-              errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: ThemeMZ.mode == 'light'
-                          ? Colors.red
-                          : Colors.amberAccent)),
-              focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey)),
-              floatingLabelAlignment: FloatingLabelAlignment.center),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width > 500
+              ? 500
+              : MediaQuery.of(context).size.width,
+          child: TextField(
+            maxLines: maxlines,
+            controller: textEditingController,
+            obscureText: obscureText,
+            textAlign: TextAlign.center,
+            onChanged: (x) => onChanged(x),
+            readOnly: readonly,
+            decoration: InputDecoration(
+                suffixIcon: suffixIcon,
+                label: Text(label!),
+                hintText: hint,
+                errorStyle: TextStyle(
+                    color: ThemeMZ.mode == 'light'
+                        ? Colors.red
+                        : Colors.amberAccent),
+                labelStyle: ThemeMZ().theme().textTheme.labelMedium,
+                border: const OutlineInputBorder(),
+                errorText: error,
+                focusedErrorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: ThemeMZ.mode == 'light'
+                            ? Colors.red
+                            : Colors.amberAccent)),
+                errorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: ThemeMZ.mode == 'light'
+                            ? Colors.red
+                            : Colors.amberAccent)),
+                focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey)),
+                floatingLabelAlignment: FloatingLabelAlignment.center),
+          ),
         ),
       ),
     );
@@ -404,33 +409,28 @@ class WriteComment extends StatelessWidget {
     return GetBuilder<MainController>(
       init: mainController,
       builder: (_) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Divider(),
-          Row(
-            children: [
-              Expanded(
-                child: TextFieldMZ(
-                    onChanged: (x) => null,
-                    maxlines: 2,
-                    error: e['error'],
-                    label: "اكتب تعليق",
-                    textEditingController: e['commentcontroller'],
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Visibility(
-                            visible: !e['waitsend'],
-                            child: const CircularProgressIndicator()),
-                        Visibility(
-                            visible: e['waitsend'],
-                            child: IconButton(
-                                onPressed: () => writeComment(),
-                                icon: const Icon(Icons.send))),
-                      ],
-                    )),
-              ),
-            ],
-          )
+          TextFieldMZ(
+              onChanged: (x) => null,
+              maxlines: 2,
+              error: e['error'],
+              label: "اكتب تعليق",
+              textEditingController: e['commentcontroller'],
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Visibility(
+                      visible: !e['waitsend'],
+                      child: const CircularProgressIndicator()),
+                  Visibility(
+                      visible: e['waitsend'],
+                      child: IconButton(
+                          onPressed: () => writeComment(),
+                          icon: const Icon(Icons.send))),
+                ],
+              ))
         ],
       ),
     );
@@ -876,7 +876,8 @@ class ADDEDITINFOItem extends StatelessWidget {
         init: mainController,
         builder: (_) => Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(
               children: [
                 Visibility(
@@ -939,20 +940,23 @@ class ADDEDITINFOItem extends StatelessWidget {
                 visible: firstpage,
                 child: Expanded(
                   child: SingleChildScrollView(
-                    child: Column(children: [
-                      ...textFeildmzlista.map((e) => TextFieldMZ(
-                            onChanged: (x) => null,
-                            label: e['label'],
-                            textEditingController: e['controller'],
-                            error: e['error'],
-                            obscureText: e['obscuretext'],
-                            hint: e['hint'],
-                            textdirection: e['td'] ?? TextDirection.rtl,
-                            maxlines: e['maxlines'] ?? 1,
-                            suffixIcon: IconButton(
-                                onPressed: e['action'], icon: Icon(e['icon'])),
-                          )),
-                    ]),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ...textFeildmzlista.map((e) => TextFieldMZ(
+                                onChanged: (x) => null,
+                                label: e['label'],
+                                textEditingController: e['controller'],
+                                error: e['error'],
+                                obscureText: e['obscuretext'],
+                                hint: e['hint'],
+                                textdirection: e['td'] ?? TextDirection.rtl,
+                                maxlines: e['maxlines'] ?? 1,
+                                suffixIcon: IconButton(
+                                    onPressed: e['action'],
+                                    icon: Icon(e['icon'])),
+                              )),
+                        ]),
                   ),
                 ),
               ),

@@ -97,9 +97,9 @@ class LogIn extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
-                    width: Platform.isAndroid
+                    width: MediaQuery.of(context).size.width < 500
                         ? MediaQuery.of(context).size.width
-                        : MediaQuery.of(context).size.width / 2,
+                        : 500,
                     child: GetBuilder<MainController>(
                       init: mainController,
                       builder: (_) =>

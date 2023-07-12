@@ -25,26 +25,28 @@ class DBController extends GetxController {
     LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
     LogIn.Pref = await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
-    // try {
-    //   await DB().createuserstable();
-    //   await DB().createofficetable();
-    //   await DB().createusersofficetable();
-    //   await DB().createtaskstable();
-    //   await DB().createuserstasktable();
-    //   await DB().createuserstasksCommentstable();
-    //   await DB().createtodotable();
-    //   await DB().createuserstodo();
-    //   await DB().createuserstodoCommentstable();
-    //   await DB().createremindtable();
-    //   await DB().createusersremindtable();
-    //   await DB().createusersremindCommentable();
-    //   await DB().createtodoimagetable();
-    //   await DB().createremindlog();
-    // } catch (e) {
-    //   "$e".contains('timed out')
-    //       ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
-    //       : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
-    // }
+    try {
+      await DB().createuserstable();
+      await DB().createofficetable();
+      await DB().createusersofficetable();
+      await DB().createtaskstable();
+      await DB().createuserstasktable();
+      await DB().createuserstasksCommentstable();
+      await DB().createtodotable();
+      await DB().createuserstodo();
+      await DB().createuserstodoCommentstable();
+      await DB().createremindtable();
+      await DB().createusersremindtable();
+      await DB().createusersremindCommentable();
+      await DB().createtodoimagetable();
+      await DB().createremindlog();
+      await DB().createremindrepeateevery();
+    } catch (e) {
+      print(e);
+      "$e".contains('timed out')
+          ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
+          : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
+    }
     if (LogIn.autologin.isNotEmpty) {
       LogIn.username.text = LogIn.autologin[0];
       LogIn.password.text = LogIn.autologin[1];
@@ -577,14 +579,20 @@ $remindid
         'reminddetails': i[2],
         'createdate': i[3],
         'editdate': i[4],
-        'todo_office_id': i[5],
+        'remind_office_id': i[5],
+        'notifi': i[6],
+        'status': i[7],
+        'type': i[8],
+        'lastsend': i[9],
+        'repeat': i[10],
+        'reminddate': i[11],
         'visible': true,
         'check': true
       });
     }
     var tt = await DB().customquery(
         query:
-            'select * from users_todo where utd_id=(Select max(utd_id)from users_todo);');
+            'select * from users_remind where ur_id=(Select max(ur_id)from users_remind);');
     for (var i in tt) {
       Whattodo.mylista[Whattodo.mylista.length - 1].addAll({
         'createby_id': i[1],
@@ -598,33 +606,7 @@ $remindid
       });
     }
 
-    for (var i in Whattodo.images) {
-      try {
-        await DB().customquery(query: '''
-insert into todo_images
-(images,ti_todo_id)values
-(
-"${await mainController.convertimagestodoTocode(image: i)}",
-$remindid
-);
-''');
-      } on Exception {
-      } catch (e) {}
-    }
-
-    var imagest = await DB().customquery(
-        query:
-            'select * from todo_images where ti_todo_id=(select Max(ti_todo_id) from todo_images where ti_id=(Select max(ti_id)from todo_images));');
-    var images = [];
-    images.clear();
-    for (var i in imagest) {
-      images.add(i[2]);
-    }
-    Whattodo.mylista[Whattodo.mylista.length - 1].addAll({
-      'images': [...images],
-    });
-
-    DB.todotable.add(Whattodo.mylista[Whattodo.mylista.length - 1]);
+    DB.remindtable.add(Remind.mylista[Remind.mylista.length - 1]);
     update();
   }
 

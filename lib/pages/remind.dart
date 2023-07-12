@@ -21,6 +21,14 @@ class Remind extends StatelessWidget {
   static TextEditingController commentcontrolleredit = TextEditingController();
   static List imagcode = [];
   static int x = 0;
+  static bool notifi = true, status = true;
+  static List typelist = [
+    'مرة واحدة _ يدوي',
+    'عدة مرات _ يدوي',
+    'تجديد شهادة _ تلقائي',
+  ];
+  static String typevalue = 'مرة واحدة _ يدوي';
+  static double repeat = 1;
   static List<Map> reminds = [
     {
       'label': 'عنوان التذكير',
@@ -131,6 +139,41 @@ class Remind extends StatelessWidget {
                         .toList(),
                     onChanged: (x) => mainController.chooseofficeremind(x)),
               ]),
+              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("تحديد نوع التذكير"),
+                ),
+                DropdownButton(
+                    value: typevalue,
+                    items: typelist
+                        .map((e) =>
+                            DropdownMenuItem(value: "$e", child: Text(e)))
+                        .toList(),
+                    onChanged: (x) => mainController.chooseremindtype(x)),
+              ]),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("تكرار إرسال التذكير كل"),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                        child: Slider(
+                            min: 1,
+                            max: 4 * 24,
+                            divisions: 4 * 24,
+                            value: repeat,
+                            onChanged: (x) {
+                              mainController.chooseremindrepeat(x);
+                            })),
+                    Text(repeat * 15 < 60
+                        ? '${(repeat * 15).floor()} دقيقة'
+                        : '${(repeat * 15 / 60).floor()} ساعة')
+                  ],
+                ),
+              ]),
             ]));
     Widget customWidgetofEdit() =>
         Column(mainAxisSize: MainAxisSize.min, children: [
@@ -138,10 +181,10 @@ class Remind extends StatelessWidget {
         ]);
     return MYPAGE(
         mylista: mylista,
-        table: 'todo',
-        tableId: 'todo_id',
+        table: 'remind',
+        tableId: 'remind_id',
         page: Remind,
-        searchRange: const ['todoname', 'tododetails'],
+        searchRange: const ['remindname', 'reminddetails'],
         mainColumn: mainColumn,
         items: itemskey,
         itemsResult: itemResult,
@@ -157,7 +200,7 @@ class Remind extends StatelessWidget {
         scrollController: scrollController,
         mainEditvisible: () => (checkifUserisAdmin() == true ||
                 checkifUserisSupervisorinOffice(
-                      officeid: MYPAGE.eE['todo_office_id'],
+                      officeid: MYPAGE.eE['remind_office_id'],
                       userid: DB.userstable[DB.userstable.indexWhere(
                               (element) =>
                                   element['username'] == Home.logininfo)]
@@ -171,14 +214,14 @@ class Remind extends StatelessWidget {
                         userid: DB.userstable[DB.userstable.indexWhere(
                                 (element) => element['username'] == Home.logininfo)]
                             ['user_id'],
-                        officeid: MYPAGE.eE['todo_office_id']) ==
+                        officeid: MYPAGE.eE['remind_office_id']) ==
                     true ||
                 checkifUserisSame(userId: MYPAGE.eE['createby_id']) == true
             ? true
             : false,
         mainAddvisible: checkifUserisinAnyOffice() == true &&
                 DB.userstable[DB.userstable
-                        .indexWhere((element) => element['username'] == Home.logininfo)]['addtodo'] ==
+                        .indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] ==
                     1
             ? true
             : false,

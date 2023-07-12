@@ -16,7 +16,8 @@ class DB {
       officetable = [],
       tasktable = [],
       todotable = [],
-      usersOffice = [];
+      usersOffice = [],
+      remindtable = [];
   createuserstable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
     await conn.query('''
@@ -218,11 +219,13 @@ remindname varchar(255) unique,
 reminddetails varchar(255),
 createdate TIMESTAMP NULL DEFAULT NULL,
 editdate TIMESTAMP NULL DEFAULT NULL,
+remind_office_id int(11),
 notifi tinyint(1) default 1,
 status tinyint(1) default 0,
 type varchar(255),
+lastsend TIMESTAMP NULL DEFAULT NULL,
+`repeat` int(11),
 reminddate TIMESTAMP  NULL DEFAULT NULL,
-remind_office_id int(11),
 foreign key (remind_office_id) references office(office_id)
 );
 ''');
@@ -258,6 +261,20 @@ rlog_remind_id int(11),
 foreign key (rlog_remind_id) references remind(remind_id),
 log varchar(255),
 logdate TIMESTAMP  NULL DEFAULT NULL
+);
+''');
+    await conn.close();
+  }
+
+  createremindrepeateevery() async {
+    MySqlConnection conn = await MySqlConnection.connect(settings);
+    await conn.query('''
+create table if not exists remind_every
+(
+revery_id int(11) unique primary key auto_increment,
+revery_remind_id int(11),
+foreign key (revery_remind_id) references remind(remind_id),
+every varchar(255)
 );
 ''');
     await conn.close();
