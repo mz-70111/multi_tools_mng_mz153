@@ -20,6 +20,7 @@ import 'package:users_tasks_mz_153/pages/remind.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/bottomnavbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
+import 'package:intl/intl.dart' as df;
 
 class MainController extends GetxController {
   @override
@@ -610,7 +611,7 @@ class MainController extends GetxController {
           }
         }
         await DBController().addremind();
-        for (var i in Whattodo.todos) {
+        for (var i in Remind.reminds) {
           i['controller'].text = '';
         }
         Get.back();
@@ -631,7 +632,8 @@ class MainController extends GetxController {
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
     update();
   }
@@ -961,7 +963,8 @@ class MainController extends GetxController {
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
     update();
   }
@@ -1538,7 +1541,8 @@ class MainController extends GetxController {
           ...DB.officetable,
           ...DB.userstable,
           ...DB.tasktable,
-          ...DB.todotable
+          ...DB.todotable,
+          ...DB.remindtable
         ];
         Home.logininfo = LogIn.username.text.toLowerCase();
         await Get.offNamed("/home");
@@ -1653,9 +1657,63 @@ class MainController extends GetxController {
     update();
   }
 
+  setreminddate({ctx}) async {
+    DateTime? dt = await showDatePicker(
+        context: ctx,
+        initialDate: Remind.onetimeremid,
+        firstDate: DateTime.parse('2022-07-13'),
+        lastDate: DateTime.now());
+    if (dt != null) {
+      Remind.onetimeremid = dt;
+      update();
+    }
+  }
+
+  setstartreminddate({ctx}) async {
+    var dt = await showTimePicker(context: ctx, initialTime: TimeOfDay.now());
+    if (dt != null) {
+      Remind.hourlystartremindvalue = dt;
+      update();
+    }
+  }
+
+  choosemanytimesremind(x) {
+    Remind.manytimesremindgroup = x;
+    update();
+  }
+
+  chooseremindmonthlyvalue(x) {
+    Remind.monthlydaysvalue = x;
+    update();
+  }
+
+  addmonthlyremindday({value}) {
+    if (!Remind.days.contains(value)) {
+      Remind.monthly.add({'day': "$value", 'check': false});
+    }
+    Remind.days.add(value);
+    update();
+  }
+
+  removemonthlyremindday({value}) {
+    Remind.days.remove(value);
+    Remind.monthly.removeWhere((element) => element['day'] == "$value");
+    update();
+  }
+
+  remindweeklycheckbox({x, index}) {
+    Remind.weekly[index]['check'] = x;
+    update();
+  }
+
+  remindmonthlycheckbox({x, index}) {
+    Remind.monthly[index]['check'] = x;
+    update();
+  }
+
   snakbar(ctx, String mymsg) {
     SnackBar mysnak = SnackBar(
-      duration: Duration(seconds: 1),
+      duration: const Duration(seconds: 1),
       content: Text(mymsg),
       backgroundColor: Colors.indigoAccent,
       elevation: 10,
@@ -1685,6 +1743,8 @@ class MainController extends GetxController {
         await dbController.gettable(list: DB.officetable, table: 'office');
         await dbController.gettable(list: DB.tasktable, table: 'tasks');
         await dbController.gettable(list: DB.todotable, table: 'todo');
+        await dbController.gettable(list: DB.remindtable, table: 'remind');
+
         for (var i in Home.searchlist) {
           i['check'] = true;
         }
@@ -1709,7 +1769,8 @@ class MainController extends GetxController {
                 ...DB.officetable,
                 ...DB.userstable,
                 ...DB.tasktable,
-                ...DB.todotable
+                ...DB.todotable,
+                ...DB.remindtable
               ];
               Home.logininfo = LogIn.username.text.toLowerCase();
               await Get.offNamed("/home");
@@ -1721,6 +1782,7 @@ class MainController extends GetxController {
           }
         }
       } catch (e) {
+        print(e);
         LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
       }
     }
@@ -1743,6 +1805,7 @@ class MainController extends GetxController {
       await dbController.gettable(list: DB.officetable, table: 'office');
       await dbController.gettable(list: DB.tasktable, table: 'tasks');
       await dbController.gettable(list: DB.todotable, table: 'todo');
+      await dbController.gettable(list: DB.remindtable, table: 'remind');
       for (var i in Home.searchlist) {
         i['check'] = true;
       }
@@ -1774,7 +1837,8 @@ class MainController extends GetxController {
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
     update();
   }

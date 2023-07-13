@@ -226,6 +226,7 @@ type varchar(255),
 lastsend TIMESTAMP NULL DEFAULT NULL,
 `repeat` int(11),
 reminddate TIMESTAMP  NULL DEFAULT NULL,
+startsendat Time,
 foreign key (remind_office_id) references office(office_id)
 );
 ''');
@@ -283,14 +284,14 @@ every varchar(255)
   createusersremindCommentable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
     await conn.query('''
-create table if not exists users_remind_commnents
+create table if not exists users_remind_comments
 (
 urc_id int(11) unique primary key auto_increment,
 urc_user_id int(11),
 foreign key (urc_user_id) references users(user_id),
 urc_remind_id int(11),
 foreign key (urc_remind_id) references remind(remind_id),
-comment varchar(255),
+comments varchar(255),
 commentdate TIMESTAMP  NULL DEFAULT NULL
 );
 ''');

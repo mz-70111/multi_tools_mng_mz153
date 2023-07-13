@@ -1064,7 +1064,6 @@ addItemWidget(
           );
         });
   } catch (e) {
-    print(e);
     return showDialog(
         context: ctx,
         builder: (_) {

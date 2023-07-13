@@ -15,6 +15,7 @@ class Remind extends StatelessWidget {
   DBController dbController = Get.find();
   static TextEditingController remindname = TextEditingController();
   static TextEditingController reminddetails = TextEditingController();
+  static TextEditingController autoCertificateurl = TextEditingController();
   static String? remindofficeNameselected;
   static List remindofficelist = [];
   static List<Map> mylista = [], comment = [];
@@ -28,7 +29,23 @@ class Remind extends StatelessWidget {
     'تجديد شهادة _ تلقائي',
   ];
   static String typevalue = 'مرة واحدة _ يدوي';
+  static List manytimesremindlist = ['أسبوعي', 'شهري'];
+  static String manytimesremindgroup = 'أسبوعي';
+  static List weekly = [
+    {'day': 'الجمعة', 'check': false},
+    {'day': 'السبت', 'check': false},
+    {'day': 'الأحد', 'check': false},
+    {'day': 'الاثنين', 'check': false},
+    {'day': 'الثلاثاء', 'check': false},
+    {'day': 'الاربعاء', 'check': false},
+    {'day': 'الخميس', 'check': false}
+  ];
+  static List monthly = [
+    {'day': 'آخر يوم في الشهر', 'check': false}
+  ];
+  static DateTime onetimeremid = DateTime.now();
   static double repeat = 1;
+  static List days = [];
   static List<Map> reminds = [
     {
       'label': 'عنوان التذكير',
@@ -49,6 +66,9 @@ class Remind extends StatelessWidget {
     },
   ];
   static ScrollController scrollController = ScrollController();
+  static List monthlydays = [];
+  static TimeOfDay hourlystartremindvalue = TimeOfDay.now();
+  static String monthlydaysvalue = "1";
   @override
   Widget build(BuildContext context) {
     List mainColumn = [
@@ -125,60 +145,201 @@ class Remind extends StatelessWidget {
     };
     Widget customWidgetofADD() => GetBuilder<MainController>(
         init: mainController,
-        builder: (_) => Column(mainAxisSize: MainAxisSize.min, children: [
-              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text("اختيار مكتب"),
-                ),
-                DropdownButton(
-                    value: remindofficeNameselected,
-                    items: remindofficelist
-                        .map((e) =>
-                            DropdownMenuItem(value: "$e", child: Text(e)))
-                        .toList(),
-                    onChanged: (x) => mainController.chooseofficeremind(x)),
-              ]),
-              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text("تحديد نوع التذكير"),
-                ),
-                DropdownButton(
-                    value: typevalue,
-                    items: typelist
-                        .map((e) =>
-                            DropdownMenuItem(value: "$e", child: Text(e)))
-                        .toList(),
-                    onChanged: (x) => mainController.chooseremindtype(x)),
-              ]),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text("تكرار إرسال التذكير كل"),
-                ),
+        builder: (_) {
+          return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("اختيار مكتب"),
+                  ),
+                  DropdownButton(
+                      value: remindofficeNameselected,
+                      items: remindofficelist
+                          .map((e) =>
+                              DropdownMenuItem(value: "$e", child: Text(e)))
+                          .toList(),
+                      onChanged: (x) => mainController.chooseofficeremind(x)),
+                ]),
+                Row(children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("تحديد نوع التذكير"),
+                  ),
+                  DropdownButton(
+                      value: typevalue,
+                      items: typelist
+                          .map((e) =>
+                              DropdownMenuItem(value: "$e", child: Text(e)))
+                          .toList(),
+                      onChanged: (x) => mainController.chooseremindtype(x)),
+                ]),
+                Visibility(
+                    visible: typevalue == typelist[0] ? true : false,
+                    child: Row(children: [
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text("تحديد تاريخ التذكير"),
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            mainController.setreminddate(ctx: context);
+                          },
+                          child: Text(
+                              df.DateFormat('yyyy-MM-dd').format(onetimeremid)))
+                    ])),
+                Visibility(
+                    visible: typevalue == typelist[1] ? true : false,
+                    child: Column(
+                      children: [
+                        Row(children: [
+                          Radio(
+                              value: manytimesremindlist[0],
+                              groupValue: manytimesremindgroup,
+                              onChanged: (x) {
+                                mainController.choosemanytimesremind(x);
+                              }),
+                          Text(manytimesremindlist[0]),
+                          Radio(
+                              value: manytimesremindlist[1],
+                              groupValue: manytimesremindgroup,
+                              onChanged: (x) {
+                                mainController.choosemanytimesremind(x);
+                              }),
+                          Text(manytimesremindlist[1]),
+                        ]),
+                        Visibility(
+                            visible:
+                                manytimesremindgroup == manytimesremindlist[0]
+                                    ? true
+                                    : false,
+                            child: Column(
+                              children: weekly
+                                  .map((e) => Row(
+                                        children: [
+                                          Checkbox(
+                                              value: e['check'],
+                                              onChanged: (x) {
+                                                mainController
+                                                    .remindweeklycheckbox(
+                                                        x: x,
+                                                        index:
+                                                            weekly.indexOf(e));
+                                              }),
+                                          Text(e['day']),
+                                        ],
+                                      ))
+                                  .toList(),
+                            )),
+                        Visibility(
+                            visible:
+                                manytimesremindgroup == manytimesremindlist[1]
+                                    ? true
+                                    : false,
+                            child: Column(children: [
+                              Row(
+                                children: [
+                                  const Text("إضافة يوم محدد"),
+                                  DropdownButton(
+                                      value: monthlydaysvalue,
+                                      items: monthlydays
+                                          .map((e) => DropdownMenuItem(
+                                              value: "$e", child: Text(e)))
+                                          .toList(),
+                                      onChanged: (x) => mainController
+                                          .chooseremindmonthlyvalue(x)),
+                                  IconButton(
+                                      onPressed: () async {
+                                        await mainController
+                                            .addmonthlyremindday(
+                                                value: monthlydaysvalue);
+                                      },
+                                      icon: const Icon(Icons.add))
+                                ],
+                              ),
+                              ...monthly.map((e) => Row(
+                                    children: [
+                                      Visibility(
+                                        visible:
+                                            e['day'].length > 2 ? false : true,
+                                        child: IconButton(
+                                            onPressed: () {
+                                              mainController
+                                                  .removemonthlyremindday(
+                                                      value: e['day']);
+                                            },
+                                            icon: const Icon(Icons.delete)),
+                                      ),
+                                      Checkbox(
+                                          value: e['check'],
+                                          onChanged: (x) {
+                                            mainController
+                                                .remindmonthlycheckbox(
+                                                    x: x,
+                                                    index: monthly.indexOf(e));
+                                          }),
+                                      Text(e['day']),
+                                    ],
+                                  )),
+                            ]))
+                      ],
+                    )),
+                Visibility(
+                    visible: typevalue == typelist[2] ? true : false,
+                    child: TextFieldMZ(
+                        label: 'عنوان الموقع',
+                        textEditingController: autoCertificateurl,
+                        onChanged: () {
+                          null;
+                        })),
+                Divider(),
                 Row(
                   children: [
-                    Expanded(
-                        child: Slider(
-                            min: 1,
-                            max: 4 * 24,
-                            divisions: 4 * 24,
-                            value: repeat,
-                            onChanged: (x) {
-                              mainController.chooseremindrepeat(x);
-                            })),
-                    Text(repeat * 15 < 60
-                        ? '${(repeat * 15).floor()} دقيقة'
-                        : '${(repeat * 15 / 60).floor()} ساعة')
+                    const Text("بدء التذكير عند الساعة"),
+                    ElevatedButton(
+                        onPressed: () {
+                          mainController.setstartreminddate(ctx: context);
+                        },
+                        child: Text(
+                            "${hourlystartremindvalue.hour}:${hourlystartremindvalue.minute}"))
                   ],
                 ),
-              ]),
-            ]));
+                Divider(),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("تكرار إرسال التذكير كل"),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Slider(
+                              min: 1,
+                              max: 4 * 24,
+                              divisions: 4 * 24,
+                              value: repeat,
+                              onChanged: (x) {
+                                mainController.chooseremindrepeat(x);
+                              })),
+                      Text(repeat * 15 < 60
+                          ? '${(repeat * 15).floor()} دقيقة'
+                          : '${(repeat * 15 / 60).floor()} ساعة')
+                    ],
+                  ),
+                ]),
+              ]);
+        });
     Widget customWidgetofEdit() =>
         Column(mainAxisSize: MainAxisSize.min, children: [
           customWidgetofADD(),
         ]);
+    monthlydays.clear();
+    for (var i = 1; i <= 31; i++) {
+      monthlydays.add("$i");
+    }
+    days.clear();
     return MYPAGE(
         mylista: mylista,
         table: 'remind',
@@ -212,7 +373,8 @@ class Remind extends StatelessWidget {
             : false,
         subeditvisible: () => checkifUserisSupervisorinOffice(
                         userid: DB.userstable[DB.userstable.indexWhere(
-                                (element) => element['username'] == Home.logininfo)]
+                                (element) =>
+                                    element['username'] == Home.logininfo)]
                             ['user_id'],
                         officeid: MYPAGE.eE['remind_office_id']) ==
                     true ||
@@ -220,8 +382,8 @@ class Remind extends StatelessWidget {
             ? true
             : false,
         mainAddvisible: checkifUserisinAnyOffice() == true &&
-                DB.userstable[DB.userstable
-                        .indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] ==
+                DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                        ['addremind'] ==
                     1
             ? true
             : false,
@@ -233,7 +395,7 @@ class Remind extends StatelessWidget {
         },
         actionSave: () => editremind(e: MYPAGE.eE),
         actionEdit: () => mainController.showeditpanel(),
-        actionDelete: () => deletetodo(ctx: context, e: MYPAGE.eE),
+        actionDelete: () => deleteremind(ctx: context, e: MYPAGE.eE),
         customeditpanelitem: () => const SizedBox());
   }
 
@@ -263,11 +425,11 @@ class Remind extends StatelessWidget {
           comment: comment,
           deletecomment: () => deletecomment(ctx: ctx, e: e),
           editcomment: () => editcomment(ctx: ctx, e: e),
-          table: 'users_todo_comments',
-          tableIdname: 'utdc_todo_id',
-          tableId: e['todo_id'],
-          officeId: e['todo_office_id'],
-          userIdname: 'utdc_user_id',
+          table: 'users_remind_comments',
+          tableIdname: 'urc_remind_id',
+          tableId: e['remind_id'],
+          officeId: e['remind_office_id'],
+          userIdname: 'urc_user_id',
         ),
         WriteComment(e: e, writeComment: () => addcomment(e: MYPAGE.eE))
       ],
@@ -309,7 +471,7 @@ class Remind extends StatelessWidget {
       }
     }
     remindofficeNameselected = DB.officetable[DB.officetable.indexWhere(
-            (element) => element['office_id'] == e['todo_office_id'])]
+            (element) => element['office_id'] == e['remind_office_id'])]
         ['officename'];
     Remind.remindname.text = e['remindname'];
     Remind.reminddetails.text = e['reminddetails'];
@@ -332,15 +494,14 @@ class Remind extends StatelessWidget {
   }
 
   updateafteredit({e}) async {
-    e['todoname'] = Remind.reminds[0]['controller'].text;
-    e['tododetails'] = Remind.reminds[1]['controller'].text;
+    e['remindname'] = Remind.reminds[0]['controller'].text;
+    e['reminddetails'] = Remind.reminds[1]['controller'].text;
     e['editby_id'] = DB.userstable[DB.userstable
         .indexWhere((y) => y['username'] == Home.logininfo)]['user_id'];
     e['editdate'] = DateTime.now();
-    e['images'].clear();
   }
 
-  deletetodo({ctx, e}) async {
+  deleteremind({ctx, e}) async {
     MainController mainController = Get.find();
     await mainController.deleteItemMainController(ctx: ctx, e: e, page: Remind);
   }
@@ -350,10 +511,10 @@ class Remind extends StatelessWidget {
     if (e['commentcontroller'].text.isNotEmpty) {
       await mainController.addcomment(
         e: e,
-        addcommentaction: dbController.addcommenttodo(
+        addcommentaction: dbController.addcommentremind(
             userid: DB.userstable[DB.userstable.indexWhere(
                 (element) => element['username'] == Home.logininfo)]['user_id'],
-            todoid: e['todo_id'],
+            remindid: e['remind_id'],
             comment: e['commentcontroller'].text),
       );
     }
@@ -363,11 +524,11 @@ class Remind extends StatelessWidget {
     await deletecommentT(
         ctx: ctx,
         actiondelete: () async => await dbController.deletecomment(
-            table: 'users_todo_comments',
-            commentIdname: 'utdc_id',
-            commentId: Comment.Ee['utdc_id'],
-            maintableidname: e['todo_id'],
-            maintablename: 'todo'));
+            table: 'users_remind_comments',
+            commentIdname: 'urc_id',
+            commentId: Comment.Ee['urc_id'],
+            maintableidname: e['remind_id'],
+            maintablename: 'remind'));
   }
 
   editcomment({e, ctx, actionedit}) async {
@@ -376,11 +537,11 @@ class Remind extends StatelessWidget {
         ctx: ctx,
         controller: commentcontrolleredit,
         actionedit: () async => await dbController.editcomment(
-            table: 'users_todo_comments',
-            commentIdname: 'utdc_id',
-            commentId: Comment.Ee['utdc_id'],
-            maintableidname: e['todo_id'],
-            maintablename: 'todo',
+            table: 'users_remind_comments',
+            commentIdname: 'urc_id',
+            commentId: Comment.Ee['urc_id'],
+            maintableidname: e['remind_id'],
+            maintablename: 'remind',
             comment: commentcontrolleredit.text));
   }
 }

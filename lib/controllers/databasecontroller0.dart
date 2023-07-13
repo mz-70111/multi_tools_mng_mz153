@@ -42,7 +42,6 @@ class DBController extends GetxController {
       await DB().createremindlog();
       await DB().createremindrepeateevery();
     } catch (e) {
-      print(e);
       "$e".contains('timed out')
           ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
           : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
@@ -541,17 +540,52 @@ $todoid
   }
 
   addremind() async {
-    await DB().customquery(query: '''
+    if (Remind.typevalue == Remind.typelist[0]) {
+      await DB().customquery(query: '''
 insert into remind
-(remindname,reminddetails,createdate,remind_office_id)
+(remindname,reminddetails,createdate,remind_office_id,type,reminddate,startsendat)
 values
 (
 "${Remind.reminds[0]['controller'].text}",
 "${Remind.reminds[1]['controller'].text}",
 "${DateTime.now()}",
-${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']}
+${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
+'0',
+"${Remind.onetimeremid}",
+"${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}"
 );
 ''');
+    } else if (Remind.typevalue == Remind.typelist[1]) {
+      await DB().customquery(query: '''
+insert into remind
+(remindname,reminddetails,createdate,remind_office_id,type,startsendat)
+values
+(
+"${Remind.reminds[0]['controller'].text}",
+"${Remind.reminds[1]['controller'].text}",
+"${DateTime.now()}",
+${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
+'1',
+"${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}"
+);
+''');
+    } else if (Remind.typevalue == Remind.typelist[2]) {}
+
+    if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0]) {
+      await DB().customquery(query: '''
+insert into remind_every
+(revery_remind_id,reminddetails,createdate,remind_office_id,type,startsendat)
+values
+(
+"${Remind.reminds[0]['controller'].text}",
+"${Remind.reminds[1]['controller'].text}",
+"${DateTime.now()}",
+${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
+'1',
+"${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}"
+);
+''');
+    } else {}
     var remindid;
     var remindidT = await DB().customquery(
         query:
@@ -570,7 +604,7 @@ $remindid
 ''');
     var t = await DB().customquery(
         query:
-            'select * from remind where remind_id=(Select max(remind_id)from remind_id);');
+            'select * from remind where remind_id=(Select max(remind_id)from remind);');
     Remind.mylista.add({});
     for (var i in t) {
       Remind.mylista[Remind.mylista.length - 1].addAll({
@@ -586,15 +620,17 @@ $remindid
         'lastsend': i[9],
         'repeat': i[10],
         'reminddate': i[11],
+        'startsendat': i[12],
         'visible': true,
         'check': true
       });
     }
+
     var tt = await DB().customquery(
         query:
             'select * from users_remind where ur_id=(Select max(ur_id)from users_remind);');
     for (var i in tt) {
-      Whattodo.mylista[Whattodo.mylista.length - 1].addAll({
+      Remind.mylista[Remind.mylista.length - 1].addAll({
         'createby_id': i[1],
         'createby': DB.userstable[DB.userstable
             .indexWhere((element) => element['user_id'] == i[1])]['fullname'],
@@ -605,7 +641,6 @@ $remindid
         'commentcontroller': TextEditingController(),
       });
     }
-
     DB.remindtable.add(Remind.mylista[Remind.mylista.length - 1]);
     update();
   }
@@ -712,6 +747,23 @@ $todoid,
     update();
   }
 
+  addcommentremind({userid, remindid, comment}) async {
+    await DB().customquery(query: '''
+insert into users_remind_comments
+(urc_user_id,urc_remind_id,comments,commentdate)
+values
+(
+$userid,
+$remindid,
+"$comment",
+"${DateTime.now()}"
+);
+''');
+
+    await gettable(list: Remind.mylista, table: 'remind', tableid: 'remind_id');
+    update();
+  }
+
   addcommenttask({userid, taskid, comment}) async {
     await DB().customquery(query: '''
 insert into users_tasks_comments
@@ -753,7 +805,8 @@ delete from users_office where uf_user_id=$id;''');
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
     update();
   }
@@ -772,7 +825,8 @@ delete from office where office_id=$id;''');
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
     update();
   }
@@ -793,7 +847,8 @@ delete from todo where todo_id=$id; ''');
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
     update();
   }
@@ -812,7 +867,8 @@ delete from tasks where task_id=$id;''');
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
     update();
   }
@@ -849,7 +905,8 @@ where $commentIdname=$commentId
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
     update();
   }
@@ -939,7 +996,8 @@ ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] ==
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
     update();
   }
@@ -1056,7 +1114,8 @@ where task_id=$id;
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
     update();
   }
@@ -1078,7 +1137,8 @@ where user_id=$id;
       ...DB.officetable,
       ...DB.userstable,
       ...DB.tasktable,
-      ...DB.todotable
+      ...DB.todotable,
+      ...DB.remindtable
     ];
   }
 }
