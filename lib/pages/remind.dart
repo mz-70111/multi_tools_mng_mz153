@@ -23,6 +23,7 @@ class Remind extends StatelessWidget {
   static List imagcode = [];
   static int x = 0;
   static bool notifi = true, status = true;
+  static int sendalertbefor = 0;
   static List typelist = [
     'مرة واحدة _ يدوي',
     'عدة مرات _ يدوي',
@@ -128,6 +129,7 @@ class Remind extends StatelessWidget {
                   Expanded(
                       child: Container(
                     height: 20,
+                    width: 20,
                     color: itemResult[4] == 1 ? Colors.red : Colors.green,
                   ))
                 ],
@@ -294,7 +296,7 @@ class Remind extends StatelessWidget {
                         onChanged: () {
                           null;
                         })),
-                Divider(),
+                const Divider(),
                 Row(
                   children: [
                     const Text("بدء التذكير عند الساعة"),
@@ -306,7 +308,7 @@ class Remind extends StatelessWidget {
                             "${hourlystartremindvalue.hour}:${hourlystartremindvalue.minute}"))
                   ],
                 ),
-                Divider(),
+                const Divider(),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Padding(
                     padding: EdgeInsets.all(8.0),
@@ -360,31 +362,21 @@ class Remind extends StatelessWidget {
         textfeildlista: reminds,
         scrollController: scrollController,
         mainEditvisible: () => (checkifUserisAdmin() == true ||
-                checkifUserisSupervisorinOffice(
-                      officeid: MYPAGE.eE['remind_office_id'],
-                      userid: DB.userstable[DB.userstable.indexWhere(
-                              (element) =>
-                                  element['username'] == Home.logininfo)]
-                          ['user_id'],
-                    ) ==
-                    true ||
-                checkifUserisSame(userId: MYPAGE.eE['createby_id']) == true)
+                (checkifUserisUserinOffice(officeid: MYPAGE.eE['remind_office_id']) == true &&
+                    DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                            ['addremind'] ==
+                        1))
             ? true
             : false,
-        subeditvisible: () => checkifUserisSupervisorinOffice(
-                        userid: DB.userstable[DB.userstable.indexWhere(
-                                (element) =>
-                                    element['username'] == Home.logininfo)]
-                            ['user_id'],
-                        officeid: MYPAGE.eE['remind_office_id']) ==
-                    true ||
-                checkifUserisSame(userId: MYPAGE.eE['createby_id']) == true
-            ? true
-            : false,
+        subeditvisible: () =>
+            (checkifUserisUserinOffice(officeid: MYPAGE.eE['remind_office_id']) == true &&
+                    DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                            ['addremind'] ==
+                        1)
+                ? true
+                : false,
         mainAddvisible: checkifUserisinAnyOffice() == true &&
-                DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                        ['addremind'] ==
-                    1
+                DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1
             ? true
             : false,
         getinfo: () {

@@ -1,7 +1,10 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
+import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 
 class Employ extends StatelessWidget {
@@ -20,7 +23,6 @@ class Employ extends StatelessWidget {
   static bool pbx = false;
   static bool addtodo = false;
   static List<Map> mylista = [];
-  static var hideshowpass;
   static List<Map> employs = [
     {
       'label': 'اسم المستخدم',
@@ -44,7 +46,7 @@ class Employ extends StatelessWidget {
       'error': null,
       'icon': Icons.visibility_off,
       'obscuretext': true,
-      'action': hideshowpass,
+      'action': () => mainController.showpassAdduser(),
       'hint': ''
     },
     {
@@ -53,7 +55,7 @@ class Employ extends StatelessWidget {
       'error': null,
       'icon': Icons.visibility_off,
       'obscuretext': true,
-      'action': hideshowpass,
+      'action': () => mainController.showpassAdduser(),
       'hint': ''
     },
     {
@@ -82,7 +84,6 @@ class Employ extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
-    hideshowpass = () => mainController.showpassAdduser();
     List mainColumn = [
       {
         'label': 'الاسم',
@@ -162,7 +163,7 @@ class Employ extends StatelessWidget {
                     onChanged: (x) {
                       mainController.checkboxaddremind(x);
                     }),
-                const Text("إضافة تذكير")
+                const Text("إضافة/تعديل تذكير")
               ],
             ),
             Row(
@@ -172,7 +173,7 @@ class Employ extends StatelessWidget {
                     onChanged: (x) {
                       mainController.checkboxaddping(x);
                     }),
-                const Text("إضافة ping")
+                const Text("إضافة/تعديل ping")
               ],
             ),
             Row(
@@ -192,7 +193,7 @@ class Employ extends StatelessWidget {
                     onChanged: (x) {
                       mainController.checkboxaddtodo(x);
                     }),
-                const Text("إضافة إجرائية")
+                const Text("إضافة/تعديل إجرائية")
               ],
             ),
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -285,6 +286,7 @@ class Employ extends StatelessWidget {
       i['error'] = null;
     }
     privilege.clear();
+    mustchgpass = true;
     Employ.enable = e['enable'] == 1 ? true : false;
     Employ.employs[0]['controller'].text = e['username'];
     Employ.employs[1]['controller'].text = e['fullname'];
@@ -293,7 +295,6 @@ class Employ extends StatelessWidget {
     Employ.employs[4]['controller'].text = e['email'] ?? '';
     Employ.employs[5]['controller'].text = e['mobile'] ?? '';
     Employ.admin = e['admin'] == 1 ? true : false;
-    mustchgpass = e['mustchgpass'] == 1 ? true : false;
     addping = e['addping'] == 1 ? true : false;
     addremind = e['addremind'] == 1 ? true : false;
     pbx = e['pbx'] == 1 ? true : false;

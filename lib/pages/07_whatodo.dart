@@ -175,29 +175,26 @@ class Whattodo extends StatelessWidget {
         textfeildlista: todos,
         scrollController: scrollController,
         mainEditvisible: () => (checkifUserisAdmin() == true ||
-                checkifUserisSupervisorinOffice(
-                      officeid: MYPAGE.eE['todo_office_id'],
-                      userid: DB.userstable[DB.userstable.indexWhere(
-                              (element) =>
-                                  element['username'] == Home.logininfo)]
-                          ['user_id'],
-                    ) ==
-                    true ||
-                checkifUserisSame(userId: MYPAGE.eE['createby_id']) == true)
+              (checkifUserisUserinOffice(
+                    officeid: MYPAGE.eE['todo_office_id']) ==
+                true &&  DB.userstable[DB.userstable.indexWhere(
+                            (element) => element['username'] == Home.logininfo)]
+                        ['addtodo'] ==
+                    1))
             ? true
             : false,
-        subeditvisible: () => checkifUserisSupervisorinOffice(
-                        userid: DB.userstable[DB.userstable.indexWhere(
-                                (element) => element['username'] == Home.logininfo)]
-                            ['user_id'],
-                        officeid: MYPAGE.eE['todo_office_id']) ==
-                    true ||
-                checkifUserisSame(userId: MYPAGE.eE['createby_id']) == true
-            ? true
-            : false,
+        subeditvisible: () =>
+            (checkifUserisUserinOffice(officeid: MYPAGE.eE['todo_office_id']) ==
+                    true && DB.userstable[DB.userstable.indexWhere(
+                            (element) => element['username'] == Home.logininfo)]
+                        ['addtodo'] ==
+                    1)
+                ? true
+                : false,
         mainAddvisible: checkifUserisinAnyOffice() == true &&
-                DB.userstable[DB.userstable
-                        .indexWhere((element) => element['username'] == Home.logininfo)]['addtodo'] ==
+                DB.userstable[DB.userstable.indexWhere(
+                            (element) => element['username'] == Home.logininfo)]
+                        ['addtodo'] ==
                     1
             ? true
             : false,

@@ -1677,6 +1677,35 @@ class MainController extends GetxController {
     }
   }
 
+  gettoday() {
+    String t = df.DateFormat("EEEE").format(DateTime.now()).toLowerCase();
+    int today = 1;
+    switch (t) {
+      case 'friday':
+        today = 5;
+        break;
+      case 'saturday':
+        today = 6;
+        break;
+      case 'sunday':
+        today = 7;
+        break;
+      case 'monday':
+        today = 1;
+        break;
+      case 'tuesday':
+        today = 2;
+        break;
+      case 'wednesday':
+        today = 3;
+        break;
+      case 'thursday':
+        today = 4;
+        break;
+    }
+    return today;
+  }
+
   choosemanytimesremind(x) {
     Remind.manytimesremindgroup = x;
     update();

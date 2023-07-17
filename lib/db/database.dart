@@ -227,6 +227,7 @@ lastsend TIMESTAMP NULL DEFAULT NULL,
 `repeat` int(11),
 reminddate TIMESTAMP  NULL DEFAULT NULL,
 startsendat Time,
+sendalertbefor int(11) default 0,
 foreign key (remind_office_id) references office(office_id)
 );
 ''');
