@@ -38,7 +38,7 @@ class Remind extends StatelessWidget {
     {'day': 'الأحد', 'check': false},
     {'day': 'الاثنين', 'check': false},
     {'day': 'الثلاثاء', 'check': false},
-    {'day': 'الاربعاء', 'check': false},
+    {'day': 'الأربعاء', 'check': false},
     {'day': 'الخميس', 'check': false}
   ];
   static List monthly = [
@@ -125,12 +125,24 @@ class Remind extends StatelessWidget {
                     "# ${itemResult[1]}_ ${itemResult[2]}",
                     style: const TextStyle(fontSize: 13),
                   )),
-                  Expanded(child: Text(itemResult[3])),
                   Expanded(
-                      child: Container(
-                    height: 20,
-                    width: 20,
-                    color: itemResult[4] == 1 ? Colors.red : Colors.green,
+                      child: Text(itemResult[3] == '0'
+                          ? 'يدوي مرة واحدة'
+                          : itemResult[3] == '1'
+                              ? 'يدوي عدة مرات'
+                              : 'تلقائي')),
+                  Expanded(
+                      child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 10,
+                          width: 20,
+                          color: itemResult[4] == 1 ? Colors.red : Colors.green,
+                        ),
+                      ),
+                      Expanded(child: SizedBox())
+                    ],
                   ))
                 ],
               ),
@@ -240,72 +252,109 @@ class Remind extends StatelessWidget {
                                 manytimesremindgroup == manytimesremindlist[1]
                                     ? true
                                     : false,
-                            child: Column(children: [
-                              Row(
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text("إضافة يوم محدد"),
-                                  DropdownButton(
-                                      value: monthlydaysvalue,
-                                      items: monthlydays
-                                          .map((e) => DropdownMenuItem(
-                                              value: "$e", child: Text(e)))
-                                          .toList(),
-                                      onChanged: (x) => mainController
-                                          .chooseremindmonthlyvalue(x)),
-                                  IconButton(
-                                      onPressed: () async {
-                                        await mainController
-                                            .addmonthlyremindday(
-                                                value: monthlydaysvalue);
-                                      },
-                                      icon: const Icon(Icons.add))
-                                ],
-                              ),
-                              ...monthly.map((e) => Row(
+                                  Divider(),
+                                  Row(
                                     children: [
-                                      Visibility(
-                                        visible:
-                                            e['day'].length > 2 ? false : true,
-                                        child: IconButton(
-                                            onPressed: () {
-                                              mainController
-                                                  .removemonthlyremindday(
-                                                      value: e['day']);
-                                            },
-                                            icon: const Icon(Icons.delete)),
+                                      const Expanded(
+                                          child: Text("أيام التذكير")),
+                                      const Text("إضافة يوم محدد"),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: DropdownButton(
+                                            value: monthlydaysvalue,
+                                            items: monthlydays
+                                                .map((e) => DropdownMenuItem(
+                                                    value: "$e",
+                                                    child: Text(e)))
+                                                .toList(),
+                                            onChanged: (x) => mainController
+                                                .chooseremindmonthlyvalue(x)),
                                       ),
-                                      Checkbox(
-                                          value: e['check'],
-                                          onChanged: (x) {
-                                            mainController
-                                                .remindmonthlycheckbox(
-                                                    x: x,
-                                                    index: monthly.indexOf(e));
-                                          }),
-                                      Text(e['day']),
+                                      IconButton(
+                                          onPressed: () async {
+                                            await mainController
+                                                .addmonthlyremindday(
+                                                    value: monthlydaysvalue);
+                                          },
+                                          icon: const Icon(Icons.add))
                                     ],
-                                  )),
-                            ]))
+                                  ),
+                                  ...monthly.map((e) => Row(
+                                        children: [
+                                          Visibility(
+                                            visible: e['day'].length > 2
+                                                ? false
+                                                : true,
+                                            child: IconButton(
+                                                onPressed: () {
+                                                  mainController
+                                                      .removemonthlyremindday(
+                                                          value: e['day']);
+                                                },
+                                                icon: const Icon(Icons.delete)),
+                                          ),
+                                          Checkbox(
+                                              value: e['check'],
+                                              onChanged: (x) {
+                                                mainController
+                                                    .remindmonthlycheckbox(
+                                                        x: x,
+                                                        index:
+                                                            monthly.indexOf(e));
+                                              }),
+                                          Text(e['day']),
+                                        ],
+                                      )),
+                                ]))
                       ],
                     )),
                 Visibility(
                     visible: typevalue == typelist[2] ? true : false,
                     child: TextFieldMZ(
+                        textdirection: TextDirection.ltr,
                         label: 'عنوان الموقع',
                         textEditingController: autoCertificateurl,
-                        onChanged: () {
-                          null;
-                        })),
+                        onChanged: (x) => null)),
                 const Divider(),
                 Row(
                   children: [
                     const Text("بدء التذكير عند الساعة"),
-                    ElevatedButton(
-                        onPressed: () {
-                          mainController.setstartreminddate(ctx: context);
-                        },
-                        child: Text(
-                            "${hourlystartremindvalue.hour}:${hourlystartremindvalue.minute}"))
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                          onPressed: () {
+                            mainController.setstartreminddate(ctx: context);
+                          },
+                          child: Text(
+                              "${hourlystartremindvalue.hour}:${hourlystartremindvalue.minute}")),
+                    )
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text("تذكير قبل"),
+                    Column(
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              mainController.sendalertbeforremindadd();
+                            },
+                            icon: Icon(Icons.add)),
+                        IconButton(
+                            onPressed: () {
+                              mainController.sendalertbeforremindmin();
+                            },
+                            icon: Icon(Icons.minimize)),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("$sendalertbefor"),
+                    ),
+                    Text("يوم/أيام")
                   ],
                 ),
                 const Divider(),
@@ -396,11 +445,20 @@ class Remind extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text("${e['remind_office_id'] ?? 'مكتب محذوف'}"),
+        Text(
+            "${DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == e['remind_office_id'])]['officename'] ?? 'مكتب محذوف'}"),
         SelectableText('''
-              # ${e['remind_id']} ${e['remindname']}
-              ${e['reminddetails']}
-              '''),
+#${e['remind_id']}_> ${e['remindname']}
+${e['reminddetails']}
+'''),
+        e['reminddate'] != null
+            ? Text(
+                "تاريخ الانتهاء :   ${df.DateFormat('yyyy-MM-dd').format(e['reminddate'])}")
+            : e['autocerturl'] != null
+                ? const Text('يرجى الانتظار.. يتم محاولة جلب المعلومات')
+                : const Text("تاريخ الانتهاء غير محدد"),
+        Text(
+            "نمط التعيين : ${e['type'] == 0 ? 'يدوي مرة واحدة' : e['type'] == 1 ? 'يدوي عدة مرات' : 'تلقائي'}"),
         const Divider(),
         Text(e['createby_id'] != null
             ? 'تم إنشاءها بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['createdate'])} بواسطة ${DB.userstable[DB.userstable.indexWhere((y) => y['user_id'] == e['createby_id'])]['fullname']}'
@@ -429,6 +487,20 @@ class Remind extends StatelessWidget {
   }
 
   customInitforAdd() {
+    Remind.hourlystartremindvalue = TimeOfDay.now();
+    sendalertbefor = 0;
+    repeat = 1.0;
+    monthly.clear();
+    monthly = [
+      {'day': 'آخر يوم في الشهر', 'check': false}
+    ];
+    for (var i in monthly) {
+      i['check'] = false;
+    }
+    for (var i in weekly) {
+      i['check'] = false;
+    }
+    Remind.autoCertificateurl.text = '';
     remindofficelist.clear();
     for (var i in DB.officetable) {
       if (checkifUserisUserinOffice(officeid: i['office_id']) == true ||
@@ -465,8 +537,68 @@ class Remind extends StatelessWidget {
     remindofficeNameselected = DB.officetable[DB.officetable.indexWhere(
             (element) => element['office_id'] == e['remind_office_id'])]
         ['officename'];
+    Remind.onetimeremid = e['reminddate'];
     Remind.remindname.text = e['remindname'];
     Remind.reminddetails.text = e['reminddetails'];
+    Remind.sendalertbefor = e['sendalertbefor'];
+    Remind.hourlystartremindvalue = TimeOfDay.fromDateTime(DateTime.parse(
+        '${e['reminddate'].toString().substring(0, 10)} ${e['startsendat'].toString().substring(0, e['startsendat'].toString().indexOf(':')).length == 1 ? '0${e['startsendat']}' : '${e['startsendat']}'}'));
+    Remind.autoCertificateurl.text = e['autocerturl'] ?? '';
+    Remind.repeat = e['repeat'].toDouble();
+    monthly.clear();
+    monthly = [
+      {'day': 'آخر يوم في الشهر', 'check': false}
+    ];
+    for (var i in monthly) {
+      i['check'] = false;
+    }
+    for (var i in weekly) {
+      i['check'] = false;
+    }
+    if (e['type'] == '0') {
+      typevalue = typelist[0];
+    } else if (e['type'] == '1') {
+      typevalue = typelist[1];
+      if (e['manytimestype'] == 0) {
+        Remind.manytimesremindgroup = Remind.manytimesremindlist[0];
+        for (var i in e['every']) {
+          switch (i) {
+            case 'friday':
+              weekly[0]['check'] = true;
+              break;
+            case 'satarday':
+              weekly[1]['check'] = true;
+              break;
+            case 'sunday':
+              weekly[2]['check'] = true;
+              break;
+            case 'monday':
+              weekly[3]['check'] = true;
+              break;
+            case 'tuesday':
+              weekly[4]['check'] = true;
+              break;
+            case 'wednesday':
+              weekly[5]['check'] = true;
+              break;
+            case 'thursday':
+              weekly[6]['check'] = true;
+              break;
+          }
+        }
+      } else {
+        Remind.manytimesremindgroup = Remind.manytimesremindlist[1];
+        for (var i in e['every']) {
+          if (i == 'last') {
+            monthly[0]['check'] = true;
+          } else {
+            monthly.add({'day': "$i", 'check': true});
+          }
+        }
+      }
+    } else {
+      typevalue = typelist[2];
+    }
   }
 
   addremind() async {

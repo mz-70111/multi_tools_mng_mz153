@@ -67,7 +67,7 @@ class DBController extends GetxController {
   }
 
   gettable({required List<Map> list, table, where = '', tableid = ''}) async {
-    var xx, yy, zz, desctable, selecttable;
+    var ww, xx, yy, zz, desctable, selecttable;
     var temp = [],
         pr = [],
         of = [],
@@ -79,7 +79,8 @@ class DBController extends GetxController {
         commentId = [],
         images = [],
         remindlog = [],
-        remindlogdate = [];
+        remindlogdate = [],
+        every = [];
 
     list.clear();
     desctable = await DB().customquery(query: 'desc $table;');
@@ -259,6 +260,17 @@ class DBController extends GetxController {
           'error': null
         });
       } else if (i.keys.toList().first == 'remind_id') {
+        ww = await DB().customquery(
+            query:
+                'select every from remind_every where revery_remind_id=${i['remind_id']}');
+        every.clear();
+        for (var evt in ww) {
+          every.add(evt[0]);
+        }
+        list[list.indexOf(i)].addAll({
+          'every': [...every]
+        });
+
         xx = await DB().customquery(
             query:
                 'select * from users_remind where ur_remind_id=${i['remind_id']}');
@@ -519,7 +531,10 @@ $todoid
 );
 ''');
       } on Exception {
-      } catch (e) {}
+        null;
+      } catch (e) {
+        null;
+      }
     }
 
     var imagest = await DB().customquery(
@@ -539,10 +554,11 @@ $todoid
   }
 
   addremind() async {
+    List every = [];
     if (Remind.typevalue == Remind.typelist[0]) {
       await DB().customquery(query: '''
 insert into remind
-(remindname,reminddetails,createdate,remind_office_id,type,reminddate,startsendat,sendalertbefor)
+(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor,reminddate,`repeat`)
 values
 (
 "${Remind.reminds[0]['controller'].text}",
@@ -550,15 +566,16 @@ values
 "${DateTime.now()}",
 ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
 '0',
-"${Remind.onetimeremid}",
 "${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
-${Remind.sendalertbefor}
+${Remind.sendalertbefor},
+"${Remind.onetimeremid}",
+${Remind.repeat}
 );
 ''');
     } else if (Remind.typevalue == Remind.typelist[1]) {
       await DB().customquery(query: '''
 insert into remind
-(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor)
+(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor,manytimestype,`repeat`)
 values
 (
 "${Remind.reminds[0]['controller'].text}",
@@ -567,22 +584,25 @@ values
 ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
 '1',
 "${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
-${Remind.sendalertbefor}
+${Remind.sendalertbefor},
+${Remind.manytimesremindgroup == Remind.manytimesremindlist[0] ? "0" : "1"},
+${Remind.repeat}
 );
 ''');
     } else if (Remind.typevalue == Remind.typelist[2]) {
       await DB().customquery(query: '''
 insert into remind
-(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor)
+(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor,`repeat`)
 values
 (
 "${Remind.reminds[0]['controller'].text}",
 "${Remind.reminds[1]['controller'].text}",
 "${DateTime.now()}",
 ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
-'1',
+'2',
 "${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
-${Remind.sendalertbefor}
+${Remind.sendalertbefor},
+${Remind.repeat}
 );
 ''');
     }
@@ -655,6 +675,7 @@ $remindid,
       }
     }
 
+    await MainController().getreminddate(id: remindid);
     await DB().customquery(query: '''
 insert into users_remind
 (createby_id,ur_remind_id)
@@ -683,10 +704,24 @@ $remindid
         'repeat': i[10],
         'reminddate': i[11],
         'startsendat': i[12],
+        'sendalertbefor': i[13],
+        'autocerturl': i[14],
+        'manytimesremind': i[15],
         'visible': true,
         'check': true
       });
     }
+
+    var evt = await DB().customquery(
+        query:
+            'select every from remind_every where revery_remind_id=(select Max(revery_remind_id) from remind_every where revery_id=(Select max(revery_id)from remind_every));');
+    every.clear();
+    for (var evr in evt) {
+      every.add(evr[0]);
+    }
+    Remind.mylista[Remind.mylista.length - 1].addAll({
+      'every': [...every]
+    });
 
     var tt = await DB().customquery(
         query:

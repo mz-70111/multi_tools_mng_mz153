@@ -391,6 +391,17 @@ class MainController extends GetxController {
 '''
     ]);
     String result = getExpiredate.stdout;
+    result = result.substring(0, result.indexOf(' '));
+    result = result.replaceAll('/', '-');
+    List y = result.split('-');
+    y[0].length == 1 ? y[0] = '0${y[0]}' : null;
+    String MM = y[0];
+    String dd = y[1];
+    String yy = y[2];
+    y[0] = yy;
+    y[1] = MM;
+    y[2] = dd;
+    result = y.join('-');
     return result;
   }
 
@@ -1662,7 +1673,7 @@ class MainController extends GetxController {
         context: ctx,
         initialDate: Remind.onetimeremid,
         firstDate: DateTime.parse('2022-07-13'),
-        lastDate: DateTime.now());
+        lastDate: DateTime.now().add(const Duration(days: 364)));
     if (dt != null) {
       Remind.onetimeremid = dt;
       update();
@@ -1677,14 +1688,14 @@ class MainController extends GetxController {
     }
   }
 
-  gettoday() {
+  gettodayinweek() {
     String t = df.DateFormat("EEEE").format(DateTime.now()).toLowerCase();
     int today = 1;
     switch (t) {
       case 'friday':
         today = 5;
         break;
-      case 'saturday':
+      case 'satarday':
         today = 6;
         break;
       case 'sunday':
@@ -1706,6 +1717,159 @@ class MainController extends GetxController {
     return today;
   }
 
+  getday({required String dayinString}) {
+    int day = 1;
+
+    switch (dayinString) {
+      case 'friday':
+        day = 5;
+        break;
+      case 'satarday':
+        day = 6;
+        break;
+      case 'sunday':
+        day = 7;
+        break;
+      case 'monday':
+        day = 1;
+        break;
+      case 'tuesday':
+        day = 2;
+        break;
+      case 'wednesday':
+        day = 3;
+        break;
+      case 'thursday':
+        day = 4;
+        break;
+    }
+    return day;
+  }
+
+  getreminddate({id}) async {
+    List<int> dateandlist = [];
+    int? dateand0, monthdays;
+    int w = 7;
+    DateTime? reminddate;
+
+    dateand0 = null;
+    if (DateTime.now().month == 1 ||
+        DateTime.now().month == 3 ||
+        DateTime.now().month == 5 ||
+        DateTime.now().month == 7 ||
+        DateTime.now().month == 8 ||
+        DateTime.now().month == 10 ||
+        DateTime.now().month == 12) {
+      monthdays = 31;
+    } else if (DateTime.now().month == 1 ||
+        DateTime.now().month == 4 ||
+        DateTime.now().month == 6 ||
+        DateTime.now().month == 9 ||
+        DateTime.now().month == 11) {
+      monthdays = 30;
+    } else if (DateTime.now().month == 2) {
+      monthdays = 28;
+    }
+    try {
+      if (Remind.typevalue == Remind.typelist[1]) {
+        var t = await DB().customquery(
+            query:
+                "select every from remind_every where revery_remind_id=$id;");
+        if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0]) {
+          for (var i in t) {
+            if (gettodayinweek() - getday(dayinString: i[0]) < 0) {
+              dateandlist.add(
+                  -1 * (gettodayinweek() - getday(dayinString: i[0])) as int);
+            } else if (gettodayinweek() - getday(dayinString: i[0]) > 0) {
+              dateandlist.add(
+                  7 - (gettodayinweek() - getday(dayinString: i[0])) as int);
+            } else {
+              dateandlist.add(gettodayinweek() - getday(dayinString: i[0]));
+            }
+          }
+          dateandlist.sort();
+          dateand0 = dateandlist[0];
+          if (dateand0 != null) {
+            reminddate = DateTime.now().add(Duration(days: dateand0));
+            await DB().customquery(
+                query:
+                    'update remind set reminddate="$reminddate" where remind_id=$id;');
+          }
+        } else if (Remind.manytimesremindgroup ==
+            Remind.manytimesremindlist[1]) {
+          int daynum = 0;
+          for (var i in t) {
+            if (i[0] == 'last') {
+              if (DateTime.now().month == 1 ||
+                  DateTime.now().month == 3 ||
+                  DateTime.now().month == 5 ||
+                  DateTime.now().month == 7 ||
+                  DateTime.now().month == 8 ||
+                  DateTime.now().month == 10 ||
+                  DateTime.now().month == 12) {
+                daynum = 31;
+              } else if (DateTime.now().month == 1 ||
+                  DateTime.now().month == 4 ||
+                  DateTime.now().month == 6 ||
+                  DateTime.now().month == 9 ||
+                  DateTime.now().month == 11) {
+                daynum = 30;
+              } else if (DateTime.now().month == 2) {
+                daynum = 28;
+              }
+            } else {
+              daynum = int.parse(i[0]);
+            }
+            dateandlist.add(daynum);
+          }
+          dateandlist.sort();
+          for (var i in dateandlist) {
+            if (i - DateTime.now().day < 0) {
+              dateand0 = monthdays! + i;
+            } else {
+              dateand0 = i;
+              break;
+            }
+          }
+          if (dateand0 != null) {
+            reminddate = DateTime.now()
+                .add(Duration(days: dateand0 - DateTime.now().day));
+            await DB().customquery(
+                query:
+                    'update remind set reminddate="$reminddate" where remind_id=$id;');
+          }
+        }
+      } else if (Remind.typevalue == Remind.typelist[2]) {
+        Remind.autoCertificateurl.text.startsWith('www.')
+            ? Remind.autoCertificateurl.text =
+                Remind.autoCertificateurl.text.substring(4)
+            : null;
+        Remind.autoCertificateurl.text.startsWith('https://')
+            ? null
+            : Remind.autoCertificateurl.text =
+                'https://${Remind.autoCertificateurl.text}';
+        await DB().customquery(
+            query:
+                'update remind set autocerturl="${Remind.autoCertificateurl.text}" remind_id=$id;');
+        String? reminddatString;
+        String? url;
+        var turl = await DB().customquery(
+            query: 'select autocerturl from remind where remind_id=$id;');
+        for (var u in turl) {
+          url = u[0];
+        }
+        reminddatString = await getCert(host: Remind.autoCertificateurl.text);
+        reminddate =
+            reminddatString != null ? DateTime.parse("$reminddatString") : null;
+        await DB().customquery(
+            query:
+                'update remind set autocerturl="${Remind.autoCertificateurl.text}",reminddate="$reminddate" where remind_id=$id;');
+      }
+    } catch (e) {
+      null;
+    }
+  }
+
   choosemanytimesremind(x) {
     Remind.manytimesremindgroup = x;
     update();
@@ -1719,8 +1883,20 @@ class MainController extends GetxController {
   addmonthlyremindday({value}) {
     if (!Remind.days.contains(value)) {
       Remind.monthly.add({'day': "$value", 'check': false});
+      Remind.days.add(value);
     }
-    Remind.days.add(value);
+    update();
+  }
+
+  sendalertbeforremindadd() {
+    Remind.sendalertbefor++;
+    update();
+  }
+
+  sendalertbeforremindmin() {
+    if (Remind.sendalertbefor > 0) {
+      Remind.sendalertbefor--;
+    }
     update();
   }
 
