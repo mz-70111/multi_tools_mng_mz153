@@ -11,7 +11,6 @@ import 'package:users_tasks_mz_153/pages/06_tasks.dart';
 import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
 import 'package:users_tasks_mz_153/pages/officemanagment.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
-import 'package:users_tasks_mz_153/tamplate/bottomnavbar.dart';
 import 'package:users_tasks_mz_153/tamplate/thememz.dart';
 import 'package:users_tasks_mz_153/tamplate/tweenmz.dart';
 
@@ -734,8 +733,6 @@ class MYPAGE extends StatelessWidget {
                                 ),
                               ))),
 
-                      //moretools
-                      Positioned(bottom: 0, left: 0, child: MoreTools()),
                       //notification
                       Positioned(left: 0, child: Notificationm()),
                       //personal panel(logout and chang password)
@@ -880,46 +877,55 @@ class ADDEDITINFOItem extends StatelessWidget {
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(
               children: [
-                Visibility(
-                    visible: editpanelvisible,
-                    child: Expanded(
-                        child: Padding(
+                IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: Icon(Icons.close)),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Visibility(
+                          visible: editpanelvisible,
+                          child: Expanded(
+                              child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: editpanel))),
+                      Visibility(
+                          visible: !editpanelvisible,
+                          child: Expanded(
+                              child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: editpanel))),
-                Visibility(
-                    visible: !editpanelvisible,
-                    child: Expanded(
-                        child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Visibility(
-                              visible: !firstpage,
-                              child: Expanded(
-                                child: Row(
-                                  children: [
-                                    TextButton(
-                                        onPressed: () {
-                                          mainController.firstbackpage();
-                                        },
-                                        child: const Text("السابق")),
-                                    const Expanded(child: SizedBox()),
-                                    addpanel,
-                                  ],
-                                ),
-                              )),
-                          Visibility(
-                            visible: firstpage,
-                            child: TextButton(
-                                onPressed: () {
-                                  mainController.firstbackpage();
-                                },
-                                child: const Text("التالي")),
-                          )
-                        ],
-                      ),
-                    ))),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Visibility(
+                                    visible: !firstpage,
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                            onPressed: () =>
+                                                mainController.firstbackpage(),
+                                            icon: const Icon(
+                                                Icons.arrow_circle_right)),
+                                        addpanel,
+                                      ],
+                                    )),
+                                Visibility(
+                                  visible: firstpage,
+                                  child: IconButton(
+                                      onPressed: () {
+                                        mainController.firstbackpage();
+                                      },
+                                      icon:
+                                          const Icon(Icons.arrow_circle_left)),
+                                )
+                              ],
+                            ),
+                          ))),
+                    ],
+                  ),
+                ),
               ],
             ),
             Visibility(

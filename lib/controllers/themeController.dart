@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/pages/00_login.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/thememz.dart';
@@ -26,6 +27,7 @@ class ThemeController extends GetxController {
     iconmodeEndrotate =
         iconmodeEndrotate == 360 * pi / 180 ? 0 : 360 * pi / 180;
     ThemeMZ.mode = ThemeMZ.mode == 'light' ? 'dark' : 'light';
+    MainController().cloasedp();
     await removemode();
     await setmode(mode: ThemeMZ.mode);
     update();

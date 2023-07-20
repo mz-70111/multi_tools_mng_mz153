@@ -26,6 +26,7 @@ class PersonPanel extends StatelessWidget {
   PersonPanel({super.key});
   static double dropend = -150.0;
   static String updatepassworderror = '';
+  static bool personalvisible = false;
   static List dropdbitem({ctx}) => [
         {
           'label': DB.userstable[DB.userstable.indexWhere(
@@ -47,7 +48,7 @@ class PersonPanel extends StatelessWidget {
           'action': () async {
             LogIn.removelogin();
             Get.offNamed('/');
-            dropend = -150.0;
+            personalvisible = false;
           },
           'size': 150.0
         }
@@ -56,28 +57,30 @@ class PersonPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<MainController>(
-        init: mainController,
-        builder: (_) {
-          dropdbitemz = dropdbitem(ctx: context);
-          return TweenMZ.translatey(
-            begin: -150.0,
-            end: dropend,
-            duration: 200,
-            child0: SizedBox(
-              width: 180,
-              child: Card(
-                child: Column(
-                  children: dropdbitemz
-                      .map((e) => SizedBox(
-                          width: e['size'],
-                          child: GestureDetector(
-                            onTap: e['action'],
-                            child: MouseRegion(
-                              onHover: (r) {
-                                mainController.changeonhoverdropPersonal(
-                                    ctx: context, x: dropdbitemz.indexOf(e));
-                              },
-                              child: Card(
+      init: mainController,
+      builder: (_) {
+        dropdbitemz = dropdbitem(ctx: context);
+        return Visibility(
+          visible: personalvisible,
+          child: SizedBox(
+            width: 180,
+            child: Card(
+              child: Column(
+                children: dropdbitemz
+                    .map((e) => SizedBox(
+                        width: e['size'],
+                        child: GestureDetector(
+                          onTap: e['action'],
+                          child: MouseRegion(
+                            onHover: (r) {
+                              mainController.changeonhoverdropPersonal(
+                                  ctx: context, x: dropdbitemz.indexOf(e));
+                            },
+                            child: TweenMZ.translatex(
+                              begin: -100.0,
+                              end: 0.0,
+                              duration: 100 * dropdbitemz.indexOf(e),
+                              child0: Card(
                                 color: Colors.indigoAccent.withOpacity(0.7),
                                 child: GetBuilder<ThemeController>(
                                   init: themeController,
@@ -94,13 +97,15 @@ class PersonPanel extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          )))
-                      .toList(),
-                ),
+                          ),
+                        )))
+                    .toList(),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -209,7 +214,6 @@ AppBarMZ() {
       IconButton(
           onPressed: () {
             mainController.personalpanelshow();
-            Notificationm.dropend = -150.0;
           },
           icon: const Icon(Icons.settings)),
       IconButton(

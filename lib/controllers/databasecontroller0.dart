@@ -343,7 +343,7 @@ class DBController extends GetxController {
 insert into users (username,fullname,password,email,mobile,admin,mustchgpass,addremind,addtodo,addping,pbx)
 values
 (
-"${Employ.employs[0]['controller'].text}",
+"${Employ.employs[0]['controller'].text.toString().toLowerCase()}",
 "${Employ.employs[1]['controller'].text}",
 "$passw",
 "${Employ.employs[4]['controller'].text}",
@@ -550,195 +550,6 @@ $todoid
     });
 
     DB.todotable.add(Whattodo.mylista[Whattodo.mylista.length - 1]);
-    update();
-  }
-
-  addremind() async {
-    List every = [];
-    if (Remind.typevalue == Remind.typelist[0]) {
-      await DB().customquery(query: '''
-insert into remind
-(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor,reminddate,`repeat`)
-values
-(
-"${Remind.reminds[0]['controller'].text}",
-"${Remind.reminds[1]['controller'].text}",
-"${DateTime.now()}",
-${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
-'0',
-"${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
-${Remind.sendalertbefor},
-"${Remind.onetimeremid}",
-${Remind.repeat}
-);
-''');
-    } else if (Remind.typevalue == Remind.typelist[1]) {
-      await DB().customquery(query: '''
-insert into remind
-(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor,manytimestype,`repeat`)
-values
-(
-"${Remind.reminds[0]['controller'].text}",
-"${Remind.reminds[1]['controller'].text}",
-"${DateTime.now()}",
-${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
-'1',
-"${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
-${Remind.sendalertbefor},
-${Remind.manytimesremindgroup == Remind.manytimesremindlist[0] ? "0" : "1"},
-${Remind.repeat}
-);
-''');
-    } else if (Remind.typevalue == Remind.typelist[2]) {
-      await DB().customquery(query: '''
-insert into remind
-(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor,`repeat`)
-values
-(
-"${Remind.reminds[0]['controller'].text}",
-"${Remind.reminds[1]['controller'].text}",
-"${DateTime.now()}",
-${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
-'2',
-"${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
-${Remind.sendalertbefor},
-${Remind.repeat}
-);
-''');
-    }
-
-    var remindid;
-    var remindidT = await DB().customquery(
-        query:
-            "select remind_id from remind where remind_id=(Select MAX(remind_id) from remind);");
-    for (var i in remindidT) {
-      remindid = i[0];
-    }
-
-    if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0]) {
-      String day = '';
-      for (var i in Remind.weekly) {
-        if (i['check'] == true) {
-          switch (i['day']) {
-            case 'الجمعة':
-              day = 'friday';
-              break;
-            case 'السبت':
-              day = 'satarday';
-              break;
-            case 'الأحد':
-              day = 'sunday';
-              break;
-            case 'الاثنين':
-              day = 'monday';
-              break;
-            case 'الثلاثاء':
-              day = 'tuesday';
-              break;
-            case 'الأربعاء':
-              day = 'wednesday';
-              break;
-            case 'الخميس':
-              day = 'thursday';
-              break;
-          }
-          await DB().customquery(query: '''
-insert into remind_every
-(revery_remind_id,every)
-values
-(
-$remindid,
-"$day"
-);
-''');
-        }
-      }
-    } else {
-      for (var i in Remind.monthly) {
-        String day = '';
-        if (i['check'] == true) {
-          if (i['day'].contains("يوم")) {
-            day = 'last';
-          } else {
-            day = i['day'];
-          }
-          await DB().customquery(query: '''
-insert into remind_every
-(revery_remind_id,every)
-values
-(
-$remindid,
-"$day"
-);
-''');
-        }
-      }
-    }
-
-    await MainController().getreminddate(id: remindid);
-    await DB().customquery(query: '''
-insert into users_remind
-(createby_id,ur_remind_id)
-values
-(
-${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == LogIn.username.text)]['user_id']},
-$remindid
-);
-''');
-    var t = await DB().customquery(
-        query:
-            'select * from remind where remind_id=(Select max(remind_id)from remind);');
-    Remind.mylista.add({});
-    for (var i in t) {
-      Remind.mylista[Remind.mylista.length - 1].addAll({
-        'remind_id': i[0],
-        'remindname': i[1],
-        'reminddetails': i[2],
-        'createdate': i[3],
-        'editdate': i[4],
-        'remind_office_id': i[5],
-        'notifi': i[6],
-        'status': i[7],
-        'type': i[8],
-        'lastsend': i[9],
-        'repeat': i[10],
-        'reminddate': i[11],
-        'startsendat': i[12],
-        'sendalertbefor': i[13],
-        'autocerturl': i[14],
-        'manytimesremind': i[15],
-        'visible': true,
-        'check': true
-      });
-    }
-
-    var evt = await DB().customquery(
-        query:
-            'select every from remind_every where revery_remind_id=(select Max(revery_remind_id) from remind_every where revery_id=(Select max(revery_id)from remind_every));');
-    every.clear();
-    for (var evr in evt) {
-      every.add(evr[0]);
-    }
-    Remind.mylista[Remind.mylista.length - 1].addAll({
-      'every': [...every]
-    });
-
-    var tt = await DB().customquery(
-        query:
-            'select * from users_remind where ur_id=(Select max(ur_id)from users_remind);');
-    for (var i in tt) {
-      Remind.mylista[Remind.mylista.length - 1].addAll({
-        'createby_id': i[1],
-        'createby': DB.userstable[DB.userstable
-            .indexWhere((element) => element['user_id'] == i[1])]['fullname'],
-        'commentdate': [],
-        'comment': [],
-        'waitsend': true,
-        'error': null,
-        'commentcontroller': TextEditingController(),
-      });
-    }
-    DB.remindtable.add(Remind.mylista[Remind.mylista.length - 1]);
     update();
   }
 
@@ -1237,5 +1048,225 @@ where user_id=$id;
       ...DB.todotable,
       ...DB.remindtable
     ];
+  }
+
+  addremind() async {
+    List every = [];
+    if (Remind.typevalue == Remind.typelist[0]) {
+      await DB().customquery(query: '''
+insert into remind
+(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor,reminddate,`repeat`)
+values
+(
+"${Remind.reminds[0]['controller'].text}",
+"${Remind.reminds[1]['controller'].text}",
+"${DateTime.now()}",
+${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
+'0',
+"${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
+${Remind.sendalertbefor},
+"${Remind.onetimeremid}",
+${Remind.repeat}
+);
+''');
+    } else if (Remind.typevalue == Remind.typelist[1]) {
+      await DB().customquery(query: '''
+insert into remind
+(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor,manytimestype,`repeat`)
+values
+(
+"${Remind.reminds[0]['controller'].text}",
+"${Remind.reminds[1]['controller'].text}",
+"${DateTime.now()}",
+${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
+'1',
+"${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
+${Remind.sendalertbefor},
+${Remind.manytimesremindgroup == Remind.manytimesremindlist[0] ? "0" : "1"},
+${Remind.repeat}
+);
+''');
+    } else if (Remind.typevalue == Remind.typelist[2]) {
+      await DB().customquery(query: '''
+insert into remind
+(remindname,reminddetails,createdate,remind_office_id,type,startsendat,sendalertbefor,`repeat`)
+values
+(
+"${Remind.reminds[0]['controller'].text}",
+"${Remind.reminds[1]['controller'].text}",
+"${DateTime.now()}",
+${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
+'2',
+"${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
+${Remind.sendalertbefor},
+${Remind.repeat}
+);
+''');
+    }
+
+    var remindid;
+    var remindidT = await DB().customquery(
+        query:
+            "select remind_id from remind where remind_id=(Select MAX(remind_id) from remind);");
+    for (var i in remindidT) {
+      remindid = i[0];
+    }
+
+    if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0]) {
+      String day = '';
+      for (var i in Remind.weekly) {
+        if (i['check'] == true) {
+          switch (i['day']) {
+            case 'الجمعة':
+              day = 'friday';
+              break;
+            case 'السبت':
+              day = 'satarday';
+              break;
+            case 'الأحد':
+              day = 'sunday';
+              break;
+            case 'الاثنين':
+              day = 'monday';
+              break;
+            case 'الثلاثاء':
+              day = 'tuesday';
+              break;
+            case 'الأربعاء':
+              day = 'wednesday';
+              break;
+            case 'الخميس':
+              day = 'thursday';
+              break;
+          }
+          await DB().customquery(query: '''
+insert into remind_every
+(revery_remind_id,every)
+values
+(
+$remindid,
+"$day"
+);
+''');
+        }
+      }
+    } else {
+      for (var i in Remind.monthly) {
+        String day = '';
+        if (i['check'] == true) {
+          if (i['day'].contains("يوم")) {
+            day = 'last';
+          } else {
+            day = i['day'];
+          }
+          await DB().customquery(query: '''
+insert into remind_every
+(revery_remind_id,every)
+values
+(
+$remindid,
+"$day"
+);
+''');
+        }
+      }
+    }
+
+    await MainController().getreminddate(id: remindid);
+    await DB().customquery(query: '''
+insert into users_remind
+(createby_id,ur_remind_id)
+values
+(
+${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']},
+$remindid
+);
+''');
+    var t = await DB().customquery(
+        query:
+            'select * from remind where remind_id=(Select max(remind_id)from remind);');
+    Remind.mylista.add({});
+    for (var i in t) {
+      Remind.mylista[Remind.mylista.length - 1].addAll({
+        'remind_id': i[0],
+        'remindname': i[1],
+        'reminddetails': i[2],
+        'createdate': i[3],
+        'editdate': i[4],
+        'remind_office_id': i[5],
+        'notifi': i[6],
+        'status': i[7],
+        'type': i[8],
+        'lastsend': i[9],
+        'repeat': i[10],
+        'reminddate': i[11],
+        'startsendat': i[12],
+        'sendalertbefor': i[13],
+        'autocerturl': i[14],
+        'manytimesremind': i[15],
+        'visible': true,
+        'check': true
+      });
+    }
+
+    var evt = await DB().customquery(
+        query:
+            'select every from remind_every where revery_remind_id=(select Max(revery_remind_id) from remind_every where revery_id=(Select max(revery_id)from remind_every));');
+    every.clear();
+    for (var evr in evt) {
+      every.add(evr[0]);
+    }
+    Remind.mylista[Remind.mylista.length - 1].addAll({
+      'every': [...every]
+    });
+
+    var tt = await DB().customquery(
+        query:
+            'select * from users_remind where ur_id=(Select max(ur_id)from users_remind);');
+    for (var i in tt) {
+      Remind.mylista[Remind.mylista.length - 1].addAll({
+        'createby_id': i[1],
+        'createby': DB.userstable[DB.userstable
+            .indexWhere((element) => element['user_id'] == i[1])]['fullname'],
+        'commentdate': [],
+        'comment': [],
+        'waitsend': true,
+        'error': null,
+        'commentcontroller': TextEditingController(),
+      });
+    }
+    DB.remindtable.add(Remind.mylista[Remind.mylista.length - 1]);
+    update();
+  }
+
+  editremind({id}) async {
+    await DB().customquery(query: '''
+  update users_remind set
+  editby_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}
+  where ur_remind_id=$id;
+  ''');
+
+    if (Remind.typevalue == Remind.typelist[0]) {
+      await DB().customquery(query: '''
+update remind set
+remindname="${Remind.reminds[0]['controller'].text}",
+reminddetails="${Remind.reminds[1]['controller'].text}",
+editdate="${DateTime.now()}",
+remind_office_id=${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
+type='0',
+startsendat="${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
+sendalertbefor=${Remind.sendalertbefor},
+reminddate="${Remind.onetimeremid}",
+`repeat`=${Remind.repeat}
+where remind_id=$id;
+''');
+    }
+
+    await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
+    DB.todotable[
+            DB.todotable.indexWhere((element) => element['todo_id'] == id)] =
+        Whattodo.mylista[
+            Whattodo.mylista.indexWhere((element) => element['todo_id'] == id)];
+    update();
   }
 }

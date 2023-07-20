@@ -247,7 +247,6 @@ class Home extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(bottom: 0, left: 0, child: MoreTools()),
             Positioned(left: 0, child: Notificationm()),
             Positioned(left: 0, child: PersonPanel()),
           ],

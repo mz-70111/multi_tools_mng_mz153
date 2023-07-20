@@ -106,23 +106,6 @@ class BottomNBMZ extends StatelessWidget {
                       .toList(),
                 ),
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: IconButton(
-                        onPressed: () {
-                          mainController.moretoolsshow(context);
-                        },
-                        icon: const Icon(
-                          Icons.density_medium_rounded,
-                          color: Colors.white,
-                        )),
-                  )
-                ],
-              )
             ]),
           )),
     ]);
@@ -140,59 +123,73 @@ class MoreTools extends StatelessWidget {
       'label': 'تذكير',
       'action': () {
         mainController.homemaincontent(6);
+        Get.back();
       },
-      'size': 150.0
+      'size': 20.0,
+      'icon': Icons.schedule
     },
-    {'label': 'ping', 'action': () {}, 'size': 150.0},
-    {'label': 'مقسم', 'action': () {}, 'size': 150.0}
+    {
+      'label': 'ping',
+      'action': () {},
+      'size': 20.0,
+      'icon': Icons.network_check
+    },
+    {'label': 'مقسم', 'action': () {}, 'size': 20.0, 'icon': Icons.phone}
   ];
   @override
   Widget build(BuildContext context) {
     return GetBuilder<MainController>(
         init: mainController,
         builder: (_) {
-          return TweenMZ.translatey(
-            begin: MediaQuery.of(context).size.height,
-            end: dropend,
-            duration: 200,
-            child0: SizedBox(
-              width: 180,
-              child: Card(
-                child: Column(
-                  children: moretoolslist
-                      .map((e) => SizedBox(
-                          width: e['size'],
-                          child: TweenMZ.translatex(
-                            begin: -150.0,
-                            duration: (moretoolslist.indexOf(e) + 1) * 200,
-                            end: 0.0,
-                            child0: GestureDetector(
-                              onTap: e['action'],
-                              child: MouseRegion(
-                                onHover: (x) {
-                                  mainController.changeonhoverdropMore(
-                                      x: moretoolslist.indexOf(e));
-                                },
-                                child: Card(
-                                  color: Colors.indigoAccent.withOpacity(0.7),
-                                  child: GetBuilder<ThemeController>(
-                                    init: themeController,
-                                    builder: (_) => Text(
-                                      " > ${e['label']}",
-                                      style: ThemeMZ()
-                                          .theme()
-                                          .textTheme
-                                          .labelMedium,
-                                    ),
+          return Column(
+            children: [
+              Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: const Icon(Icons.close)),
+              ),
+              ...moretoolslist
+                  .map((e) => TweenMZ.translatex(
+                        begin: -150.0,
+                        duration: (moretoolslist.indexOf(e) + 1) * 200,
+                        end: 0.0,
+                        child0: GestureDetector(
+                          onTap: e['action'],
+                          child: MouseRegion(
+                            onHover: (x) {
+                              mainController.changeonhoverdropMore(
+                                  ctx: context, x: moretoolslist.indexOf(e));
+                            },
+                            onExit: (x) {
+                              mainController.changeonexitdropMore(
+                                  ctx: context, x: moretoolslist.indexOf(e));
+                            },
+                            child: GetBuilder<ThemeController>(
+                              init: themeController,
+                              builder: (_) => Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(e['icon']),
+                                      Text(
+                                        "  ${e['label']}",
+                                        style: TextStyle(fontSize: e['size']),
+                                      ),
+                                    ],
                                   ),
-                                ),
+                                  Divider()
+                                ],
                               ),
                             ),
-                          )))
-                      .toList(),
-                ),
-              ),
-            ),
+                          ),
+                        ),
+                      ))
+                  .toList(),
+            ],
           );
         });
   }

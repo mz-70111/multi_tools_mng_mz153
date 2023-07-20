@@ -45,7 +45,7 @@ class Remind extends StatelessWidget {
     {'day': 'آخر يوم في الشهر', 'check': false}
   ];
   static DateTime onetimeremid = DateTime.now();
-  static double repeat = 1;
+  static int repeat = 15;
   static List days = [];
   static List<Map> reminds = [
     {
@@ -100,7 +100,8 @@ class Remind extends StatelessWidget {
       'remind_id',
       'remindname',
       'type',
-      'status'
+      'status',
+      'manytimestype'
     ];
     List itemResult = [];
     List colors = [];
@@ -129,7 +130,7 @@ class Remind extends StatelessWidget {
                       child: Text(itemResult[3] == '0'
                           ? 'يدوي مرة واحدة'
                           : itemResult[3] == '1'
-                              ? 'يدوي عدة مرات'
+                              ? 'يدوي عدة مرات ${itemResult[5] == 0 ? "أسبوعي" : "شهري"}'
                               : 'تلقائي')),
                   Expanded(
                       child: Row(
@@ -141,7 +142,7 @@ class Remind extends StatelessWidget {
                           color: itemResult[4] == 1 ? Colors.red : Colors.green,
                         ),
                       ),
-                      Expanded(child: SizedBox())
+                      const Expanded(child: SizedBox())
                     ],
                   ))
                 ],
@@ -259,7 +260,7 @@ class Remind extends StatelessWidget {
                                   Row(
                                     children: [
                                       const Expanded(
-                                          child: Text("أيام التذكير")),
+                                          child: Text("أيام التذكير<")),
                                       const Text("إضافة يوم محدد"),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
@@ -335,7 +336,10 @@ class Remind extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    const Text("تذكير قبل"),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text("تذكير قبل"),
+                    ),
                     Column(
                       children: [
                         IconButton(
@@ -354,38 +358,38 @@ class Remind extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: Text("$sendalertbefor"),
                     ),
-                    Text("يوم/أيام")
+                    const Text("يوم/أيام"),
                   ],
                 ),
-                const Divider(),
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text("تكرار إرسال التذكير كل"),
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: Slider(
-                              min: 1,
-                              max: 4 * 24,
-                              divisions: 4 * 24,
-                              value: repeat,
-                              onChanged: (x) {
-                                mainController.chooseremindrepeat(x);
-                              })),
-                      Text(repeat * 15 < 60
-                          ? '${(repeat * 15).floor()} دقيقة'
-                          : '${(repeat * 15 / 60).floor()} ساعة')
-                    ],
-                  ),
-                ]),
+                Row(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Expanded(child: Text("تكرار التذكير كل")),
+                    ),
+                    Column(
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              mainController.repeatalertbeforremindadd();
+                            },
+                            icon: Icon(Icons.add)),
+                        IconButton(
+                            onPressed: () {
+                              mainController.repeatalertbeforremindmin();
+                            },
+                            icon: Icon(Icons.minimize)),
+                      ],
+                    ),
+                    Text(repeat < 60
+                        ? '$repeat دقيقة'
+                        : '${(repeat / 60).floor()} ساعة')
+                  ],
+                ),
               ]);
         });
     Widget customWidgetofEdit() =>
-        Column(mainAxisSize: MainAxisSize.min, children: [
-          customWidgetofADD(),
-        ]);
+        Column(mainAxisSize: MainAxisSize.min, children: [customWidgetofADD()]);
     monthlydays.clear();
     for (var i = 1; i <= 31; i++) {
       monthlydays.add("$i");
@@ -458,7 +462,7 @@ ${e['reminddetails']}
                 ? const Text('يرجى الانتظار.. يتم محاولة جلب المعلومات')
                 : const Text("تاريخ الانتهاء غير محدد"),
         Text(
-            "نمط التعيين : ${e['type'] == 0 ? 'يدوي مرة واحدة' : e['type'] == 1 ? 'يدوي عدة مرات' : 'تلقائي'}"),
+            "نمط التعيين : ${e['type'] == '0' ? 'يدوي مرة واحدة' : e['type'] == '1' ? 'يدوي عدة مرات ${e['manytimestype'] == 0 ? "أسبوعي" : "شهري"}' : 'تلقائي'}"),
         const Divider(),
         Text(e['createby_id'] != null
             ? 'تم إنشاءها بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['createdate'])} بواسطة ${DB.userstable[DB.userstable.indexWhere((y) => y['user_id'] == e['createby_id'])]['fullname']}'
@@ -489,7 +493,7 @@ ${e['reminddetails']}
   customInitforAdd() {
     Remind.hourlystartremindvalue = TimeOfDay.now();
     sendalertbefor = 0;
-    repeat = 1.0;
+    repeat = 15;
     monthly.clear();
     monthly = [
       {'day': 'آخر يوم في الشهر', 'check': false}
@@ -544,7 +548,7 @@ ${e['reminddetails']}
     Remind.hourlystartremindvalue = TimeOfDay.fromDateTime(DateTime.parse(
         '${e['reminddate'].toString().substring(0, 10)} ${e['startsendat'].toString().substring(0, e['startsendat'].toString().indexOf(':')).length == 1 ? '0${e['startsendat']}' : '${e['startsendat']}'}'));
     Remind.autoCertificateurl.text = e['autocerturl'] ?? '';
-    Remind.repeat = e['repeat'].toDouble();
+    Remind.repeat = e['repeat'];
     monthly.clear();
     monthly = [
       {'day': 'آخر يوم في الشهر', 'check': false}

@@ -38,11 +38,10 @@ class MainController extends GetxController {
   }
 
   personalpanelshow() {
-    for (var i in PersonPanel.dropdbitemz) {
-      i['size'] = 150.0;
-    }
     PersonPanel.dropend = PersonPanel.dropend == 0.0 ? -150.0 : 0.0;
-    MoreTools.dropend = 1000;
+    PersonPanel.personalvisible =
+        PersonPanel.personalvisible == true ? false : true;
+
     Get.back();
     update();
   }
@@ -88,6 +87,7 @@ class MainController extends GetxController {
   }
 
   navbar(x) async {
+    cloasedp();
     Get.back();
     for (var i in BottomNBMZ.pageslist) {
       i['color'] = [
@@ -119,6 +119,7 @@ class MainController extends GetxController {
   }
 
   homemaincontent(x) async {
+    cloasedp();
     HomePage.selectedPage = x;
     for (var i in BottomNBMZ.pageslist) {
       i['color'] = [
@@ -128,6 +129,10 @@ class MainController extends GetxController {
       i['border'] = Colors.transparent;
       i['rotate'] = i['irotate'] = 0.0 * pi / 180;
       i['rize'] = 0.0;
+
+      for (var i in MoreTools.moretoolslist) {
+        i['size'] = 20.0;
+      }
     }
 
     PersonPanel.dropend = -150;
@@ -241,6 +246,11 @@ class MainController extends GetxController {
                 j['check'] = true;
               }
             }
+            if (j.keys.toList().first == 'remind_id') {
+              if (j['createby'] == i['fullname']) {
+                j['check'] = true;
+              }
+            }
           }
         }
       }
@@ -250,7 +260,6 @@ class MainController extends GetxController {
         if (i.keys.toList().first == 'office_id') {
           for (var j in Home.searchlist) {
             if (i['check'] == true) {
-              print(i['users']);
               if (i['users'].contains(j['user_id'])) {
                 j['check'] = true;
               }
@@ -260,7 +269,7 @@ class MainController extends GetxController {
               if (i['office_id'] == j['todo_office_id']) {
                 j['check'] = true;
               }
-              if (i['office_id'] == j['remind']) {
+              if (i['office_id'] == j['remind_office_id']) {
                 j['check'] = true;
               }
             }
@@ -952,8 +961,28 @@ class MainController extends GetxController {
           ADDEDITINFOItem.addeditvisible = false;
           Editpanel.savevisible = false;
           ADDEDITINFOItem.firstpage = true;
-        } on Exception {
-          print('errrrr');
+        } catch (e) {
+          "$e".contains('timed out')
+              ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
+              : "$e".contains('Duplicat')
+                  ? {
+                      ADDEDITINFOItem.errormsg = 'اسم محجوز مسبقا',
+                      ADDEDITINFOItem.firstpage = true
+                    }
+                  : ADDEDITINFOItem.errormsg = "$e";
+          ADDEDITINFOItem.addeditvisible = true;
+          Editpanel.savevisible = true;
+        }
+        Editpanel.wait = false;
+        update();
+      } else if (page == Remind) {
+        try {
+          Editpanel.wait = true;
+          update();
+          await DBController().editremind(id: e['remind_id']);
+          ADDEDITINFOItem.addeditvisible = false;
+          Editpanel.savevisible = false;
+          ADDEDITINFOItem.firstpage = true;
         } catch (e) {
           "$e".contains('timed out')
               ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
@@ -1069,6 +1098,12 @@ class MainController extends GetxController {
                 } else {
                   j['check'] = false;
                 }
+              }
+              if (i['office_id'] == j['todo_office_id']) {
+                j['check'] = true;
+              }
+              if (i['office_id'] == j['remind_office_id']) {
+                j['check'] = true;
               }
             }
           }
@@ -1403,7 +1438,6 @@ class MainController extends GetxController {
       await actioneditcomment();
       Get.back();
     } catch (e) {
-      print(e);
       Comment.errmsg = 'لايمكن الوصول للمخدم';
     }
     Comment.wait = false;
@@ -1412,7 +1446,8 @@ class MainController extends GetxController {
 
 //changepassword
   changepasswordPresonal({ctx, old}) async {
-    PersonPanel.dropend = -150.0;
+    PersonPanel.personalvisible =
+        PersonPanel.personalvisible == true ? false : true;
     MainController mainController = Get.find();
     TextEditingController old = TextEditingController();
     TextEditingController newpass = TextEditingController();
@@ -1568,25 +1603,30 @@ class MainController extends GetxController {
   }
 
 //endemploy
-  changeonhoverdropMore({x}) {
+  changeonhoverdropMore({x, required ctx}) {
     for (var i in MoreTools.moretoolslist) {
-      i['size'] = 150.0;
+      i['size'] = 20.0;
     }
-    MoreTools.moretoolslist[x]['size'] = 170.0;
+    MoreTools.moretoolslist[x]['size'] = 25.0;
+    update();
+  }
+
+  changeonexitdropMore({x, required ctx}) {
+    MoreTools.moretoolslist[x]['size'] = 20.0;
     update();
   }
 
   changeonhoverdropPersonal({x, ctx}) {
     for (var i in PersonPanel.dropdbitemz) {
-      i['size'] = 150.0;
+      i['size'] = 20.0;
     }
-    PersonPanel.dropdbitemz[x]['size'] = 170.0;
+    PersonPanel.dropdbitemz[x]['size'] = 25.0;
     update();
   }
 
 //close drob
   cloasedp() {
-    PersonPanel.dropend = -150.0;
+    PersonPanel.personalvisible = false;
     Notificationm.dropend = -150.0;
     MoreTools.dropend = 1000.0;
     update();
@@ -1900,6 +1940,26 @@ class MainController extends GetxController {
     update();
   }
 
+  repeatalertbeforremindadd() {
+    if (Remind.repeat < 60) {
+      Remind.repeat = Remind.repeat + 15;
+    }else{
+      Remind.repeat = Remind.repeat + 60;
+    }
+    update();
+  }
+
+  repeatalertbeforremindmin() {
+    if (Remind.repeat > 15) {
+      if(Remind.repeat<=60){
+    Remind.repeat = Remind.repeat - 15;
+      }else{
+Remind.repeat = Remind.repeat -60;
+      }
+    }
+    update();
+  }
+
   removemonthlyremindday({value}) {
     Remind.days.remove(value);
     Remind.monthly.removeWhere((element) => element['day'] == "$value");
@@ -1987,7 +2047,6 @@ class MainController extends GetxController {
           }
         }
       } catch (e) {
-        print(e);
         LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
       }
     }
