@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
@@ -45,6 +44,8 @@ class Remind extends StatelessWidget {
     {'day': 'آخر يوم في الشهر', 'check': false}
   ];
   static DateTime onetimeremid = DateTime.now();
+  static DateTime? remiddate;
+
   static int repeat = 15;
   static List days = [];
   static List<Map> reminds = [
@@ -130,7 +131,7 @@ class Remind extends StatelessWidget {
                       child: Text(itemResult[3] == '0'
                           ? 'يدوي مرة واحدة'
                           : itemResult[3] == '1'
-                              ? 'يدوي عدة مرات ${itemResult[5] == 0 ? "أسبوعي" : "شهري"}'
+                              ? 'يدوي عدة مرات ${itemResult[5] == 1 ? "شهري" : "أسبوعي"}'
                               : 'تلقائي')),
                   Expanded(
                       child: Row(
@@ -259,8 +260,7 @@ class Remind extends StatelessWidget {
                                   Divider(),
                                   Row(
                                     children: [
-                                      const Expanded(
-                                          child: Text("أيام التذكير<")),
+                                      const Text("أيام التذكير<"),
                                       const Text("إضافة يوم محدد"),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
@@ -365,7 +365,7 @@ class Remind extends StatelessWidget {
                   children: [
                     const Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Expanded(child: Text("تكرار التذكير كل")),
+                      child: Text("تكرار التذكير كل"),
                     ),
                     Column(
                       children: [
@@ -444,7 +444,21 @@ class Remind extends StatelessWidget {
         customeditpanelitem: () => const SizedBox());
   }
 
+  getcertininfo({e}) {
+    Future.delayed(Duration(seconds: 10), () => dbController.onReady());
+  }
+
   getinfo({e, ctx}) {
+    // if (Platform.isAndroid) {
+    //   getcertininfo();
+    // }
+    if (e['reminddate'] == null &&
+        e['type'] == '2' &&
+        e['autocerturl'] != null) {
+      mainController.getreminddate(
+          id: e['remind_id'], certsrc: e['autocerturl']);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -459,7 +473,7 @@ ${e['reminddetails']}
             ? Text(
                 "تاريخ الانتهاء :   ${df.DateFormat('yyyy-MM-dd').format(e['reminddate'])}")
             : e['autocerturl'] != null
-                ? const Text('يرجى الانتظار.. يتم محاولة جلب المعلومات')
+                ? const Text('يتم محاولة جلب المعلومات')
                 : const Text("تاريخ الانتهاء غير محدد"),
         Text(
             "نمط التعيين : ${e['type'] == '0' ? 'يدوي مرة واحدة' : e['type'] == '1' ? 'يدوي عدة مرات ${e['manytimestype'] == 0 ? "أسبوعي" : "شهري"}' : 'تلقائي'}"),
@@ -541,12 +555,12 @@ ${e['reminddetails']}
     remindofficeNameselected = DB.officetable[DB.officetable.indexWhere(
             (element) => element['office_id'] == e['remind_office_id'])]
         ['officename'];
-    Remind.onetimeremid = e['reminddate'];
+    Remind.onetimeremid = e['reminddate'] ?? DateTime.now();
     Remind.remindname.text = e['remindname'];
     Remind.reminddetails.text = e['reminddetails'];
     Remind.sendalertbefor = e['sendalertbefor'];
     Remind.hourlystartremindvalue = TimeOfDay.fromDateTime(DateTime.parse(
-        '${e['reminddate'].toString().substring(0, 10)} ${e['startsendat'].toString().substring(0, e['startsendat'].toString().indexOf(':')).length == 1 ? '0${e['startsendat']}' : '${e['startsendat']}'}'));
+        '${DateTime.now().toString().substring(0, 10)} ${e['startsendat'].toString().substring(0, e['startsendat'].toString().indexOf(':')).length == 1 ? '0${e['startsendat']}' : '${e['startsendat']}'}'));
     Remind.autoCertificateurl.text = e['autocerturl'] ?? '';
     Remind.repeat = e['repeat'];
     monthly.clear();
@@ -627,6 +641,17 @@ ${e['reminddetails']}
     e['editby_id'] = DB.userstable[DB.userstable
         .indexWhere((y) => y['username'] == Home.logininfo)]['user_id'];
     e['editdate'] = DateTime.now();
+    e['type'] = Remind.typevalue == Remind.typelist[0]
+        ? "0"
+        : Remind.typevalue == Remind.typelist[1]
+            ? "1"
+            : "2";
+    e['manytimestype'] =
+        Remind.manytimesremindgroup == Remind.manytimesremindlist[0] ? 0 : 1;
+
+    e['reminddate'] = Remind.typevalue == Remind.typelist[0]
+        ? Remind.onetimeremid
+        : Remind.remiddate;
   }
 
   deleteremind({ctx, e}) async {

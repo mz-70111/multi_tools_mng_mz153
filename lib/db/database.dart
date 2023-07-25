@@ -230,6 +230,8 @@ startsendat Time,
 sendalertbefor int(11) default 0,
 autocerturl varchar(255),
 manytimestype tinyint(1),
+pasue tinyint(1) default 0,
+pausedate TIMESTAMP  NULL DEFAULT NULL, 
 foreign key (remind_office_id) references office(office_id)
 );
 ''');

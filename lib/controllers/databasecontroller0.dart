@@ -25,27 +25,27 @@ class DBController extends GetxController {
     LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
     LogIn.Pref = await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
-    try {
-      await DB().createuserstable();
-      await DB().createofficetable();
-      await DB().createusersofficetable();
-      await DB().createtaskstable();
-      await DB().createuserstasktable();
-      await DB().createuserstasksCommentstable();
-      await DB().createtodotable();
-      await DB().createuserstodo();
-      await DB().createuserstodoCommentstable();
-      await DB().createremindtable();
-      await DB().createusersremindtable();
-      await DB().createusersremindCommentable();
-      await DB().createtodoimagetable();
-      await DB().createremindlog();
-      await DB().createremindrepeateevery();
-    } catch (e) {
-      "$e".contains('timed out')
-          ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
-          : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
-    }
+    // try {
+    //   await DB().createuserstable();
+    //   await DB().createofficetable();
+    //   await DB().createusersofficetable();
+    //   await DB().createtaskstable();
+    //   await DB().createuserstasktable();
+    //   await DB().createuserstasksCommentstable();
+    //   await DB().createtodotable();
+    //   await DB().createuserstodo();
+    //   await DB().createuserstodoCommentstable();
+    //   await DB().createremindtable();
+    //   await DB().createusersremindtable();
+    //   await DB().createusersremindCommentable();
+    //   await DB().createtodoimagetable();
+    //   await DB().createremindlog();
+    //   await DB().createremindrepeateevery();
+    // } catch (e) {
+    //   "$e".contains('timed out')
+    //       ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
+    //       : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
+    // }
     if (LogIn.autologin.isNotEmpty) {
       LogIn.username.text = LogIn.autologin[0];
       LogIn.password.text = LogIn.autologin[1];
@@ -282,12 +282,14 @@ class DBController extends GetxController {
                         .indexWhere((element) => element['user_id'] == t[1])]
                     ['fullname']
                 : null,
-            'editby_id': t[2],
-            'editby': t[2] != null
+            'createdate': t[2],
+            'editby_id': t[3],
+            'editby': t[3] != null
                 ? DB.userstable[DB.userstable
-                        .indexWhere((element) => element['user_id'] == t[2])]
+                        .indexWhere((element) => element['user_id'] == t[3])]
                     ['fullname']
                 : null,
+            'editdate': t[4]
           });
         }
         yy = await DB().customquery(
@@ -958,9 +960,9 @@ insert into todo_images
 $id
 );
 ''');
-      } on Exception {
-        print('xxx');
-      } catch (e) {}
+      } catch (e) {
+        null;
+      }
     }
     await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
     DB.todotable[
@@ -1111,55 +1113,35 @@ ${Remind.repeat}
     for (var i in remindidT) {
       remindid = i[0];
     }
-
-    if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0]) {
-      String day = '';
-      for (var i in Remind.weekly) {
-        if (i['check'] == true) {
-          switch (i['day']) {
-            case 'الجمعة':
-              day = 'friday';
-              break;
-            case 'السبت':
-              day = 'satarday';
-              break;
-            case 'الأحد':
-              day = 'sunday';
-              break;
-            case 'الاثنين':
-              day = 'monday';
-              break;
-            case 'الثلاثاء':
-              day = 'tuesday';
-              break;
-            case 'الأربعاء':
-              day = 'wednesday';
-              break;
-            case 'الخميس':
-              day = 'thursday';
-              break;
-          }
-          await DB().customquery(query: '''
-insert into remind_every
-(revery_remind_id,every)
-values
-(
-$remindid,
-"$day"
-);
-''');
-        }
-      }
-    } else {
-      for (var i in Remind.monthly) {
+    if (Remind.typevalue == Remind.typelist[1]) {
+      if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0]) {
         String day = '';
-        if (i['check'] == true) {
-          if (i['day'].contains("يوم")) {
-            day = 'last';
-          } else {
-            day = i['day'];
-          }
-          await DB().customquery(query: '''
+        for (var i in Remind.weekly) {
+          if (i['check'] == true) {
+            switch (i['day']) {
+              case 'الجمعة':
+                day = 'friday';
+                break;
+              case 'السبت':
+                day = 'satarday';
+                break;
+              case 'الأحد':
+                day = 'sunday';
+                break;
+              case 'الاثنين':
+                day = 'monday';
+                break;
+              case 'الثلاثاء':
+                day = 'tuesday';
+                break;
+              case 'الأربعاء':
+                day = 'wednesday';
+                break;
+              case 'الخميس':
+                day = 'thursday';
+                break;
+            }
+            await DB().customquery(query: '''
 insert into remind_every
 (revery_remind_id,every)
 values
@@ -1168,17 +1150,39 @@ $remindid,
 "$day"
 );
 ''');
+          }
+        }
+      } else {
+        for (var i in Remind.monthly) {
+          String day = '';
+          if (i['check'] == true) {
+            if (i['day'].contains("يوم")) {
+              day = 'last';
+            } else {
+              day = i['day'];
+            }
+            await DB().customquery(query: '''
+insert into remind_every
+(revery_remind_id,every)
+values
+(
+$remindid,
+"$day"
+);
+''');
+          }
         }
       }
     }
-
-    await MainController().getreminddate(id: remindid);
+    await MainController()
+        .getreminddate(certsrc: Remind.autoCertificateurl.text, id: remindid);
     await DB().customquery(query: '''
 insert into users_remind
-(createby_id,ur_remind_id)
+(createby_id,createdate,ur_remind_id)
 values
 (
 ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']},
+"${DateTime.now()}",
 $remindid
 );
 ''');
@@ -1203,7 +1207,9 @@ $remindid
         'startsendat': i[12],
         'sendalertbefor': i[13],
         'autocerturl': i[14],
-        'manytimesremind': i[15],
+        'manytimestype': i[15],
+        'pause': i[16],
+        'pasuedate': i[17],
         'visible': true,
         'check': true
       });
@@ -1228,6 +1234,9 @@ $remindid
         'createby_id': i[1],
         'createby': DB.userstable[DB.userstable
             .indexWhere((element) => element['user_id'] == i[1])]['fullname'],
+        'createdate': i[2],
+        'editby_id': i[3],
+        'editdate': i[4],
         'commentdate': [],
         'comment': [],
         'waitsend': true,
@@ -1236,13 +1245,15 @@ $remindid
       });
     }
     DB.remindtable.add(Remind.mylista[Remind.mylista.length - 1]);
+
     update();
   }
 
   editremind({id}) async {
     await DB().customquery(query: '''
   update users_remind set
-  editby_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}
+  editby_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']},
+  editdate="${DateTime.now()}"
   where ur_remind_id=$id;
   ''');
 
@@ -1257,16 +1268,132 @@ type='0',
 startsendat="${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
 sendalertbefor=${Remind.sendalertbefor},
 reminddate="${Remind.onetimeremid}",
-`repeat`=${Remind.repeat}
+`repeat`=${Remind.repeat},
+autocerturl=null
+where remind_id=$id;
+''');
+    } else if (Remind.typevalue == Remind.typelist[1]) {
+      await DB().customquery(query: '''
+update remind set
+remindname="${Remind.reminds[0]['controller'].text}",
+reminddetails="${Remind.reminds[1]['controller'].text}",
+editdate="${DateTime.now()}",
+remind_office_id=${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
+type='1',
+startsendat="${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
+sendalertbefor=${Remind.sendalertbefor},
+manytimestype=${Remind.manytimesremindgroup == Remind.manytimesremindlist[0] ? "0" : "1"},
+`repeat`=${Remind.repeat},
+reminddate=null,
+autocerturl=null
+where remind_id=$id;
+''');
+    } else if (Remind.typevalue == Remind.typelist[2]) {
+      await DB().customquery(query: '''
+update remind set
+remindname="${Remind.reminds[0]['controller'].text}",
+reminddetails="${Remind.reminds[1]['controller'].text}",
+editdate="${DateTime.now()}",
+remind_office_id=${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == Remind.remindofficeNameselected)]['office_id']},
+type='2',
+startsendat="${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
+sendalertbefor=${Remind.sendalertbefor},
+`repeat`=${Remind.repeat},
+reminddate=null,
+autocerturl=null
 where remind_id=$id;
 ''');
     }
+    await DB().customquery(
+        query: 'delete from remind_every where revery_remind_id=$id;');
+    if (Remind.typevalue == Remind.typelist[1]) {
+      if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0]) {
+        String day = '';
+        for (var i in Remind.weekly) {
+          if (i['check'] == true) {
+            switch (i['day']) {
+              case 'الجمعة':
+                day = 'friday';
+                break;
+              case 'السبت':
+                day = 'satarday';
+                break;
+              case 'الأحد':
+                day = 'sunday';
+                break;
+              case 'الاثنين':
+                day = 'monday';
+                break;
+              case 'الثلاثاء':
+                day = 'tuesday';
+                break;
+              case 'الأربعاء':
+                day = 'wednesday';
+                break;
+              case 'الخميس':
+                day = 'thursday';
+                break;
+            }
+            await DB().customquery(query: '''
+insert into remind_every
+(revery_remind_id,every)
+values
+(
+$id,
+"$day"
+);
+''');
+          }
+        }
+      } else {
+        for (var i in Remind.monthly) {
+          String day = '';
+          if (i['check'] == true) {
+            if (i['day'].contains("يوم")) {
+              day = 'last';
+            } else {
+              day = i['day'];
+            }
+            await DB().customquery(query: '''
+insert into remind_every
+(revery_remind_id,every)
+values
+(
+$id,
+"$day"
+);
+''');
+          }
+        }
+      }
+    }
+    await MainController()
+        .getreminddate(certsrc: Remind.autoCertificateurl.text, id: id);
+    await gettable(list: Remind.mylista, table: 'remind', tableid: 'remind_id');
+    DB.remindtable[DB.remindtable
+            .indexWhere((element) => element['remind_id'] == id)] =
+        Remind.mylista[
+            Remind.mylista.indexWhere((element) => element['remind_id'] == id)];
+    update();
+  }
 
-    await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
-    DB.todotable[
-            DB.todotable.indexWhere((element) => element['todo_id'] == id)] =
-        Whattodo.mylista[
-            Whattodo.mylista.indexWhere((element) => element['todo_id'] == id)];
+  deleteremind({id}) async {
+    await DB().customquery(query: '''
+delete from users_remind where ur_remind_id=$id;''');
+    await DB().customquery(query: '''
+delete from remind_every where revery_remind_id=$id;''');
+    await DB().customquery(query: '''
+delete from remind where remind_id=$id;''');
+
+    Remind.mylista.removeWhere((element) => element['remind_id'] == id);
+    DB.remindtable.removeWhere((element) => element['remind_id'] == id);
+    Home.searchlist = [
+      ...DB.officetable,
+      ...DB.userstable,
+      ...DB.tasktable,
+      ...DB.todotable,
+      ...DB.remindtable
+    ];
     update();
   }
 }

@@ -399,11 +399,13 @@ class MainController extends GetxController {
 \$webRequest.ServicePoint.Certificate.GetExpirationDateString()
 '''
     ]);
-    String result = getExpiredate.stdout;
+    String result = '';
+    result = getExpiredate.stdout;
     result = result.substring(0, result.indexOf(' '));
     result = result.replaceAll('/', '-');
     List y = result.split('-');
     y[0].length == 1 ? y[0] = '0${y[0]}' : null;
+    y[1].length == 1 ? y[1] = '0${y[1]}' : null;
     String MM = y[0];
     String dd = y[1];
     String yy = y[2];
@@ -681,7 +683,9 @@ class MainController extends GetxController {
                             ? name = Whattodo.mylista[Whattodo.mylista
                                     .indexWhere((element) => element['todo_id'] == e['todo_id'])]
                                 ['todoname']
-                            : null;
+                            : page == Remind
+                                ? name = Remind.mylista[Remind.mylista.indexWhere((element) => element['remind_id'] == e['remind_id'])]['remindname']
+                                : null;
           } catch (r) {
             null;
           }
@@ -730,7 +734,12 @@ class MainController extends GetxController {
                                                             .deletetodo(
                                                                 id: e[
                                                                     'todo_id'])
-                                                        : null;
+                                                        : page == Remind
+                                                            ? await DBController()
+                                                                .deleteremind(
+                                                                    id: e[
+                                                                        'remind_id'])
+                                                            : null;
 
                                         Get.back();
                                         Get.back();
@@ -1786,12 +1795,12 @@ class MainController extends GetxController {
     return day;
   }
 
-  getreminddate({id}) async {
+  getreminddate({id, required certsrc}) async {
+    Remind.remiddate = null;
     List<int> dateandlist = [];
     int? dateand0, monthdays;
     int w = 7;
     DateTime? reminddate;
-
     dateand0 = null;
     if (DateTime.now().month == 1 ||
         DateTime.now().month == 3 ||
@@ -1834,6 +1843,7 @@ class MainController extends GetxController {
             await DB().customquery(
                 query:
                     'update remind set reminddate="$reminddate" where remind_id=$id;');
+            Remind.remiddate = reminddate;
           }
         } else if (Remind.manytimesremindgroup ==
             Remind.manytimesremindlist[1]) {
@@ -1877,37 +1887,34 @@ class MainController extends GetxController {
             await DB().customquery(
                 query:
                     'update remind set reminddate="$reminddate" where remind_id=$id;');
+            Remind.remiddate = reminddate;
           }
         }
       } else if (Remind.typevalue == Remind.typelist[2]) {
-        Remind.autoCertificateurl.text.startsWith('www.')
-            ? Remind.autoCertificateurl.text =
-                Remind.autoCertificateurl.text.substring(4)
-            : null;
-        Remind.autoCertificateurl.text.startsWith('https://')
-            ? null
-            : Remind.autoCertificateurl.text =
-                'https://${Remind.autoCertificateurl.text}';
+        certsrc.startsWith('www.') ? certsrc = certsrc.substring(4) : null;
+        certsrc.startsWith('https://') ? null : certsrc = 'https://$certsrc';
         await DB().customquery(
             query:
-                'update remind set autocerturl="${Remind.autoCertificateurl.text}" remind_id=$id;');
-        String? reminddatString;
-        String? url;
-        var turl = await DB().customquery(
-            query: 'select autocerturl from remind where remind_id=$id;');
-        for (var u in turl) {
-          url = u[0];
+                'update remind set autocerturl="$certsrc" where remind_id=$id;');
+
+        String cert = await getCert(host: certsrc);
+        await DB().customquery(
+            query:
+                'update remind set reminddate="${DateTime.parse(cert)}" where remind_id=$id;');
+        Remind.remiddate = DateTime.parse(cert);
+        var t = await DB().customquery(
+            query: 'select reminddate from remind where remind_id=$id;');
+        for (var i in t) {
+          Remind.mylista[Remind.mylista
+                  .indexWhere((element) => element['remind_id'] == id)]
+              ['reminddate'] = i[0];
         }
-        reminddatString = await getCert(host: Remind.autoCertificateurl.text);
-        reminddate =
-            reminddatString != null ? DateTime.parse("$reminddatString") : null;
-        await DB().customquery(
-            query:
-                'update remind set autocerturl="${Remind.autoCertificateurl.text}",reminddate="$reminddate" where remind_id=$id;');
       }
     } catch (e) {
       null;
     }
+
+    update();
   }
 
   choosemanytimesremind(x) {
@@ -1943,7 +1950,7 @@ class MainController extends GetxController {
   repeatalertbeforremindadd() {
     if (Remind.repeat < 60) {
       Remind.repeat = Remind.repeat + 15;
-    }else{
+    } else {
       Remind.repeat = Remind.repeat + 60;
     }
     update();
@@ -1951,10 +1958,10 @@ class MainController extends GetxController {
 
   repeatalertbeforremindmin() {
     if (Remind.repeat > 15) {
-      if(Remind.repeat<=60){
-    Remind.repeat = Remind.repeat - 15;
-      }else{
-Remind.repeat = Remind.repeat -60;
+      if (Remind.repeat <= 60) {
+        Remind.repeat = Remind.repeat - 15;
+      } else {
+        Remind.repeat = Remind.repeat - 60;
       }
     }
     update();
@@ -2094,6 +2101,7 @@ Remind.repeat = Remind.repeat -60;
         }
       }
     } catch (e) {
+      print(e);
       LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
     }
     LogIn.loginwait = false;
