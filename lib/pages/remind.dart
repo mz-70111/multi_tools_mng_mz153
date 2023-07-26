@@ -449,16 +449,16 @@ class Remind extends StatelessWidget {
   }
 
   getinfo({e, ctx}) {
-    // if (Platform.isAndroid) {
-    //   getcertininfo();
-    // }
-    if (e['reminddate'] == null &&
+
+if(Remind.typevalue==Remind.typelist[2]){
+ if (e['reminddate'] == null &&
         e['type'] == '2' &&
         e['autocerturl'] != null) {
       mainController.getreminddate(
           id: e['remind_id'], certsrc: e['autocerturl']);
     }
-
+}
+  
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -472,9 +472,7 @@ ${e['reminddetails']}
         e['reminddate'] != null
             ? Text(
                 "تاريخ الانتهاء :   ${df.DateFormat('yyyy-MM-dd').format(e['reminddate'])}")
-            : e['autocerturl'] != null
-                ? const Text('يتم محاولة جلب المعلومات')
-                : const Text("تاريخ الانتهاء غير محدد"),
+            : const Text("تاريخ الانتهاء غير محدد"),
         Text(
             "نمط التعيين : ${e['type'] == '0' ? 'يدوي مرة واحدة' : e['type'] == '1' ? 'يدوي عدة مرات ${e['manytimestype'] == 0 ? "أسبوعي" : "شهري"}' : 'تلقائي'}"),
         const Divider(),
@@ -487,7 +485,32 @@ ${e['reminddetails']}
               ? 'تم تعديلها بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['editdate'] ?? DateTime.now())} بواسطة ${DB.userstable[DB.userstable.indexWhere((y) => y['user_id'] == e['editby_id'])]['fullname']}'
               : 'تم تعديلها بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['editdate'] ?? DateTime.now())} بواسطة حساب محذوف'),
         ),
-        const Divider(),
+        Divider(),
+        e['type'] == '1'
+            ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text("أيام التذكير"),
+                ...e['every'].map((v) => Text("> $v"))
+              ])
+            : e['type'] == '2'
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [Text("مصدر الشهادة"), Text(e['autocerturl'])],
+                  )
+                : SizedBox(),
+        Divider(),
+        Visibility(
+            visible: e['reminddate'] == null ? false : true,
+            child: e['reminddate'] != null
+                ? Text(e['reminddate'].difference(DateTime.now()).inDays > 0
+                    ? "المدة المتبقية  ${e['reminddate'].difference(DateTime.now()).inDays} يوم"
+                    : e['reminddate'].difference(DateTime.now()).inDays == 0
+                        ? (int.parse("${e['startsendat']}".substring(0, 2)) -
+                                    DateTime.now().hour) >=
+                                0
+                            ? 'المدة المتبقية ${int.parse("${e['startsendat']}".substring(0, 2)) - DateTime.now().hour} ساعة'
+                            : 'المدة المتبقية منتهية منذ ${(int.parse("${e['startsendat']}".substring(0, 2)) - DateTime.now().hour) * -1} ساعة'
+                        : "المدة المتبقية منتهية منذ  ${e['reminddate'].difference(DateTime.now()).inDays} يوم")
+                : const SizedBox()),
         const Divider(),
         Comment(
           comment: comment,
@@ -652,6 +675,27 @@ ${e['reminddetails']}
     e['reminddate'] = Remind.typevalue == Remind.typelist[0]
         ? Remind.onetimeremid
         : Remind.remiddate;
+    if (e['type'] == '1') {
+      if (e['manytimestype'] == 0) {
+        e['every'].clear();
+        for (var i in weekly) {
+          if (i['check'] == true) {
+            e['every'].add(i['day']);
+          }
+        }
+      }
+    }
+    if (e['type'] == '1') {
+      if (e['manytimestype'] == 1) {
+        e['every'].clear();
+        for (var i in monthly) {
+          if (i['check'] == true) {
+            e['every'].add(i['day']);
+          }
+        }
+      }
+    }
+    e['autocerturl'] = Remind.autoCertificateurl.text;
   }
 
   deleteremind({ctx, e}) async {

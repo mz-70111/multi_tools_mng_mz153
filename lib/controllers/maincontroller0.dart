@@ -1795,7 +1795,7 @@ class MainController extends GetxController {
     return day;
   }
 
-  getreminddate({id, required certsrc}) async {
+  getreminddate({typevalue, manytimevalue, id, required certsrc}) async {
     Remind.remiddate = null;
     List<int> dateandlist = [];
     int? dateand0, monthdays;
@@ -1820,11 +1820,12 @@ class MainController extends GetxController {
       monthdays = 28;
     }
     try {
-      if (Remind.typevalue == Remind.typelist[1]) {
+      if (Remind.typevalue == Remind.typelist[1] || typevalue == '1') {
         var t = await DB().customquery(
             query:
                 "select every from remind_every where revery_remind_id=$id;");
-        if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0]) {
+        if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0] ||
+            manytimevalue == 0) {
           for (var i in t) {
             if (gettodayinweek() - getday(dayinString: i[0]) < 0) {
               dateandlist.add(
@@ -1846,7 +1847,8 @@ class MainController extends GetxController {
             Remind.remiddate = reminddate;
           }
         } else if (Remind.manytimesremindgroup ==
-            Remind.manytimesremindlist[1]) {
+                Remind.manytimesremindlist[1] ||
+            manytimevalue == 1) {
           int daynum = 0;
           for (var i in t) {
             if (i[0] == 'last') {
@@ -1890,7 +1892,7 @@ class MainController extends GetxController {
             Remind.remiddate = reminddate;
           }
         }
-      } else if (Remind.typevalue == Remind.typelist[2]) {
+      } else if (Remind.typevalue == Remind.typelist[2] || typevalue == '2') {
         certsrc.startsWith('www.') ? certsrc = certsrc.substring(4) : null;
         certsrc.startsWith('https://') ? null : certsrc = 'https://$certsrc';
         await DB().customquery(
@@ -1902,6 +1904,7 @@ class MainController extends GetxController {
             query:
                 'update remind set reminddate="${DateTime.parse(cert)}" where remind_id=$id;');
         Remind.remiddate = DateTime.parse(cert);
+
         var t = await DB().customquery(
             query: 'select reminddate from remind where remind_id=$id;');
         for (var i in t) {
@@ -1915,6 +1918,21 @@ class MainController extends GetxController {
     }
 
     update();
+  }
+
+  getreminddateauto() {
+    if (DateTime.now().minute == 3) {
+          print('g');
+
+      for (var i in DB.remindtable) {
+        getreminddate(
+            typevalue: i['type'],
+            manytimevalue: i['manytimestype'],
+            id: i['remind_id'],
+            certsrc: i['autocerturl']);
+      }
+    }
+    Future.delayed(const Duration(minutes: 1), () => DBController().onReady());
   }
 
   choosemanytimesremind(x) {

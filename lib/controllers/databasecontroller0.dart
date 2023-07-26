@@ -63,6 +63,7 @@ class DBController extends GetxController {
   onReady() async {
     super.onReady();
     mainController.autosendnotifitasks();
+    mainController.getreminddateauto();
     update();
   }
 
@@ -1299,8 +1300,7 @@ type='2',
 startsendat="${Remind.hourlystartremindvalue.hour}:${Remind.hourlystartremindvalue.minute}",
 sendalertbefor=${Remind.sendalertbefor},
 `repeat`=${Remind.repeat},
-reminddate=null,
-autocerturl=null
+reminddate=null
 where remind_id=$id;
 ''');
     }
