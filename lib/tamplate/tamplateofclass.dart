@@ -10,6 +10,7 @@ import 'package:users_tasks_mz_153/pages/employaccount.dart';
 import 'package:users_tasks_mz_153/pages/06_tasks.dart';
 import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
 import 'package:users_tasks_mz_153/pages/officemanagment.dart';
+import 'package:users_tasks_mz_153/pages/remind.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/thememz.dart';
 import 'package:users_tasks_mz_153/tamplate/tweenmz.dart';
@@ -595,6 +596,12 @@ class MYPAGE extends StatelessWidget {
                                                       }),
                                                 ),
                                               )),
+                                          Expanded(
+                                              child: TextFieldMZ(
+                                            label: '',
+                                            onChanged: (x) => null,
+                                            textEditingController: Remind.timez,
+                                          )),
                                           Expanded(
                                             child: TextFieldMZ(
                                                 suffixIcon: Visibility(

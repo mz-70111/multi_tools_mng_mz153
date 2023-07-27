@@ -15,6 +15,8 @@ class Remind extends StatelessWidget {
   static TextEditingController remindname = TextEditingController();
   static TextEditingController reminddetails = TextEditingController();
   static TextEditingController autoCertificateurl = TextEditingController();
+  static TextEditingController timez = TextEditingController(text: '25');
+
   static String? remindofficeNameselected;
   static List remindofficelist = [];
   static List<Map> mylista = [], comment = [];
@@ -444,21 +446,16 @@ class Remind extends StatelessWidget {
         customeditpanelitem: () => const SizedBox());
   }
 
-  getcertininfo({e}) {
-    Future.delayed(Duration(seconds: 10), () => dbController.onReady());
-  }
-
   getinfo({e, ctx}) {
-
-if(Remind.typevalue==Remind.typelist[2]){
- if (e['reminddate'] == null &&
-        e['type'] == '2' &&
-        e['autocerturl'] != null) {
-      mainController.getreminddate(
-          id: e['remind_id'], certsrc: e['autocerturl']);
+    if (Remind.typevalue == Remind.typelist[2]) {
+      if (e['reminddate'] == null &&
+          e['type'] == '2' &&
+          e['autocerturl'] != null) {
+        mainController.getreminddate(
+            id: e['remind_id'], certsrc: e['autocerturl']);
+      }
     }
-}
-  
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,

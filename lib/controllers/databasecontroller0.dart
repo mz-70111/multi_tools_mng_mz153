@@ -55,7 +55,9 @@ class DBController extends GetxController {
       LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
     }
     LogIn.loginwait = false;
+
     super.onInit();
+
     update();
   }
 

@@ -1898,20 +1898,11 @@ class MainController extends GetxController {
         await DB().customquery(
             query:
                 'update remind set autocerturl="$certsrc" where remind_id=$id;');
-
         String cert = await getCert(host: certsrc);
         await DB().customquery(
             query:
                 'update remind set reminddate="${DateTime.parse(cert)}" where remind_id=$id;');
         Remind.remiddate = DateTime.parse(cert);
-
-        var t = await DB().customquery(
-            query: 'select reminddate from remind where remind_id=$id;');
-        for (var i in t) {
-          Remind.mylista[Remind.mylista
-                  .indexWhere((element) => element['remind_id'] == id)]
-              ['reminddate'] = i[0];
-        }
       }
     } catch (e) {
       null;
@@ -1920,19 +1911,21 @@ class MainController extends GetxController {
     update();
   }
 
-  getreminddateauto() {
-    if (DateTime.now().minute == 3) {
-          print('g');
-
+  getreminddateauto() async {
+    if (DateTime.now().minute == int.parse(Remind.timez.text)) {
       for (var i in DB.remindtable) {
-        getreminddate(
-            typevalue: i['type'],
-            manytimevalue: i['manytimestype'],
-            id: i['remind_id'],
-            certsrc: i['autocerturl']);
+        if (i['type'] == '2' && i['reminddate'] == null) {
+          try {
+            String cert = await getCert(host: i['autocerturl']);
+            await DB().customquery(
+                query:
+                    'update remind set reminddate="${DateTime.parse(cert)}" where remind_id=${i['remind_id']};');
+            Remind.remiddate = DateTime.parse(cert);
+          } catch (e) {}
+        }
       }
     }
-    Future.delayed(const Duration(minutes: 1), () => DBController().onReady());
+    Future.delayed(Duration(minutes: 1), () => DBController().onReady());
   }
 
   choosemanytimesremind(x) {
