@@ -2031,42 +2031,42 @@ class MainController extends GetxController {
         await dbController.gettable(list: DB.remindtable, table: 'remind');
 
         office_ids('office_id');
-      await dbController.gettable(
-        list: DB.userstable,
-        table: 'users',
-        where: DB.userstable[DB.userstable.indexWhere((element) =>
-                    element['username'] == LogIn.username.text)]['admin'] ==
-                1
-            ? ''
-            : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
-      );
-      await dbController.gettable(
-        list: DB.officetable,
-        table: 'office',
-        where: DB.userstable[DB.userstable.indexWhere((element) =>
-                    element['username'] == LogIn.username.text)]['admin'] ==
-                1
-            ? ''
-            : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == LogIn.username.text)]['user_id']}',
-      );
-      office_ids('task_office_id');
-      await dbController.gettable(
-          list: DB.tasktable,
-          table: 'tasks',
-          where: 'where ${LogIn.office_ids}');
+        await dbController.gettable(
+          list: DB.userstable,
+          table: 'users',
+          where: DB.userstable[DB.userstable.indexWhere((element) =>
+                      element['username'] == LogIn.username.text)]['admin'] ==
+                  1
+              ? ''
+              : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+        );
+        await dbController.gettable(
+          list: DB.officetable,
+          table: 'office',
+          where: DB.userstable[DB.userstable.indexWhere((element) =>
+                      element['username'] == LogIn.username.text)]['admin'] ==
+                  1
+              ? ''
+              : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == LogIn.username.text)]['user_id']}',
+        );
+        office_ids('task_office_id');
+        await dbController.gettable(
+            list: DB.tasktable,
+            table: 'tasks',
+            where: 'where ${LogIn.office_ids}');
 
-      office_ids('todo_office_id');
-      await dbController.gettable(
-          list: DB.todotable,
-          table: 'todo',
-          where: 'where ${LogIn.office_ids}');
+        office_ids('todo_office_id');
+        await dbController.gettable(
+            list: DB.todotable,
+            table: 'todo',
+            where: 'where ${LogIn.office_ids}');
 
-      office_ids('remind_office_id');
-      await dbController.gettable(
-          list: DB.remindtable,
-          table: 'remind',
-          where: 'where ${LogIn.office_ids}');
-          
+        office_ids('remind_office_id');
+        await dbController.gettable(
+            list: DB.remindtable,
+            table: 'remind',
+            where: 'where ${LogIn.office_ids}');
+
         Home.searchlist = [
           ...DB.officetable,
           ...DB.userstable,
