@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
+import 'package:users_tasks_mz_153/pages/00_login.dart';
 import 'package:users_tasks_mz_153/pages/02_home.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
@@ -397,10 +398,13 @@ class Remind extends StatelessWidget {
       monthlydays.add("$i");
     }
     days.clear();
+        mainController.office_ids('remind_office_id');
+
     return MYPAGE(
         mylista: mylista,
         table: 'remind',
         tableId: 'remind_id',
+        where: 'where ${LogIn.office_ids}',
         page: Remind,
         searchRange: const ['remindname', 'reminddetails'],
         mainColumn: mainColumn,

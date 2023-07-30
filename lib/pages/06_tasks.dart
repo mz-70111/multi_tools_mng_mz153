@@ -4,6 +4,7 @@ import 'package:teledart/teledart.dart';
 import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
+import 'package:users_tasks_mz_153/pages/00_login.dart';
 import 'package:users_tasks_mz_153/pages/02_home.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 import 'package:intl/intl.dart' as df;
@@ -234,10 +235,12 @@ class Tasks extends StatelessWidget {
             ),
           ),
         ]);
+    mainController.office_ids('task_office_id');
     return MYPAGE(
       mylista: mylista,
       table: 'tasks',
       tableId: 'task_id',
+      where: 'where ${LogIn.office_ids}',
       page: Tasks,
       searchRange: const ['taskname', 'userstask_name'],
       mainColumn: mainColumn,

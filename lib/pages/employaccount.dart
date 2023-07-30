@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
+import 'package:users_tasks_mz_153/pages/00_login.dart';
+import 'package:users_tasks_mz_153/pages/02_home.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 
@@ -239,11 +241,17 @@ class Employ extends StatelessWidget {
           ),
           customWidgetofADD()
         ]);
+    mainController.office_ids('office_id');
 
     return MYPAGE(
         mylista: mylista,
         table: 'users',
         tableId: 'user_id',
+        where: DB.userstable[DB.userstable.indexWhere((element) =>
+                    element['username'] == LogIn.username.text)]['admin'] ==
+                1
+            ? ''
+            : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
         page: Employ,
         searchRange: const ['username', 'fullname'],
         mainColumn: mainColumn,

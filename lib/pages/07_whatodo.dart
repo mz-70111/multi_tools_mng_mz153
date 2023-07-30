@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
+import 'package:users_tasks_mz_153/pages/00_login.dart';
 import 'package:users_tasks_mz_153/pages/02_home.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
@@ -155,10 +156,13 @@ class Whattodo extends StatelessWidget {
         Column(mainAxisSize: MainAxisSize.min, children: [
           customWidgetofADD(),
         ]);
+            mainController.office_ids('todo_office_id');
+
     return MYPAGE(
         mylista: mylista,
         table: 'todo',
         tableId: 'todo_id',
+        where: 'where ${LogIn.office_ids}',
         page: Whattodo,
         searchRange: const ['todoname', 'tododetails'],
         mainColumn: mainColumn,
@@ -175,27 +179,21 @@ class Whattodo extends StatelessWidget {
         textfeildlista: todos,
         scrollController: scrollController,
         mainEditvisible: () => (checkifUserisAdmin() == true ||
-              (checkifUserisUserinOffice(
-                    officeid: MYPAGE.eE['todo_office_id']) ==
-                true &&  DB.userstable[DB.userstable.indexWhere(
-                            (element) => element['username'] == Home.logininfo)]
-                        ['addtodo'] ==
-                    1))
+                (checkifUserisUserinOffice(officeid: MYPAGE.eE['todo_office_id']) == true &&
+                    DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                            ['addtodo'] ==
+                        1))
             ? true
             : false,
         subeditvisible: () =>
-            (checkifUserisUserinOffice(officeid: MYPAGE.eE['todo_office_id']) ==
-                    true && DB.userstable[DB.userstable.indexWhere(
-                            (element) => element['username'] == Home.logininfo)]
-                        ['addtodo'] ==
-                    1)
+            (checkifUserisUserinOffice(officeid: MYPAGE.eE['todo_office_id']) == true &&
+                    DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                            ['addtodo'] ==
+                        1)
                 ? true
                 : false,
         mainAddvisible: checkifUserisinAnyOffice() == true &&
-                DB.userstable[DB.userstable.indexWhere(
-                            (element) => element['username'] == Home.logininfo)]
-                        ['addtodo'] ==
-                    1
+                DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addtodo'] == 1
             ? true
             : false,
         getinfo: () {

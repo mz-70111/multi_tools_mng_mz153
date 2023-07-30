@@ -465,9 +465,10 @@ class MYPAGE extends StatelessWidget {
       required this.itemsResult,
       required this.itemsWidget,
       required this.subeditvisible,
-      required this.customeditpanelitem});
+      required this.customeditpanelitem,
+      this.where = ''});
   final List<Map> mylista;
-  final String table, tableId, addlabel;
+  final String table, tableId, addlabel, where;
   final Type page;
   final List<String> searchRange;
   final List mainColumn, items, itemsResult;
@@ -509,10 +510,10 @@ class MYPAGE extends StatelessWidget {
                       FutureBuilder(future: Future(() async {
                         try {
                           return await dbController.gettable(
-                            list: mylista,
-                            tableid: tableId,
-                            table: table,
-                          );
+                              list: mylista,
+                              tableid: tableId,
+                              table: table,
+                              where: where);
                         } catch (e) {
                           null;
                         }

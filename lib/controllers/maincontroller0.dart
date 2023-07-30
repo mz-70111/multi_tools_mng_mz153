@@ -2014,6 +2014,8 @@ class MainController extends GetxController {
     DB.officetable.clear();
     DB.tasktable.clear();
     DB.todotable.clear();
+    DB.remindtable.clear();
+
     Home.selectall = true;
     LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
     LogIn.loginwait = true;
@@ -2028,10 +2030,53 @@ class MainController extends GetxController {
         await dbController.gettable(list: DB.todotable, table: 'todo');
         await dbController.gettable(list: DB.remindtable, table: 'remind');
 
+        office_ids('office_id');
+      await dbController.gettable(
+        list: DB.userstable,
+        table: 'users',
+        where: DB.userstable[DB.userstable.indexWhere((element) =>
+                    element['username'] == LogIn.username.text)]['admin'] ==
+                1
+            ? ''
+            : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+      );
+      await dbController.gettable(
+        list: DB.officetable,
+        table: 'office',
+        where: DB.userstable[DB.userstable.indexWhere((element) =>
+                    element['username'] == LogIn.username.text)]['admin'] ==
+                1
+            ? ''
+            : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == LogIn.username.text)]['user_id']}',
+      );
+      office_ids('task_office_id');
+      await dbController.gettable(
+          list: DB.tasktable,
+          table: 'tasks',
+          where: 'where ${LogIn.office_ids}');
+
+      office_ids('todo_office_id');
+      await dbController.gettable(
+          list: DB.todotable,
+          table: 'todo',
+          where: 'where ${LogIn.office_ids}');
+
+      office_ids('remind_office_id');
+      await dbController.gettable(
+          list: DB.remindtable,
+          table: 'remind',
+          where: 'where ${LogIn.office_ids}');
+          
+        Home.searchlist = [
+          ...DB.officetable,
+          ...DB.userstable,
+          ...DB.tasktable,
+          ...DB.todotable,
+          ...DB.remindtable
+        ];
         for (var i in Home.searchlist) {
           i['check'] = true;
         }
-
         i:
         for (var i in DB.userstable) {
           if (LogIn.username.text.toLowerCase() ==
@@ -2044,24 +2089,20 @@ class MainController extends GetxController {
               LogIn.errorMSglogin = '';
               LogIn.usernamereadonly = true;
               LogIn.oldpassvisible = false;
+              update();
             } else {
               await setlogin(
                   username: LogIn.username.text.toLowerCase(),
                   password: LogIn.password.text);
-              Home.searchlist = [
-                ...DB.officetable,
-                ...DB.userstable,
-                ...DB.tasktable,
-                ...DB.todotable,
-                ...DB.remindtable
-              ];
               Home.logininfo = LogIn.username.text.toLowerCase();
               await Get.offNamed("/home");
               break i;
             }
           } else if (LogIn.username.text != i['username'] ||
               codepassword(word: LogIn.password.text) != i['password']) {
-            LogIn.errorMSglogin = "كلمة المرور او اسم المستخدم غير صحيح";
+            if (i['mustchgpass'] != 1) {
+              LogIn.errorMSglogin = "كلمة المرور او اسم المستخدم غير صحيح";
+            }
           }
         }
       } catch (e) {
@@ -2072,12 +2113,25 @@ class MainController extends GetxController {
     update();
   }
 
+  office_ids(offname) {
+    LogIn.office_ids = '';
+    for (var i in DB.userstable[DB.userstable.indexWhere(
+        (element) => element['username'] == LogIn.username.text)]['office']) {
+      LogIn.office_ids += '$offname= $i or ';
+    }
+    LogIn.office_ids =
+        LogIn.office_ids.substring(0, LogIn.office_ids.lastIndexOf(' or'));
+    LogIn.office_ids = "(${LogIn.office_ids})";
+    print(LogIn.office_ids);
+  }
+
   autologin() async {
     DBController dbController = Get.find();
     DB.userstable.clear();
     DB.officetable.clear();
     DB.tasktable.clear();
     DB.todotable.clear();
+    DB.remindtable.clear();
     Home.selectall = true;
     LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
     LogIn.loginwait = true;
@@ -2088,6 +2142,49 @@ class MainController extends GetxController {
       await dbController.gettable(list: DB.tasktable, table: 'tasks');
       await dbController.gettable(list: DB.todotable, table: 'todo');
       await dbController.gettable(list: DB.remindtable, table: 'remind');
+      office_ids('office_id');
+      await dbController.gettable(
+        list: DB.userstable,
+        table: 'users',
+        where: DB.userstable[DB.userstable.indexWhere((element) =>
+                    element['username'] == LogIn.username.text)]['admin'] ==
+                1
+            ? ''
+            : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+      );
+      await dbController.gettable(
+        list: DB.officetable,
+        table: 'office',
+        where: DB.userstable[DB.userstable.indexWhere((element) =>
+                    element['username'] == LogIn.username.text)]['admin'] ==
+                1
+            ? ''
+            : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == LogIn.username.text)]['user_id']}',
+      );
+      office_ids('task_office_id');
+      await dbController.gettable(
+          list: DB.tasktable,
+          table: 'tasks',
+          where: 'where ${LogIn.office_ids}');
+
+      office_ids('todo_office_id');
+      await dbController.gettable(
+          list: DB.todotable,
+          table: 'todo',
+          where: 'where ${LogIn.office_ids}');
+
+      office_ids('remind_office_id');
+      await dbController.gettable(
+          list: DB.remindtable,
+          table: 'remind',
+          where: 'where ${LogIn.office_ids}');
+      Home.searchlist = [
+        ...DB.officetable,
+        ...DB.userstable,
+        ...DB.tasktable,
+        ...DB.todotable,
+        ...DB.remindtable
+      ];
       for (var i in Home.searchlist) {
         i['check'] = true;
       }
@@ -2100,7 +2197,6 @@ class MainController extends GetxController {
             break i;
           } else if (i['mustchgpass'] == 1) {
             LogIn.errorMSglogin = '';
-
             LogIn.usernamereadonly = true;
             LogIn.oldpassvisible = false;
           } else {
@@ -2108,7 +2204,9 @@ class MainController extends GetxController {
             break i;
           }
         } else {
-          LogIn.errorMSglogin = "كلمة المرور او اسم المستخدم غير صحيح";
+          if (i['mustchgpass'] != 1) {
+            LogIn.errorMSglogin = "كلمة المرور او اسم المستخدم غير صحيح";
+          }
         }
       }
     } catch (e) {

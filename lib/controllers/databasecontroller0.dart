@@ -55,9 +55,7 @@ class DBController extends GetxController {
       LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
     }
     LogIn.loginwait = false;
-
     super.onInit();
-
     update();
   }
 
@@ -88,7 +86,8 @@ class DBController extends GetxController {
     list.clear();
     desctable = await DB().customquery(query: 'desc $table;');
     if (Home.selectall == true) {
-      selecttable = await DB().customquery(query: 'select * from $table');
+      selecttable =
+          await DB().customquery(query: 'select * from $table $where');
     } else {
       temp.clear();
       for (var i in Home.searchlist) {
@@ -727,6 +726,8 @@ delete from users_office where uf_user_id=$id;''');
   deleteoffice({id}) async {
     await DB().customquery(query: '''
 update todo set todo_office_id=null where todo_office_id=$id;''');
+    await DB().customquery(query: '''
+update remind set remind_office_id=null where remind_office_id=$id;''');
     await DB().customquery(query: '''
 delete from users_office where uf_office_id=$id;''');
     await DB().customquery(query: '''

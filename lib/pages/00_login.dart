@@ -10,6 +10,7 @@ import 'package:users_tasks_mz_153/tamplate/thememz.dart';
 
 class LogIn extends StatelessWidget {
   const LogIn({super.key});
+  static String office_ids = '';
   static List<String> autologin = getlogin() ?? [];
   static TextEditingController username = TextEditingController();
   static TextEditingController password = TextEditingController();

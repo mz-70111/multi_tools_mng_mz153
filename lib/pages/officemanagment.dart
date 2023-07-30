@@ -125,6 +125,12 @@ class Office extends StatelessWidget {
         mylista: mylista,
         table: 'office',
         tableId: 'office_id',
+        where: DB.userstable[DB.userstable.indexWhere(
+                        (element) => element['username'] == Home.logininfo)]
+                    ['admin'] ==
+                1
+            ? ''
+            : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}',
         page: Office,
         searchRange: const ['officename'],
         mainColumn: mainColumn,
