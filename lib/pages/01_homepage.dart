@@ -27,7 +27,6 @@ class HomePage extends StatelessWidget {
               mainController.cloasedp();
             },
             child: Scaffold(
-              drawer: Drawer(child: MoreTools()),
               body: Home.pages[selectedPage]['page'],
               appBar: AppBarMZ(),
               bottomNavigationBar: GetBuilder<ThemeController>(

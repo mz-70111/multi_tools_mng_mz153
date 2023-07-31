@@ -29,8 +29,11 @@ class PersonPanel extends StatelessWidget {
   static bool personalvisible = false;
   static List dropdbitem({ctx}) => [
         {
-          'label': DB.userstable[DB.userstable.indexWhere(
-              (element) => element['username'] == Home.logininfo)]['fullname'],
+          'label': Home.logininfo.isNotEmpty
+              ? DB.userstable[DB.userstable.indexWhere(
+                      (element) => element['username'] == Home.logininfo)]
+                  ['fullname']
+              : '',
           'action': () {
             showinfo(ctx: ctx);
           },

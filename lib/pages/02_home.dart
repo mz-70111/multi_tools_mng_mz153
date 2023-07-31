@@ -10,10 +10,10 @@ import 'package:users_tasks_mz_153/pages/06_tasks.dart';
 import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
 import 'package:users_tasks_mz_153/pages/remind.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
-import 'package:users_tasks_mz_153/tamplate/bottomnavbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 import 'package:users_tasks_mz_153/tamplate/thememz.dart';
 import 'package:intl/intl.dart' as df;
+import 'package:users_tasks_mz_153/tamplate/tweenmz.dart';
 
 // ignore: must_be_immutable
 class Home extends StatelessWidget {
@@ -31,43 +31,71 @@ class Home extends StatelessWidget {
       'visible': false,
       'label': 'الصفحة الرئيسية',
       'icon': Icons.home_filled,
-      'page': Home()
+      'page': Home(),
+      'size': 50.0
     },
     {
       'visible': false,
       'label': 'التقارير',
       'icon': Icons.departure_board,
-      'page': Reports()
+      'page': Reports(),
+      'size': 50.0
     },
     {
       'visible': true,
       'label': 'المكاتب',
       'icon': Icons.work,
       'page': const Office(),
+      'size': 50.0
     },
     {
       'visible': true,
       'label': 'الحسابات',
       'icon': Icons.people,
-      'page': const Employ()
+      'page': const Employ(),
+      'size': 50.0
     },
     {
       'visible': true,
       'label': 'المهام',
       'icon': Icons.task_alt_outlined,
-      'page': Tasks()
+      'page': Tasks(),
+      'size': 50.0
     },
     {
       'visible': true,
       'label': 'الإجرائيات',
       'icon': Icons.work_history,
-      'page': Whattodo()
+      'page': Whattodo(),
+      'size': 50.0
     },
     {
-      'visible': false,
+      'visible': true,
       'label': 'التذكير',
-      'icon': Icons.work_history,
-      'page': Remind()
+      'icon': Icons.punch_clock,
+      'page': Remind(),
+      'size': 50.0
+    },
+    {
+      'visible': true,
+      'label': 'بينغ',
+      'icon': Icons.wifi_2_bar_rounded,
+      'page': Remind(),
+      'size': 50.0
+    },
+    {
+      'visible': true,
+      'label': 'تسجيلات المقسم',
+      'icon': Icons.phone,
+      'page': Remind(),
+      'size': 50.0
+    },
+    {
+      'visible': true,
+      'label': 'تفقد أخطاء البريد الالكتروني',
+      'icon': Icons.mark_email_unread_outlined,
+      'page': Remind(),
+      'size': 50.0
     }
   ];
   Home({super.key});
@@ -203,41 +231,67 @@ class Home extends StatelessWidget {
                           Expanded(
                             child: SingleChildScrollView(
                               child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: pages
-                                    .map((e) => Visibility(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ...pages.map(
+                                      (e) => Visibility(
                                           visible: e['visible'],
                                           child: GestureDetector(
                                             onTap: () =>
                                                 mainController.homemaincontent(
                                                     pages.indexOf(e)),
-                                            child: Card(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Row(
-                                                  children: [
-                                                    Icon(e['icon']),
-                                                    Visibility(
-                                                        visible: !searchvis,
+                                            child: TweenMZ.translatex(
+                                              begin: -150.0,
+                                              duration:
+                                                  (pages.indexOf(e) + 1) * 50,
+                                              end: 0.0,
+                                              child0: MouseRegion(
+                                                  onHover: (x) {
+                                                    mainController
+                                                        .changeonhoverpagestitle(
+                                                            ctx: context,
+                                                            x: pages
+                                                                .indexOf(e));
+                                                  },
+                                                  onExit: (x) {
+                                                    mainController
+                                                        .changeonexitdropMore(
+                                                            ctx: context,
+                                                            x: pages
+                                                                .indexOf(e));
+                                                  },
+                                                  child: SizedBox(
+                                                    height: e['size'],
+                                                    child: Card(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
                                                         child: Row(
                                                           children: [
-                                                            const SizedBox(),
-                                                            Text(e['label'],
-                                                                style: ThemeMZ()
-                                                                    .theme()
-                                                                    .textTheme
-                                                                    .labelMedium),
+                                                            Icon(e['icon']),
+                                                            Visibility(
+                                                                visible:
+                                                                    !searchvis,
+                                                                child: Row(
+                                                                  children: [
+                                                                    const SizedBox(),
+                                                                    Text(e['label'],
+                                                                        style: ThemeMZ()
+                                                                            .theme()
+                                                                            .textTheme
+                                                                            .labelMedium),
+                                                                  ],
+                                                                )),
                                                           ],
-                                                        )),
-                                                  ],
-                                                ),
-                                              ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )),
                                             ),
-                                          ),
-                                        ))
-                                    .toList(),
-                              ),
+                                          )),
+                                    )
+                                  ]),
                             ),
                           )
                         ],
