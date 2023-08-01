@@ -196,10 +196,10 @@ class Comment extends StatelessWidget {
     required this.editcomment,
     required this.tableId,
     required this.tableIdname,
-    required this.userIdname,
+    required this.userId,
     required this.officeId,
   });
-  final String table, tableIdname, userIdname;
+  final String table, tableIdname, userId;
   final int tableId, officeId;
   final List<Map> comment;
   final Function deletecomment;
@@ -251,16 +251,24 @@ class Comment extends StatelessWidget {
                     Row(
                       children: [
                         Visibility(
-                          visible: checkifUserisSame(userId: e[userIdname]) ==
+                          visible: checkifUserisSame(
+                                          userid: e[userId],
+                                          usertable: DB.userstable) ==
                                       true ||
                                   checkifUserisSupervisorinOffice(
+                                    usertable: DB.userstable,
                                           userid: DB.userstable[DB.userstable
-                                              .indexWhere((element) =>
-                                                  element['username'] ==
-                                                  Home.logininfo)]['user_id'],
+                                                  .indexWhere(
+                                                      (element) => element['username'] == Home.logininfo)]
+                                              ['user_id'],
                                           officeid: officeId) ==
                                       true ||
-                                  checkifUserisAdmin() == true
+                                  checkifUserisAdmin(
+                                          usertable: DB.userstable,
+                                          userid:
+                                              DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                                  ['user_id']) ==
+                                      true
                               ? true
                               : false,
                           child: Row(
@@ -268,7 +276,9 @@ class Comment extends StatelessWidget {
                             return Visibility(
                               visible: ed['icon'] == Icons.delete
                                   ? true
-                                  : checkifUserisSame(userId: e[userIdname]) ==
+                                  : checkifUserisSame(
+                                              userid: e[userId],
+                                              usertable: DB.userstable) ==
                                           true
                                       ? true
                                       : false,
@@ -283,8 +293,8 @@ class Comment extends StatelessWidget {
                           }).toList()),
                         ),
                         Text(
-                          e[userIdname] != null
-                              ? "${DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == e[userIdname])]['fullname']}"
+                          e[userId] != null
+                              ? "${DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == e[userId])]['fullname']}"
                               : "حساب محذوف",
                           softWrap: true,
                         ),
@@ -534,12 +544,24 @@ class MYPAGE extends StatelessWidget {
                                     child: const Icon(Icons.refresh))
                               ]));
                         } else {
-                          if (checkifUserisinAnyOffice() == false &&
+                          if (checkifUserisinAnyOffice(
+                                      usertable: DB.userstable,
+                                      userid: DB.userstable[DB.userstable
+                                          .indexWhere((element) =>
+                                              element['username'] ==
+                                              Home.logininfo)]['user_id']) ==
+                                  false &&
                               page == Whattodo) {
                             Future(() => mainController.snakbar(context,
                                 'لست عضوا في اي مكتب لا يمكنك اضافة إجرايئات'));
                           }
-                          if (checkifUserisSupervisorinAnyOffice() == false &&
+                          if (checkifUserisSupervisorinAnyOffice(
+                                      usertable: DB.userstable,
+                                      userid: DB.userstable[DB.userstable
+                                          .indexWhere((element) =>
+                                              element['username'] ==
+                                              Home.logininfo)]['user_id']) ==
+                                  false &&
                               page == Tasks) {
                             Future(() => mainController.snakbar(context,
                                 'لست مشرفا في اي مكتب لا يمكنك اضافة مهام'));
@@ -746,28 +768,27 @@ class MYPAGE extends StatelessWidget {
   }
 }
 
-checkifUserisinAnyOffice() {
+checkifUserisinAnyOffice({usertable, userid}) {
   bool result = false;
-  if (DB.userstable[DB.userstable.indexWhere(
-              (element) => element['username'] == Home.logininfo)]['privilege']
+  if (usertable[usertable.indexWhere((element) => element['user_id'] == userid)]
+              ['privilege']
           .contains("موظف") ||
-      DB.userstable[DB.userstable.indexWhere(
-              (element) => element['username'] == Home.logininfo)]['privilege']
+      usertable[usertable.indexWhere((element) => element['user_id'] == userid)]
+              ['privilege']
           .contains("مشرف")) {
     result = true;
   }
   return result;
 }
 
-checkifUserisUserinOffice({officeid}) {
+checkifUserisUserinOffice({officeid, usertable, userid}) {
   bool result = false;
-  for (var j in DB.userstable) {
+  for (var j in usertable) {
     for (var l = 0; l < j['office'].length; l++) {
       if (j['office'][l] == officeid &&
           j['privilege'][l] == 'موظف' &&
-          DB.userstable[DB.userstable.indexWhere(
-                      (element) => element['username'] == Home.logininfo)]
-                  ['user_id'] ==
+          usertable[usertable.indexWhere(
+                  (element) => element['user_id'] == userid)]['user_id'] ==
               j['user_id']) {
         result = true;
       }
@@ -776,12 +797,11 @@ checkifUserisUserinOffice({officeid}) {
   return result;
 }
 
-checkifUserisSame({userId}) {
+checkifUserisSame({userid, usertable}) {
   bool result = false;
-  if (DB.userstable[DB.userstable
-              .indexWhere((element) => element['username'] == Home.logininfo)]
-          ['user_id'] ==
-      userId) {
+  if (usertable[usertable.indexWhere(
+          (element) => element['username'] == Home.logininfo)]['user_id'] ==
+      userid) {
     result = true;
   }
   return result;
@@ -799,9 +819,9 @@ checkifUserisSupervisorinAnyOffice({userid, usertable}) {
   return result;
 }
 
-checkifUserisSupervisorinOffice({officeid, required userid}) {
+checkifUserisSupervisorinOffice({officeid, userid, usertable}) {
   bool result = false;
-  for (var j in DB.userstable) {
+  for (var j in usertable) {
     for (var l = 0; l < j['office'].length; l++) {
       if (j['office'][l] == officeid &&
           j['privilege'][l] == 'مشرف' &&
@@ -813,10 +833,9 @@ checkifUserisSupervisorinOffice({officeid, required userid}) {
   return result;
 }
 
-checkifUserisAdmin() {
+checkifUserisAdmin({userid, usertable}) {
   bool result = false;
-  if (DB.userstable[DB.userstable
-              .indexWhere((element) => element['username'] == Home.logininfo)]
+  if (usertable[usertable.indexWhere((element) => element['user_id'] == userid)]
           ['admin'] ==
       1) {
     result = true;

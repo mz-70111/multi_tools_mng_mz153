@@ -277,6 +277,7 @@ class MainController extends GetxController {
   }
 
   directsendTask({ctx, officeid, e}) async {
+    bool wait = false;
     String mymsg = Tasks.mymsgTask(e: e);
     mymsg +=
         'قام بإرسال الإشعار ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']}';
@@ -294,16 +295,23 @@ class MainController extends GetxController {
                   ? const Text("لست مشرفا في أي مكتب")
                   : Text(mymsg),
               actions: [
-                IconButton(
-                    onPressed: () async {
-                      Tasks.sendtask(
-                          msg: mymsg,
-                          chatid: DB.officetable[DB.officetable.indexWhere(
-                              (element) =>
-                                  element['office_id'] ==
-                                  e['task_office_id'])]['chatid']);
-                    },
-                    icon: const Icon(Icons.send))
+                Visibility(
+                  visible: !wait,
+                  child: IconButton(
+                      onPressed: () async {
+                        wait = true;
+                        update();
+                        Tasks.sendtask(
+                            msg: mymsg,
+                            chatid: DB.officetable[DB.officetable.indexWhere(
+                                (element) =>
+                                    element['office_id'] ==
+                                    e['task_office_id'])]['chatid']);
+                        wait = false;
+                        update();
+                      },
+                      icon: const Icon(Icons.send)),
+                )
               ],
             ),
           );
@@ -344,7 +352,7 @@ class MainController extends GetxController {
       null;
     }
     int timenow = DateTime.now().hour;
-    if (timenow == 12) {
+    if (timenow == 23) {
       for (var i in office) {
         List usershavetask = [];
         mymsg = '';
@@ -378,12 +386,13 @@ class MainController extends GetxController {
           }
           for (var p in i['users']) {
             if (!usershavetask.contains(p)) {
-              print(p);
-              if (checkifUserisSupervisorinAnyOffice(userid: p,usertable: users)==false) {
-              mymsg +=
-                  ' * ${users[users.indexWhere((element) => element['user_id'] == p)]['fullname']} ليس لديه مهمة حاليا\n';
-              mymsg += '--------------\n';
-            }
+              if (checkifUserisSupervisorinAnyOffice(
+                      userid: p, usertable: users) ==
+                  false) {
+                mymsg +=
+                    ' * ${users[users.indexWhere((element) => element['user_id'] == p)]['fullname']} ليس لديه مهمة حاليا\n';
+                mymsg += '--------------\n';
+              }
             }
           }
           mymsg += 'تم ارسال الاشعار بشكل تلقائي';
@@ -1307,31 +1316,6 @@ class MainController extends GetxController {
 
 //tasks
 
-  checkifuserSupervisor({officeid, userid}) {
-    bool usersupervisor = false;
-    for (var i = 0;
-        i <
-            DB
-                .userstable[DB.userstable
-                        .indexWhere((element) => element['user_id'] == userid)]
-                    ['privilege']
-                .length;
-        i++) {
-      if (DB.userstable[DB.userstable
-                  .indexWhere((element) => element['user_id'] == userid)]
-              ['privilege'][i] ==
-          'مشرف') {
-        if (DB.userstable[DB.userstable
-                    .indexWhere((element) => element['user_id'] == userid)]
-                ['office'][i] ==
-            officeid) {
-          usersupervisor = true;
-        }
-      }
-    }
-    return usersupervisor;
-  }
-
   getusersinofficeifsupervisor() async {
     List office = [];
     office.clear();
@@ -2149,7 +2133,9 @@ class MainController extends GetxController {
                             element['username'] == Home.logininfo)]['admin'] ==
                         1
                     ? ''
-                    : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+                    : LogIn.office_ids.contains('= _')
+                        ? 'where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}'
+                        : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
               );
               await dbController.gettable(
                 usertable: DB.userstable,
@@ -2171,7 +2157,9 @@ class MainController extends GetxController {
                               ['admin'] ==
                           1
                       ? ''
-                      : 'where ${LogIn.office_ids}');
+                      : LogIn.office_ids.contains('= _')
+                          ? 'where 1=2'
+                          : 'where ${LogIn.office_ids}');
 
               office_ids('todo_office_id');
               await dbController.gettable(
@@ -2183,7 +2171,9 @@ class MainController extends GetxController {
                               ['admin'] ==
                           1
                       ? ''
-                      : 'where ${LogIn.office_ids}');
+                      : LogIn.office_ids.contains('= _')
+                          ? 'where 1=2'
+                          : 'where ${LogIn.office_ids}');
               office_ids('remind_office_id');
               await dbController.gettable(
                   usertable: DB.userstable,
@@ -2194,7 +2184,9 @@ class MainController extends GetxController {
                               ['admin'] ==
                           1
                       ? ''
-                      : 'where ${LogIn.office_ids}');
+                      : LogIn.office_ids.contains('= _')
+                          ? 'where 1=2'
+                          : 'where ${LogIn.office_ids}');
 
               Home.searchlist = [
                 ...DB.officetable,
@@ -2217,11 +2209,11 @@ class MainController extends GetxController {
           }
         }
       } catch (e) {
+        print(e);
         LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
       }
     }
     LogIn.loginwait = false;
-    print(DB.officetable);
     update();
   }
 
@@ -2235,6 +2227,7 @@ class MainController extends GetxController {
     LogIn.office_ids =
         LogIn.office_ids.substring(0, LogIn.office_ids.lastIndexOf(' or'));
     LogIn.office_ids = "(${LogIn.office_ids})";
+    print(LogIn.office_ids);
   }
 
   autologin() async {
@@ -2272,11 +2265,12 @@ class MainController extends GetxController {
               list: DB.userstable,
               table: 'users',
               where: DB.userstable[DB.userstable.indexWhere((element) =>
-                              element['username'] == LogIn.username.text)]
-                          ['admin'] ==
+                          element['username'] == Home.logininfo)]['admin'] ==
                       1
                   ? ''
-                  : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+                  : LogIn.office_ids.contains('= _')
+                      ? 'where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}'
+                      : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
             );
             await dbController.gettable(
               usertable: DB.userstable,
@@ -2297,7 +2291,9 @@ class MainController extends GetxController {
                             element['username'] == Home.logininfo)]['admin'] ==
                         1
                     ? ''
-                    : 'where ${LogIn.office_ids}');
+                    : LogIn.office_ids.contains('= _')
+                        ? 'where 1=2'
+                        : 'where ${LogIn.office_ids}');
 
             office_ids('todo_office_id');
             await dbController.gettable(
@@ -2308,7 +2304,9 @@ class MainController extends GetxController {
                             element['username'] == Home.logininfo)]['admin'] ==
                         1
                     ? ''
-                    : 'where ${LogIn.office_ids}');
+                    : LogIn.office_ids.contains('= _')
+                        ? 'where 1=2'
+                        : 'where ${LogIn.office_ids}');
             office_ids('remind_office_id');
             await dbController.gettable(
                 usertable: DB.userstable,
@@ -2318,7 +2316,9 @@ class MainController extends GetxController {
                             element['username'] == Home.logininfo)]['admin'] ==
                         1
                     ? ''
-                    : 'where ${LogIn.office_ids}');
+                    : LogIn.office_ids.contains('= _')
+                        ? 'where 1=2'
+                        : 'where ${LogIn.office_ids}');
 
             Home.searchlist = [
               ...DB.officetable,

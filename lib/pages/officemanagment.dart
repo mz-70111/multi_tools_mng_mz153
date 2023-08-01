@@ -145,9 +145,9 @@ class Office extends StatelessWidget {
             ctx: context, pickcolor: () => pickcolor(ctx: context)),
         textfeildlista: offices,
         scrollController: scrollController,
-        mainEditvisible: () => checkifUserisAdmin() == true ? true : false,
+        mainEditvisible: () => checkifUserisAdmin(usertable: DB.userstable,userid: DB.userstable[DB.userstable.indexWhere((element) => element['username']==Home.logininfo)]['user_id']) == true ? true : false,
         subeditvisible: () => true,
-        mainAddvisible: checkifUserisAdmin() == true ? true : false,
+        mainAddvisible: checkifUserisAdmin(usertable: DB.userstable,userid: DB.userstable[DB.userstable.indexWhere((element) => element['username']==Home.logininfo)]['user_id']) == true ? true : false,
         customWidgetofEdit: customWidgetofEdit(
             ctx: context, pickcolor: () => pickcolor(ctx: context)),
         customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
@@ -370,6 +370,7 @@ class Office extends StatelessWidget {
     String mymsg = '';
     for (var i in e['users'] ?? []) {
       if (checkifUserisSupervisorinOffice(
+        usertable: DB.userstable,
             officeid: e['office_id'],
             userid: i,
           ) ==
@@ -415,6 +416,7 @@ ${Tasks.mymsgTask(e: j)}
               actions: [
                 Visibility(
                   visible: checkifUserisSupervisorinOffice(
+                    usertable: DB.userstable,
                     officeid: e['office_id'],
                     userid: DB.userstable[DB.userstable.indexWhere(
                             (element) => element['username'] == Home.logininfo)]

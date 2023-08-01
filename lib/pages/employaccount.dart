@@ -247,11 +247,13 @@ class Employ extends StatelessWidget {
         mylista: mylista,
         table: 'users',
         tableId: 'user_id',
-        where: DB.userstable[DB.userstable.indexWhere((element) =>
-                    element['username'] == LogIn.username.text)]['admin'] ==
+        where: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == LogIn.username.text)]
+                    ['admin'] ==
                 1
             ? ''
-            : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+            : LogIn.office_ids.contains('= _')
+                ? 'where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}'
+                : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
         page: Employ,
         searchRange: const ['username', 'fullname'],
         mainColumn: mainColumn,
@@ -265,9 +267,22 @@ class Employ extends StatelessWidget {
         customWidgetofADD: customWidgetofADD(),
         textfeildlista: employs,
         scrollController: scrollController,
-        mainEditvisible: () => checkifUserisAdmin() == true ? true : false,
+        mainEditvisible: () => checkifUserisAdmin(
+                    usertable: DB.userstable,
+                    userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                        ['user_id']) ==
+                true
+            ? true
+            : false,
         subeditvisible: () => true,
-        mainAddvisible: checkifUserisAdmin() == true ? true : false,
+        mainAddvisible: checkifUserisAdmin(
+                    usertable: DB.userstable,
+                    userid:
+                        DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                            ['user_id']) ==
+                true
+            ? true
+            : false,
         customWidgetofEdit: customWidgetofEdit(ctx: context),
         customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
         getinfo: () => getinfo(e: MYPAGE.eE),

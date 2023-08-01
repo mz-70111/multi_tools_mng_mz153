@@ -410,7 +410,9 @@ class Remind extends StatelessWidget {
                   ['admin'] ==
               1
           ? ''
-          : 'where ${LogIn.office_ids}',
+          : LogIn.office_ids.contains('= _')
+              ? 'where 1=2'
+              : 'where ${LogIn.office_ids}',
       page: Remind,
       searchRange: const ['remindname', 'reminddetails'],
       mainColumn: mainColumn,
@@ -426,17 +428,27 @@ class Remind extends StatelessWidget {
       customWidgetofEdit: customWidgetofEdit(),
       textfeildlista: reminds,
       scrollController: scrollController,
-      mainEditvisible: () => (checkifUserisAdmin() == true ||
+      mainEditvisible: () => (checkifUserisAdmin(
+                      usertable: DB.userstable,
+                      userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                          ['user_id']) ==
+                  true ||
               (checkifUserisUserinOffice(
+                          usertable: DB.userstable,
+                          userid: DB.userstable[DB.userstable.indexWhere(
+                                  (element) => element['username'] == Home.logininfo)]
+                              ['user_id'],
                           officeid: MYPAGE.eE['remind_office_id']) ==
                       true &&
-                  DB.userstable[DB.userstable.indexWhere((element) =>
-                              element['username'] == Home.logininfo)]
-                          ['addremind'] ==
-                      1))
+                  DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
           ? true
           : false,
       subeditvisible: () => (checkifUserisUserinOffice(
+                      usertable: DB.userstable,
+                      userid: DB.userstable[DB.userstable.indexWhere(
+                              (element) =>
+                                  element['username'] == Home.logininfo)]
+                          ['user_id'],
                       officeid: MYPAGE.eE['remind_office_id']) ==
                   true &&
               DB.userstable[DB.userstable.indexWhere(
@@ -445,7 +457,13 @@ class Remind extends StatelessWidget {
                   1)
           ? true
           : false,
-      mainAddvisible: checkifUserisinAnyOffice() == true &&
+      mainAddvisible: checkifUserisinAnyOffice(
+                      usertable: DB.userstable,
+                      userid: DB.userstable[DB.userstable.indexWhere(
+                              (element) =>
+                                  element['username'] == Home.logininfo)]
+                          ['user_id']) ==
+                  true &&
               DB.userstable[DB.userstable.indexWhere(
                           (element) => element['username'] == Home.logininfo)]
                       ['addremind'] ==
@@ -462,8 +480,19 @@ class Remind extends StatelessWidget {
       actionEdit: () => mainController.showeditpanel(),
       actionDelete: () => deleteremind(ctx: context, e: MYPAGE.eE),
       customeditpanelitem: () => Visibility(
-        visible: (checkifUserisAdmin() == true ||
+        visible: (checkifUserisAdmin(
+                        usertable: DB.userstable,
+                        userid: DB.userstable[DB.userstable.indexWhere(
+                                (element) =>
+                                    element['username'] == Home.logininfo)]
+                            ['user_id']) ==
+                    true ||
                 checkifUserisUserinOffice(
+                      usertable: DB.userstable,
+                      userid: DB.userstable[DB.userstable.indexWhere(
+                              (element) =>
+                                  element['username'] == Home.logininfo)]
+                          ['user_id'],
                       officeid: MYPAGE.eE['remind_office_id'],
                     ) ==
                     true)
@@ -547,7 +576,7 @@ ${e['reminddetails']}
           tableIdname: 'urc_remind_id',
           tableId: e['remind_id'],
           officeId: e['remind_office_id'],
-          userIdname: 'urc_user_id',
+          userId: 'urc_user_id',
         ),
         WriteComment(e: e, writeComment: () => addcomment(e: MYPAGE.eE))
       ],
@@ -571,8 +600,15 @@ ${e['reminddetails']}
     Remind.autoCertificateurl.text = '';
     remindofficelist.clear();
     for (var i in DB.officetable) {
-      if (checkifUserisUserinOffice(officeid: i['office_id']) == true ||
+      if (checkifUserisUserinOffice(
+                  usertable: DB.userstable,
+                  userid: DB.userstable[DB.userstable.indexWhere(
+                          (element) => element['username'] == Home.logininfo)]
+                      ['user_id'],
+                  officeid: i['office_id']) ==
+              true ||
           checkifUserisSupervisorinOffice(
+                usertable: DB.userstable,
                 officeid: i['office_id'],
                 userid: DB.userstable[DB.userstable.indexWhere(
                         (element) => element['username'] == Home.logininfo)]
@@ -591,8 +627,15 @@ ${e['reminddetails']}
     }
     remindofficelist.clear();
     for (var i in DB.officetable) {
-      if (checkifUserisUserinOffice(officeid: i['office_id']) == true ||
+      if (checkifUserisUserinOffice(
+                  usertable: DB.userstable,
+                  userid: DB.userstable[DB.userstable.indexWhere(
+                          (element) => element['username'] == Home.logininfo)]
+                      ['user_id'],
+                  officeid: i['office_id']) ==
+              true ||
           checkifUserisSupervisorinOffice(
+                usertable: DB.userstable,
                 officeid: i['office_id'],
                 userid: DB.userstable[DB.userstable.indexWhere(
                         (element) => element['username'] == Home.logininfo)]

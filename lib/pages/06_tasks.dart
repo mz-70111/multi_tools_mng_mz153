@@ -245,7 +245,9 @@ class Tasks extends StatelessWidget {
                   ['admin'] ==
               1
           ? ''
-          : 'where ${LogIn.office_ids}',
+          : LogIn.office_ids.contains('= _')
+              ? 'where 1=2'
+              : 'where ${LogIn.office_ids}',
       page: Tasks,
       searchRange: const ['taskname', 'userstask_name'],
       mainColumn: mainColumn,
@@ -261,8 +263,15 @@ class Tasks extends StatelessWidget {
       customWidgetofEdit: customWidgetofEdit(),
       textfeildlista: tasks,
       scrollController: scrollController,
-      mainEditvisible: () => (checkifUserisAdmin() == true ||
+      mainEditvisible: () => (checkifUserisAdmin(
+                      usertable: DB.userstable,
+                      userid: DB.userstable[DB.userstable.indexWhere(
+                              (element) =>
+                                  element['username'] == Home.logininfo)]
+                          ['user_id']) ==
+                  true ||
               checkifUserisSupervisorinOffice(
+                    usertable: DB.userstable,
                     officeid: MYPAGE.eE['task_office_id'],
                     userid: DB.userstable[DB.userstable.indexWhere(
                             (element) => element['username'] == Home.logininfo)]
@@ -272,6 +281,7 @@ class Tasks extends StatelessWidget {
           ? true
           : false,
       subeditvisible: () => checkifUserisSupervisorinOffice(
+                usertable: DB.userstable,
                 officeid: MYPAGE.eE['task_office_id'],
                 userid: DB.userstable[DB.userstable.indexWhere(
                         (element) => element['username'] == Home.logininfo)]
@@ -280,8 +290,14 @@ class Tasks extends StatelessWidget {
               true
           ? true
           : false,
-      mainAddvisible:
-          checkifUserisSupervisorinAnyOffice() == true ? true : false,
+      mainAddvisible: checkifUserisSupervisorinAnyOffice(
+                  usertable: DB.userstable,
+                  userid: DB.userstable[DB.userstable.indexWhere(
+                          (element) => element['username'] == Home.logininfo)]
+                      ['user_id']) ==
+              true
+          ? true
+          : false,
       getinfo: () {
         return getinfo(
           e: MYPAGE.eE,
@@ -292,14 +308,18 @@ class Tasks extends StatelessWidget {
       actionEdit: () => mainController.showeditpanel(),
       actionDelete: () => deletetask(ctx: context, e: MYPAGE.eE),
       customeditpanelitem: () => Visibility(
-        visible: (checkifUserisAdmin() == true ||
+        visible: (checkifUserisAdmin(
+                        usertable: DB.userstable,
+                        userid: DB.userstable[DB.userstable.indexWhere(
+                                (element) =>
+                                    element['username'] == Home.logininfo)]
+                            ['user_id']) ==
+                    true ||
                 checkifUserisSupervisorinOffice(
-                      officeid: MYPAGE.eE['task_office_id'],
-                      userid: DB.userstable[DB.userstable.indexWhere(
-                              (element) =>
-                                  element['username'] == Home.logininfo)]
-                          ['user_id'],
-                    ) ==
+                        officeid: MYPAGE.eE['task_office_id'],
+                        userid: DB.userstable[DB.userstable.indexWhere((element) =>
+                            element['username'] == Home.logininfo)]['user_id'],
+                        usertable: DB.userstable) ==
                     true)
             ? true
             : false,
@@ -408,7 +428,7 @@ class Tasks extends StatelessWidget {
           tableIdname: 'utc_task_id',
           tableId: e['task_id'],
           officeId: e['task_office_id'],
-          userIdname: 'utc_user_id',
+          userId: 'utc_user_id',
         ),
         WriteComment(e: e, writeComment: () => addcomment(e: MYPAGE.eE))
       ],
@@ -444,6 +464,7 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
     taskofficelist.clear();
     for (var i in DB.officetable) {
       if (checkifUserisSupervisorinOffice(
+            usertable: DB.userstable,
             officeid: i['office_id'],
             userid: DB.userstable[DB.userstable.indexWhere(
                 (element) => element['username'] == Home.logininfo)]['user_id'],
@@ -467,6 +488,7 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
     taskofficelist.clear();
     for (var i in DB.officetable) {
       if (checkifUserisSupervisorinOffice(
+            usertable: DB.userstable,
             officeid: i['office_id'],
             userid: DB.userstable[DB.userstable.indexWhere(
                 (element) => element['username'] == Home.logininfo)]['user_id'],

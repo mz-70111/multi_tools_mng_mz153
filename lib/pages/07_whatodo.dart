@@ -156,17 +156,15 @@ class Whattodo extends StatelessWidget {
         Column(mainAxisSize: MainAxisSize.min, children: [
           customWidgetofADD(),
         ]);
-            mainController.office_ids('todo_office_id');
+    mainController.office_ids('todo_office_id');
 
     return MYPAGE(
         mylista: mylista,
         table: 'todo',
         tableId: 'todo_id',
-        where:DB.userstable[DB.userstable.indexWhere((element) =>
-                            element['username'] == Home.logininfo)]['admin'] ==
-                        1
-                    ? ''
-                    : 'where ${LogIn.office_ids}',
+        where: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['admin'] == 1
+            ? '':LogIn.office_ids.contains('= _')?'where 1=2'
+            : 'where ${LogIn.office_ids}',
         page: Whattodo,
         searchRange: const ['todoname', 'tododetails'],
         mainColumn: mainColumn,
@@ -182,24 +180,22 @@ class Whattodo extends StatelessWidget {
         customWidgetofEdit: customWidgetofEdit(),
         textfeildlista: todos,
         scrollController: scrollController,
-        mainEditvisible: () => (checkifUserisAdmin() == true ||
-                (checkifUserisUserinOffice(officeid: MYPAGE.eE['todo_office_id']) == true &&
+        mainEditvisible: () => (checkifUserisAdmin(usertable: DB.userstable,userid: DB.userstable[DB.userstable.indexWhere((element) => element['username']==Home.logininfo)]['user_id']) == true ||
+                (checkifUserisUserinOffice(usertable: DB.userstable,userid: DB.userstable[DB.userstable.indexWhere((element) => element['username']==Home.logininfo)]['user_id'],officeid: MYPAGE.eE['todo_office_id']) == true &&
                     DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
                             ['addtodo'] ==
                         1))
             ? true
             : false,
         subeditvisible: () =>
-            (checkifUserisUserinOffice(officeid: MYPAGE.eE['todo_office_id']) == true &&
-                    DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                            ['addtodo'] ==
-                        1)
+            (checkifUserisUserinOffice(usertable: DB.userstable,userid: DB.userstable[DB.userstable.indexWhere((element) => element['username']==Home.logininfo)]['user_id'],officeid: MYPAGE.eE['todo_office_id']) == true && DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addtodo'] == 1)
                 ? true
                 : false,
-        mainAddvisible: checkifUserisinAnyOffice() == true &&
-                DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addtodo'] == 1
-            ? true
-            : false,
+        mainAddvisible:
+            checkifUserisinAnyOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) == true &&
+                    DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addtodo'] == 1
+                ? true
+                : false,
         getinfo: () {
           return getinfo(
             e: MYPAGE.eE,
@@ -265,7 +261,7 @@ class Whattodo extends StatelessWidget {
           tableIdname: 'utdc_todo_id',
           tableId: e['todo_id'],
           officeId: e['todo_office_id'],
-          userIdname: 'utdc_user_id',
+          userId: 'utdc_user_id',
         ),
         WriteComment(e: e, writeComment: () => addcomment(e: MYPAGE.eE))
       ],
@@ -275,8 +271,15 @@ class Whattodo extends StatelessWidget {
   customInitforAdd() {
     todoofficelist.clear();
     for (var i in DB.officetable) {
-      if (checkifUserisUserinOffice(officeid: i['office_id']) == true ||
+      if (checkifUserisUserinOffice(
+                  usertable: DB.userstable,
+                  userid: DB.userstable[DB.userstable.indexWhere(
+                          (element) => element['username'] == Home.logininfo)]
+                      ['user_id'],
+                  officeid: i['office_id']) ==
+              true ||
           checkifUserisSupervisorinOffice(
+            usertable: DB.userstable,
                 officeid: i['office_id'],
                 userid: DB.userstable[DB.userstable.indexWhere(
                         (element) => element['username'] == Home.logininfo)]
@@ -297,8 +300,9 @@ class Whattodo extends StatelessWidget {
     }
     todoofficelist.clear();
     for (var i in DB.officetable) {
-      if (checkifUserisUserinOffice(officeid: i['office_id']) == true ||
+      if (checkifUserisUserinOffice(usertable: DB.userstable,userid: DB.userstable[DB.userstable.indexWhere((element) => element['username']==Home.logininfo)]['user_id'],officeid: i['office_id']) == true ||
           checkifUserisSupervisorinOffice(
+            usertable: DB.userstable,
                 officeid: i['office_id'],
                 userid: DB.userstable[DB.userstable.indexWhere(
                         (element) => element['username'] == Home.logininfo)]
