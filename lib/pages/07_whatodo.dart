@@ -162,7 +162,11 @@ class Whattodo extends StatelessWidget {
         mylista: mylista,
         table: 'todo',
         tableId: 'todo_id',
-        where: 'where ${LogIn.office_ids}',
+        where:DB.userstable[DB.userstable.indexWhere((element) =>
+                            element['username'] == Home.logininfo)]['admin'] ==
+                        1
+                    ? ''
+                    : 'where ${LogIn.office_ids}',
         page: Whattodo,
         searchRange: const ['todoname', 'tododetails'],
         mainColumn: mainColumn,

@@ -4,10 +4,13 @@ import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/themeController.dart';
 
 import 'package:users_tasks_mz_153/pages/03_reports.dart';
+import 'package:users_tasks_mz_153/pages/checkemail.dart';
 import 'package:users_tasks_mz_153/pages/officemanagment.dart';
 import 'package:users_tasks_mz_153/pages/employaccount.dart';
 import 'package:users_tasks_mz_153/pages/06_tasks.dart';
 import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
+import 'package:users_tasks_mz_153/pages/pbx.dart';
+import 'package:users_tasks_mz_153/pages/ping.dart';
 import 'package:users_tasks_mz_153/pages/remind.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
@@ -80,21 +83,21 @@ class Home extends StatelessWidget {
       'visible': true,
       'label': 'بينغ',
       'icon': Icons.wifi_2_bar_rounded,
-      'page': Remind(),
+      'page': Ping(),
       'size': 50.0
     },
     {
       'visible': true,
       'label': 'تسجيلات المقسم',
       'icon': Icons.phone,
-      'page': Remind(),
+      'page': PBX(),
       'size': 50.0
     },
     {
       'visible': true,
       'label': 'تفقد أخطاء البريد الالكتروني',
       'icon': Icons.mark_email_unread_outlined,
-      'page': Remind(),
+      'page': Checkemail(),
       'size': 50.0
     }
   ];

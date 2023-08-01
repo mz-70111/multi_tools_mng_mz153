@@ -240,7 +240,12 @@ class Tasks extends StatelessWidget {
       mylista: mylista,
       table: 'tasks',
       tableId: 'task_id',
-      where: 'where ${LogIn.office_ids}',
+      where: DB.userstable[DB.userstable.indexWhere(
+                      (element) => element['username'] == Home.logininfo)]
+                  ['admin'] ==
+              1
+          ? ''
+          : 'where ${LogIn.office_ids}',
       page: Tasks,
       searchRange: const ['taskname', 'userstask_name'],
       mainColumn: mainColumn,
@@ -317,7 +322,8 @@ class Tasks extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text("${e['task_office_id'] ?? 'مكتب محذوف'}"),
+        Text(
+            "${DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == e['task_office_id'])]['officename'] ?? 'مكتب محذوف'}"),
         SelectableText('''
               # ${e['task_id']} ${e['taskname']}
               ${e['taskdetails']}

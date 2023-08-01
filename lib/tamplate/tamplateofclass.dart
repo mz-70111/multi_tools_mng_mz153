@@ -489,7 +489,6 @@ class MYPAGE extends StatelessWidget {
   final bool mainAddvisible;
   final ScrollController scrollController;
   //static
-
   static String selectedOffice = "جميع المكاتب";
   static double dialogeBegin = 1000;
   static double dialogeEnd = 0;
@@ -510,6 +509,7 @@ class MYPAGE extends StatelessWidget {
                       FutureBuilder(future: Future(() async {
                         try {
                           return await dbController.gettable(
+                              usertable: DB.userstable,
                               list: mylista,
                               tableid: tableId,
                               table: table,
@@ -573,30 +573,25 @@ class MYPAGE extends StatelessWidget {
                                     children: [
                                       Row(
                                         children: [
-                                          Visibility(
-                                              visible: DB.officetable.isNotEmpty
-                                                  ? true
-                                                  : false,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Card(
-                                                  child: DropdownButton(
-                                                      value: selectedOffice,
-                                                      items: officelist
-                                                          .map((e) =>
-                                                              DropdownMenuItem(
-                                                                  value: e,
-                                                                  child: Text(
-                                                                      "$e")))
-                                                          .toList(),
-                                                      onChanged: (x) {
-                                                        mainController
-                                                            .chooseoffice(x);
-                                                        dbController.update();
-                                                      }),
-                                                ),
-                                              )),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Card(
+                                              child: DropdownButton(
+                                                  value: selectedOffice,
+                                                  items: officelist
+                                                      .map((e) =>
+                                                          DropdownMenuItem(
+                                                              value: e,
+                                                              child:
+                                                                  Text("$e")))
+                                                      .toList(),
+                                                  onChanged: (x) {
+                                                    mainController
+                                                        .chooseoffice(x);
+                                                    dbController.update();
+                                                  }),
+                                            ),
+                                          ),
                                           Expanded(
                                               child: TextFieldMZ(
                                             label: '',
@@ -792,10 +787,9 @@ checkifUserisSame({userId}) {
   return result;
 }
 
-checkifUserisSupervisorinAnyOffice() {
+checkifUserisSupervisorinAnyOffice({userid, usertable}) {
   bool result = false;
-  if (DB.userstable[DB.userstable
-              .indexWhere((element) => element['username'] == Home.logininfo)]
+  if (usertable[usertable.indexWhere((element) => element['user_id'] == userid)]
           ['privilege']
       .contains("مشرف")) {
     result = true;

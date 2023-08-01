@@ -29,6 +29,12 @@ class MainController extends GetxController {
     update();
   }
 
+  @override
+  onReady() async {
+    super.onReady();
+    update();
+  }
+
   passvis() {
     LogIn.iconpassvis = LogIn.iconpassvis == Icons.visibility_off
         ? Icons.visibility
@@ -52,8 +58,6 @@ class MainController extends GetxController {
     update();
   }
 
- 
-
   opennotifi() async {
     Home.selectall = false;
     for (var i in Home.searchlist) {
@@ -69,8 +73,11 @@ class MainController extends GetxController {
             ['check'] = true;
       }
     }
-    await DBController()
-        .gettable(list: Tasks.mylista, table: 'tasks', tableid: 'task_id');
+    await DBController().gettable(
+        usertable: DB.userstable,
+        list: Tasks.mylista,
+        table: 'tasks',
+        tableid: 'task_id');
     await homemaincontent(4);
     update();
   }
@@ -303,19 +310,48 @@ class MainController extends GetxController {
         });
   }
 
-  autosendnotifitasks() async {
-    String mymsg = '';
+  autosendnotifiremind() async {
     int timenow = DateTime.now().hour;
-    if (timenow == 09 || timenow == 9) {
-      await DBController().gettable(
-          list: DB.officetable, table: 'office', tableid: 'office_id');
+    if (timenow == 8) {
       for (var i in DB.officetable) {
+        if (i['notifi'] == 1) {
+          for (var j in DB.remindtable) {
+            if (i['notifi'] == 1) {
+              if (i['reminddate'].difference(DateTime.now().add(Duration()))) {}
+            }
+          }
+        }
+      }
+    }
+  }
+
+  autosendnotifitasks() async {
+    List<Map> office = [], users = [], tasks = [];
+    DBController dbController = Get.find();
+    print('task');
+    String mymsg = '';
+    try {
+      await dbController.gettable(
+          usertable: users, list: users, table: 'users', tableid: 'user_id');
+      await dbController.gettable(
+          usertable: users,
+          list: office,
+          table: 'office',
+          tableid: 'office_id');
+      await dbController.gettable(
+          usertable: users, list: tasks, table: 'tasks', tableid: 'task_id');
+    } catch (e) {
+      null;
+    }
+    int timenow = DateTime.now().hour;
+    if (timenow == 12) {
+      for (var i in office) {
         List usershavetask = [];
         mymsg = '';
         if (i['sendstatus'] == 0) {
           mymsg += 'مهمات ${i['officename']}\n';
           if (i['notifi'] == 1) {
-            for (var j in DB.tasktable) {
+            for (var j in tasks) {
               var send = 0;
               for (var t in i['users']) {
                 if (j['userstask_id'].contains(t)) {
@@ -325,16 +361,14 @@ class MainController extends GetxController {
                   }
                 }
               }
-
               if (send > 0 && j['notifi'] == 1) {
                 try {
                   List userstaskname = [];
+                  userstaskname.clear();
                   for (var ii in j['userstask_id']) {
-                    userstaskname.add(DB.userstable[DB.userstable
-                            .indexWhere((element) => element['user_id'] == ii)]
-                        ['fullname']);
+                    userstaskname.add(users[users.indexWhere(
+                        (element) => element['user_id'] == ii)]['fullname']);
                   }
-
                   mymsg += Tasks.mymsgTask(e: j);
                 } catch (e) {
                   null;
@@ -344,23 +378,24 @@ class MainController extends GetxController {
           }
           for (var p in i['users']) {
             if (!usershavetask.contains(p)) {
-              if (checkifuserSupervisor(officeid: i['office_id'], userid: p) ==
-                  false) {
-                mymsg +=
-                    ' * ${DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == p)]['fullname']} ليس لديه مهمة حاليا\n';
-                mymsg += '--------------\n';
-              }
+              print(p);
+              if (checkifUserisSupervisorinAnyOffice(userid: p,usertable: users)==false) {
+              mymsg +=
+                  ' * ${users[users.indexWhere((element) => element['user_id'] == p)]['fullname']} ليس لديه مهمة حاليا\n';
+              mymsg += '--------------\n';
+            }
             }
           }
           mymsg += 'تم ارسال الاشعار بشكل تلقائي';
-        }
-        if (mymsg.isNotEmpty) {
-          Tasks.sendtask(msg: mymsg, chatid: i['chatid']);
-        }
-        try {
-          await DB().customquery(query: 'update office set sendstatus=1');
-        } catch (e) {
-          null;
+
+          if (mymsg.isNotEmpty) {
+            Tasks.sendtask(msg: mymsg, chatid: i['chatid']);
+          }
+          try {
+            await DB().customquery(query: 'update office set sendstatus=1');
+          } catch (e) {
+            null;
+          }
         }
       }
     } else {
@@ -370,7 +405,8 @@ class MainController extends GetxController {
         null;
       }
     }
-    Future.delayed(const Duration(hours: 1), () => DBController().onReady());
+    Future.delayed(
+        const Duration(hours: 1), () async => await autosendnotifitasks());
   }
 
   getCert({required String host}) async {
@@ -386,6 +422,7 @@ class MainController extends GetxController {
 \$webRequest.ServicePoint.Certificate.GetExpirationDateString()
 '''
     ]);
+    await Process.run('Powershell.exe', ['taskkill /im powershell.exe /f /t']);
     String result = '';
     result = getExpiredate.stdout;
     result = result.substring(0, result.indexOf(' '));
@@ -1259,8 +1296,11 @@ class MainController extends GetxController {
         }
       }
     }
-    await DBController()
-        .gettable(list: Employ.mylista, table: 'users', tableid: 'user_id');
+    await DBController().gettable(
+        usertable: DB.userstable,
+        list: Employ.mylista,
+        table: 'users',
+        tableid: 'user_id');
     homemaincontent(3);
   }
 //endoffice
@@ -1405,6 +1445,16 @@ class MainController extends GetxController {
       await DB().customquery(
           query:
               "update tasks set notifi=${x == true ? 1 : 0} where task_id=${e['task_id']}");
+      e['notifi'] = x == true ? 1 : 0;
+    } catch (t) {}
+    update();
+  }
+
+  remindnotifichg({x, e}) async {
+    try {
+      await DB().customquery(
+          query:
+              "update remind set notifi=${x == true ? 1 : 0} where remind_id=${e['remind_id']}");
       e['notifi'] = x == true ? 1 : 0;
     } catch (t) {}
     update();
@@ -1579,6 +1629,64 @@ class MainController extends GetxController {
         await setlogin(
             username: LogIn.username.text.toLowerCase(),
             password: LogIn.newpassword.text);
+        Home.logininfo = LogIn.username.text.toLowerCase();
+        office_ids('office_id');
+        await dbController.gettable(
+          usertable: DB.userstable,
+          list: DB.userstable,
+          table: 'users',
+          where: DB.userstable[DB.userstable.indexWhere(
+                          (element) => element['username'] == Home.logininfo)]
+                      ['admin'] ==
+                  1
+              ? ''
+              : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+        );
+        await dbController.gettable(
+          usertable: DB.userstable,
+          list: DB.officetable,
+          table: 'office',
+          where: DB.userstable[DB.userstable.indexWhere(
+                          (element) => element['username'] == Home.logininfo)]
+                      ['admin'] ==
+                  1
+              ? ''
+              : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}',
+        );
+        office_ids('task_office_id');
+        await dbController.gettable(
+            usertable: DB.userstable,
+            list: DB.tasktable,
+            table: 'tasks',
+            where: DB.userstable[DB.userstable.indexWhere(
+                            (element) => element['username'] == Home.logininfo)]
+                        ['admin'] ==
+                    1
+                ? ''
+                : 'where ${LogIn.office_ids}');
+
+        office_ids('todo_office_id');
+        await dbController.gettable(
+            usertable: DB.userstable,
+            list: DB.todotable,
+            table: 'todo',
+            where: DB.userstable[DB.userstable.indexWhere(
+                            (element) => element['username'] == Home.logininfo)]
+                        ['admin'] ==
+                    1
+                ? ''
+                : 'where ${LogIn.office_ids}');
+        office_ids('remind_office_id');
+        await dbController.gettable(
+            usertable: DB.userstable,
+            list: DB.remindtable,
+            table: 'remind',
+            where: DB.userstable[DB.userstable.indexWhere(
+                            (element) => element['username'] == Home.logininfo)]
+                        ['admin'] ==
+                    1
+                ? ''
+                : 'where ${LogIn.office_ids}');
         Home.searchlist = [
           ...DB.officetable,
           ...DB.userstable,
@@ -1594,7 +1702,6 @@ class MainController extends GetxController {
       LogIn.loginwait = false;
       update();
     }
-
     update();
   }
 
@@ -1781,7 +1888,7 @@ class MainController extends GetxController {
     return day;
   }
 
-  getreminddate({typevalue, manytimevalue, id, required certsrc}) async {
+  getreminddate({certsrc, id, type, manytimestype, ereminddate}) async {
     Remind.remiddate = null;
     List<int> dateandlist = [];
     int? dateand0, monthdays;
@@ -1806,12 +1913,12 @@ class MainController extends GetxController {
       monthdays = 28;
     }
     try {
-      if (Remind.typevalue == Remind.typelist[1] || typevalue == '1') {
+      if (Remind.typevalue == Remind.typelist[1] || type == '1') {
         var t = await DB().customquery(
             query:
                 "select every from remind_every where revery_remind_id=$id;");
         if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0] ||
-            manytimevalue == 0) {
+            manytimestype == 0) {
           for (var i in t) {
             if (gettodayinweek() - getday(dayinString: i[0]) < 0) {
               dateandlist.add(
@@ -1834,7 +1941,7 @@ class MainController extends GetxController {
           }
         } else if (Remind.manytimesremindgroup ==
                 Remind.manytimesremindlist[1] ||
-            manytimevalue == 1) {
+            manytimestype == 1) {
           int daynum = 0;
           for (var i in t) {
             if (i[0] == 'last') {
@@ -1878,40 +1985,41 @@ class MainController extends GetxController {
             Remind.remiddate = reminddate;
           }
         }
-      } else if (Remind.typevalue == Remind.typelist[2] || typevalue == '2') {
+      } else if (Remind.typevalue == Remind.typelist[2] || type == '2') {
         certsrc.startsWith('www.') ? certsrc = certsrc.substring(4) : null;
         certsrc.startsWith('https://') ? null : certsrc = 'https://$certsrc';
         await DB().customquery(
             query:
                 'update remind set autocerturl="$certsrc" where remind_id=$id;');
-        String cert = await getCert(host: certsrc);
-        await DB().customquery(
-            query:
-                'update remind set reminddate="${DateTime.parse(cert)}" where remind_id=$id;');
-        Remind.remiddate = DateTime.parse(cert);
+        if (Platform.isWindows) {
+          String cert = await getCert(host: certsrc);
+          await DB().customquery(
+              query:
+                  'update remind set reminddate="${DateTime.parse(cert)}" where remind_id=$id;');
+          Remind.remiddate = DateTime.parse(cert);
+        } else {
+          var tr = await DB().customquery(
+              query: 'select reminddate from remind where remind_id=$id;');
+          for (var rd in tr) {
+            Remind.remiddate = rd[0];
+          }
+        }
       }
     } catch (e) {
       null;
     }
 
     update();
-  }
-
-  getreminddateauto() async {
-    if (DateTime.now().minute == int.parse(Remind.timez.text)) {
+    Future.delayed(Duration(hours: 3), () async {
       for (var i in DB.remindtable) {
-        if (i['type'] == '2' && i['reminddate'] == null) {
-          try {
-            String cert = await getCert(host: i['autocerturl']);
-            await DB().customquery(
-                query:
-                    'update remind set reminddate="${DateTime.parse(cert)}" where remind_id=${i['remind_id']};');
-            Remind.remiddate = DateTime.parse(cert);
-          } catch (e) {}
-        }
+        await getreminddate(
+            certsrc: i['autocerturl'],
+            id: i['remind_id'],
+            type: i['type'],
+            manytimestype: i['manytimestype'],
+            ereminddate: i['reminddate']);
       }
-    }
-    Future.delayed(Duration(minutes: 1), () => DBController().onReady());
+    });
   }
 
   choosemanytimesremind(x) {
@@ -2011,11 +2119,9 @@ class MainController extends GetxController {
       LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
     } else {
       try {
-        await dbController.gettable(list: DB.userstable, table: 'users');
-        await dbController.gettable(list: DB.officetable, table: 'office');
-        await dbController.gettable(list: DB.tasktable, table: 'tasks');
-        await dbController.gettable(list: DB.todotable, table: 'todo');
-        await dbController.gettable(list: DB.remindtable, table: 'remind');
+        await dbController.gettable(
+            usertable: DB.userstable, list: DB.userstable, table: 'users');
+
         i:
         for (var i in DB.userstable) {
           if (LogIn.username.text.toLowerCase() ==
@@ -2025,10 +2131,10 @@ class MainController extends GetxController {
               LogIn.errorMSglogin = "تم تعطيل حسابك اتصل بالمسؤول";
               break i;
             } else if (i['mustchgpass'] == 1) {
+              check = true;
               LogIn.errorMSglogin = '';
               LogIn.usernamereadonly = true;
               LogIn.oldpassvisible = false;
-              update();
             } else {
               await setlogin(
                   username: LogIn.username.text.toLowerCase(),
@@ -2036,6 +2142,7 @@ class MainController extends GetxController {
               Home.logininfo = LogIn.username.text.toLowerCase();
               office_ids('office_id');
               await dbController.gettable(
+                usertable: DB.userstable,
                 list: DB.userstable,
                 table: 'users',
                 where: DB.userstable[DB.userstable.indexWhere((element) =>
@@ -2045,6 +2152,7 @@ class MainController extends GetxController {
                     : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
               );
               await dbController.gettable(
+                usertable: DB.userstable,
                 list: DB.officetable,
                 table: 'office',
                 where: DB.userstable[DB.userstable.indexWhere((element) =>
@@ -2055,6 +2163,7 @@ class MainController extends GetxController {
               );
               office_ids('task_office_id');
               await dbController.gettable(
+                  usertable: DB.userstable,
                   list: DB.tasktable,
                   table: 'tasks',
                   where: DB.userstable[DB.userstable.indexWhere((element) =>
@@ -2066,6 +2175,7 @@ class MainController extends GetxController {
 
               office_ids('todo_office_id');
               await dbController.gettable(
+                  usertable: DB.userstable,
                   list: DB.todotable,
                   table: 'todo',
                   where: DB.userstable[DB.userstable.indexWhere((element) =>
@@ -2076,6 +2186,7 @@ class MainController extends GetxController {
                       : 'where ${LogIn.office_ids}');
               office_ids('remind_office_id');
               await dbController.gettable(
+                  usertable: DB.userstable,
                   list: DB.remindtable,
                   table: 'remind',
                   where: DB.userstable[DB.userstable.indexWhere((element) =>
@@ -2100,7 +2211,7 @@ class MainController extends GetxController {
             }
           } else if (LogIn.username.text != i['username'] ||
               codepassword(word: LogIn.password.text) != i['password']) {
-            if (i['mustchgpass'] != 1) {
+            if (check == false) {
               LogIn.errorMSglogin = "كلمة المرور او اسم المستخدم غير صحيح";
             }
           }
@@ -2110,6 +2221,7 @@ class MainController extends GetxController {
       }
     }
     LogIn.loginwait = false;
+    print(DB.officetable);
     update();
   }
 
@@ -2126,6 +2238,7 @@ class MainController extends GetxController {
   }
 
   autologin() async {
+    bool check = false;
     DBController dbController = Get.find();
     DB.userstable.clear();
     DB.officetable.clear();
@@ -2137,12 +2250,8 @@ class MainController extends GetxController {
     LogIn.loginwait = true;
     update();
     try {
-      await dbController.gettable(list: DB.userstable, table: 'users');
-      await dbController.gettable(list: DB.officetable, table: 'office');
-      await dbController.gettable(list: DB.tasktable, table: 'tasks');
-      await dbController.gettable(list: DB.todotable, table: 'todo');
-      await dbController.gettable(list: DB.remindtable, table: 'remind');
-
+      await dbController.gettable(
+          usertable: DB.userstable, list: DB.userstable, table: 'users');
       i:
       for (var i in DB.userstable) {
         if (LogIn.username.text.toLowerCase() == i['username'].toLowerCase() &&
@@ -2151,6 +2260,7 @@ class MainController extends GetxController {
             LogIn.errorMSglogin = "تم تعطيل حسابك اتصل بالمسؤول";
             break i;
           } else if (i['mustchgpass'] == 1) {
+            check = true;
             LogIn.errorMSglogin = '';
             LogIn.usernamereadonly = true;
             LogIn.oldpassvisible = false;
@@ -2158,6 +2268,7 @@ class MainController extends GetxController {
             Home.logininfo = LogIn.username.text.toLowerCase();
             office_ids('office_id');
             await dbController.gettable(
+              usertable: DB.userstable,
               list: DB.userstable,
               table: 'users',
               where: DB.userstable[DB.userstable.indexWhere((element) =>
@@ -2168,43 +2279,43 @@ class MainController extends GetxController {
                   : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
             );
             await dbController.gettable(
+              usertable: DB.userstable,
               list: DB.officetable,
               table: 'office',
               where: DB.userstable[DB.userstable.indexWhere((element) =>
-                              element['username'] == Home.logininfo)]
-                          ['admin'] ==
+                          element['username'] == Home.logininfo)]['admin'] ==
                       1
                   ? ''
                   : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}',
             );
             office_ids('task_office_id');
             await dbController.gettable(
+                usertable: DB.userstable,
                 list: DB.tasktable,
                 table: 'tasks',
                 where: DB.userstable[DB.userstable.indexWhere((element) =>
-                                element['username'] == Home.logininfo)]
-                            ['admin'] ==
+                            element['username'] == Home.logininfo)]['admin'] ==
                         1
                     ? ''
                     : 'where ${LogIn.office_ids}');
 
             office_ids('todo_office_id');
             await dbController.gettable(
+                usertable: DB.userstable,
                 list: DB.todotable,
                 table: 'todo',
                 where: DB.userstable[DB.userstable.indexWhere((element) =>
-                                element['username'] == Home.logininfo)]
-                            ['admin'] ==
+                            element['username'] == Home.logininfo)]['admin'] ==
                         1
                     ? ''
                     : 'where ${LogIn.office_ids}');
             office_ids('remind_office_id');
             await dbController.gettable(
+                usertable: DB.userstable,
                 list: DB.remindtable,
                 table: 'remind',
                 where: DB.userstable[DB.userstable.indexWhere((element) =>
-                                element['username'] == Home.logininfo)]
-                            ['admin'] ==
+                            element['username'] == Home.logininfo)]['admin'] ==
                         1
                     ? ''
                     : 'where ${LogIn.office_ids}');
@@ -2224,14 +2335,16 @@ class MainController extends GetxController {
           }
         } else {
           if (i['mustchgpass'] != 1) {
-            LogIn.errorMSglogin = "كلمة المرور او اسم المستخدم غير صحيح";
+            if (check == false) {
+              LogIn.errorMSglogin = "كلمة المرور او اسم المستخدم غير صحيح";
+            }
           }
         }
       }
     } catch (e) {
+      print(e);
       LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
     }
-
     update();
   }
 

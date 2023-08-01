@@ -87,6 +87,7 @@ class LogIn extends StatelessWidget {
                 const SizedBox(width: 100, child: LinearProgressIndicator()),
           },
         ];
+    Future(() async => await mainController.autosendnotifitasks());
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -181,7 +182,7 @@ class LogIn extends StatelessWidget {
     LogIn.iconpassvis = Icons.visibility_off;
     LogIn.usernamereadonly = false;
     LogIn.oldpassvisible = true;
-
+    MYPAGE.selectedOffice = 'جميع المكاتب';
     await LogIn.Pref.remove('login');
   }
 }

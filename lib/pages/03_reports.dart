@@ -87,16 +87,19 @@ class Reports extends StatelessWidget {
                 try {
                   return {
                     await dbController.gettable(
+                      usertable: DB.userstable,
                       list: mylista,
                       tableid: 'user_id',
                       table: 'users',
                     ),
                     await dbController.gettable(
+                      usertable: DB.userstable,
                       list: todolista,
                       tableid: 'todo_id',
                       table: 'todo',
                     ),
                     await dbController.gettable(
+                      usertable: DB.userstable,
                       list: tasklista,
                       tableid: 'task_id',
                       table: 'tasks',

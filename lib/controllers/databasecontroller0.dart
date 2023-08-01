@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,7 +25,7 @@ class DBController extends GetxController {
     LogIn.Pref = await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
     // try {
-    //   await DB().createuserstable();
+    // await DB().createuserstable();
     //   await DB().createofficetable();
     //   await DB().createusersofficetable();
     //   await DB().createtaskstable();
@@ -62,12 +61,16 @@ class DBController extends GetxController {
   @override
   onReady() async {
     super.onReady();
-    mainController.autosendnotifitasks();
-    mainController.getreminddateauto();
+    mainController.getreminddate();
     update();
   }
 
-  gettable({required List<Map> list, table, where = '', tableid = ''}) async {
+  gettable(
+      {required List<Map> list,
+      table,
+      where = '',
+      tableid = '',
+      required usertable}) async {
     var ww, xx, yy, zz, desctable, selecttable;
     var temp = [],
         pr = [],
@@ -161,15 +164,13 @@ class DBController extends GetxController {
           list[list.indexOf(i)].addAll({
             'createby_id': t[1],
             'createby': t[1] != null
-                ? DB.userstable[DB.userstable
-                        .indexWhere((element) => element['user_id'] == t[1])]
-                    ['fullname']
+                ? usertable[usertable.indexWhere(
+                    (element) => element['user_id'] == t[1])]['fullname']
                 : null,
             'editby_id': t[2],
             'editby': t[2] != null
-                ? DB.userstable[DB.userstable
-                        .indexWhere((element) => element['user_id'] == t[2])]
-                    ['fullname']
+                ? usertable[usertable.indexWhere(
+                    (element) => element['user_id'] == t[2])]['fullname']
                 : null,
           });
         }
@@ -186,9 +187,8 @@ class DBController extends GetxController {
           commentdate.add(o[4]);
           usersIdC.add(o[1]);
           usersC.add(o[1] != null
-              ? DB.userstable[DB.userstable
-                      .indexWhere((element) => element['user_id'] == o[1])]
-                  ['fullname']
+              ? usertable[usertable.indexWhere(
+                  (element) => element['user_id'] == o[1])]['fullname']
               : null);
           comment.add(o[3]);
         }
@@ -222,9 +222,8 @@ class DBController extends GetxController {
         for (var t in xx) {
           ui.add(t[1]);
           un.add(t[1] != null
-              ? DB.userstable[DB.userstable
-                      .indexWhere((element) => element['user_id'] == t[1])]
-                  ['fullname']
+              ? usertable[usertable.indexWhere(
+                  (element) => element['user_id'] == t[1])]['fullname']
               : null);
         }
 
@@ -245,9 +244,8 @@ class DBController extends GetxController {
           commentdate.add(o[4]);
           usersIdC.add(o[1]);
           usersC.add(o[1] != null
-              ? DB.userstable[DB.userstable
-                      .indexWhere((element) => element['user_id'] == o[1])]
-                  ['fullname']
+              ? usertable[usertable.indexWhere(
+                  (element) => element['user_id'] == o[1])]['fullname']
               : null);
           comment.add(o[3]);
         }
@@ -280,16 +278,14 @@ class DBController extends GetxController {
           list[list.indexOf(i)].addAll({
             'createby_id': t[1],
             'createby': t[1] != null
-                ? DB.userstable[DB.userstable
-                        .indexWhere((element) => element['user_id'] == t[1])]
-                    ['fullname']
+                ? usertable[usertable.indexWhere(
+                    (element) => element['user_id'] == t[1])]['fullname']
                 : null,
             'createdate': t[2],
             'editby_id': t[3],
             'editby': t[3] != null
-                ? DB.userstable[DB.userstable
-                        .indexWhere((element) => element['user_id'] == t[3])]
-                    ['fullname']
+                ? usertable[usertable.indexWhere(
+                    (element) => element['user_id'] == t[3])]['fullname']
                 : null,
             'editdate': t[4]
           });
@@ -655,7 +651,11 @@ $todoid,
 );
 ''');
 
-    await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
+    await gettable(
+        list: Whattodo.mylista,
+        table: 'todo',
+        tableid: 'todo_id',
+        usertable: DB.userstable);
     update();
   }
 
@@ -672,7 +672,11 @@ $remindid,
 );
 ''');
 
-    await gettable(list: Remind.mylista, table: 'remind', tableid: 'remind_id');
+    await gettable(
+        list: Remind.mylista,
+        table: 'remind',
+        tableid: 'remind_id',
+        usertable: DB.userstable);
     update();
   }
 
@@ -688,7 +692,11 @@ $taskid,
 "${DateTime.now()}"
 );
 ''');
-    await gettable(list: Tasks.mylista, table: 'tasks', tableid: 'task_id');
+    await gettable(
+        list: Tasks.mylista,
+        table: 'tasks',
+        tableid: 'task_id',
+        usertable: DB.userstable);
     update();
   }
 
@@ -798,7 +806,10 @@ delete from users_office where uf_user_id=$id;''');
     await DB().customquery(query: '''
 delete from $table where $commentIdname=$commentId;''');
     await gettable(
-        list: Whattodo.mylista, table: maintablename, tableid: maintableidname);
+        list: Whattodo.mylista,
+        table: maintablename,
+        tableid: maintableidname,
+        usertable: DB.userstable);
   }
 
   editcomment(
@@ -814,7 +825,10 @@ comments="$comment"
 where $commentIdname=$commentId
 ''');
     await gettable(
-        list: Whattodo.mylista, table: maintablename, tableid: maintableidname);
+        list: Whattodo.mylista,
+        table: maintablename,
+        tableid: maintableidname,
+        usertable: DB.userstable);
     Home.searchlist = [
       ...DB.officetable,
       ...DB.userstable,
@@ -872,7 +886,11 @@ ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] ==
 );
 ''');
     }
-    await gettable(list: Employ.mylista, table: 'users', tableid: 'user_id');
+    await gettable(
+        list: Employ.mylista,
+        table: 'users',
+        tableid: 'user_id',
+        usertable: DB.userstable);
     DB.userstable[
             DB.userstable.indexWhere((element) => element['user_id'] == id)] =
         Employ.mylista[
@@ -901,7 +919,18 @@ ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] ==
   where user_id=$id;
   ''');
 
-    await gettable(list: Employ.mylista, table: 'users', tableid: 'user_id');
+    await gettable(
+      usertable: DB.userstable,
+      list: Employ.mylista,
+      table: 'users',
+      tableid: 'user_id',
+      where: DB.userstable[DB.userstable.indexWhere(
+                      (element) => element['username'] == Home.logininfo)]
+                  ['admin'] ==
+              1
+          ? ''
+          : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+    );
     DB.userstable[
             DB.userstable.indexWhere((element) => element['user_id'] == id)] =
         Employ.mylista[
@@ -925,7 +954,11 @@ notifi=${Office.notifi == true ? 1 : 0},
 color="${Office.selectcolor.toString().contains("Material") ? Office.selectcolor.toString().substring(Office.selectcolor.toString().indexOf('value: Color(') + 13, Office.selectcolor.toString().length - 2) : Office.selectcolor.toString().substring(Office.selectcolor.toString().indexOf('Color(') + 6, Office.selectcolor.toString().length - 1)}"
 where office_id=$id;
 ''');
-    await gettable(list: Office.mylista, table: 'office', tableid: 'office_id');
+    await gettable(
+        usertable: DB.userstable,
+        list: Office.mylista,
+        table: 'office',
+        tableid: 'office_id');
     DB.officetable[DB.officetable
             .indexWhere((element) => element['office_id'] == id)] =
         Office.mylista[
@@ -968,7 +1001,11 @@ $id
         null;
       }
     }
-    await gettable(list: Whattodo.mylista, table: 'todo', tableid: 'todo_id');
+    await gettable(
+        usertable: DB.userstable,
+        list: Whattodo.mylista,
+        table: 'todo',
+        tableid: 'todo_id');
     DB.todotable[
             DB.todotable.indexWhere((element) => element['todo_id'] == id)] =
         Whattodo.mylista[
@@ -1005,7 +1042,11 @@ $id
 );
 ''');
     }
-    await gettable(list: Tasks.mylista, table: 'tasks', tableid: 'task_id');
+    await gettable(
+        usertable: DB.userstable,
+        list: Tasks.mylista,
+        table: 'tasks',
+        tableid: 'task_id');
     DB.tasktable[
             DB.tasktable.indexWhere((element) => element['task_id'] == id)] =
         Tasks.mylista[
@@ -1019,7 +1060,11 @@ update tasks set
 notifi=$notifi
 where task_id=$id;
 ''');
-    await gettable(list: Tasks.mylista, table: 'tasks', tableid: 'task_id');
+    await gettable(
+        usertable: DB.userstable,
+        list: Tasks.mylista,
+        table: 'tasks',
+        tableid: 'task_id');
     DB.tasktable[
             DB.tasktable.indexWhere((element) => element['task_id'] == id)] =
         Tasks.mylista[
@@ -1042,7 +1087,11 @@ mobile="$mobile",
 email="$email"
 where user_id=$id;
 ''');
-    await gettable(list: Employ.mylista, table: 'users', tableid: 'user_id');
+    await gettable(
+        usertable: DB.userstable,
+        list: Employ.mylista,
+        table: 'users',
+        tableid: 'user_id');
     DB.userstable[
             DB.userstable.indexWhere((element) => element['user_id'] == id)] =
         Employ.mylista[
@@ -1372,7 +1421,11 @@ $id,
     }
     await MainController()
         .getreminddate(certsrc: Remind.autoCertificateurl.text, id: id);
-    await gettable(list: Remind.mylista, table: 'remind', tableid: 'remind_id');
+    await gettable(
+        usertable: DB.userstable,
+        list: Remind.mylista,
+        table: 'remind',
+        tableid: 'remind_id');
     DB.remindtable[DB.remindtable
             .indexWhere((element) => element['remind_id'] == id)] =
         Remind.mylista[
