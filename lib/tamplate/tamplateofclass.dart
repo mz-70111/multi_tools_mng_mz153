@@ -256,7 +256,7 @@ class Comment extends StatelessWidget {
                                           usertable: DB.userstable) ==
                                       true ||
                                   checkifUserisSupervisorinOffice(
-                                    usertable: DB.userstable,
+                                          usertable: DB.userstable,
                                           userid: DB.userstable[DB.userstable
                                                   .indexWhere(
                                                       (element) => element['username'] == Home.logininfo)]
@@ -583,10 +583,17 @@ class MYPAGE extends StatelessWidget {
                                   }
                                 }
 
-                                if (officetrue.length > 1 &&
-                                    officetrue.length !=
-                                        officelist.length - 2) {
+                                if (officetrue.length !=
+                                        officelist.length - 2 ||
+                                    officetrue.isEmpty) {
                                   selectedOffice = 'مخصص';
+                                }
+                                if (officetrue.length ==
+                                    officelist.length - 2) {
+                                  selectedOffice = 'جميع المكاتب';
+                                }
+                                if (officetrue.length == 1) {
+                                  selectedOffice = officetrue[0];
                                 }
                                 return Column(
                                     crossAxisAlignment:
@@ -614,12 +621,6 @@ class MYPAGE extends StatelessWidget {
                                                   }),
                                             ),
                                           ),
-                                          Expanded(
-                                              child: TextFieldMZ(
-                                            label: '',
-                                            onChanged: (x) => null,
-                                            textEditingController: Remind.timez,
-                                          )),
                                           Expanded(
                                             child: TextFieldMZ(
                                                 suffixIcon: Visibility(
@@ -784,6 +785,7 @@ checkifUserisinAnyOffice({usertable, userid}) {
 checkifUserisUserinOffice({officeid, usertable, userid}) {
   bool result = false;
   for (var j in usertable) {
+    print(j['addremind']);
     for (var l = 0; l < j['office'].length; l++) {
       if (j['office'][l] == officeid &&
           j['privilege'][l] == 'موظف' &&
@@ -794,6 +796,7 @@ checkifUserisUserinOffice({officeid, usertable, userid}) {
       }
     }
   }
+  print(userid);
   return result;
 }
 

@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
 import 'package:users_tasks_mz_153/pages/00_login.dart';
@@ -24,6 +25,7 @@ class Employ extends StatelessWidget {
   static bool addremind = false;
   static bool pbx = false;
   static bool addtodo = false;
+  static List<Map> users = [], office = [];
   static List<Map> mylista = [];
   static List<Map> employs = [
     {
@@ -247,7 +249,7 @@ class Employ extends StatelessWidget {
         mylista: mylista,
         table: 'users',
         tableId: 'user_id',
-        where: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == LogIn.username.text)]
+        where: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
                     ['admin'] ==
                 1
             ? ''
@@ -269,8 +271,9 @@ class Employ extends StatelessWidget {
         scrollController: scrollController,
         mainEditvisible: () => checkifUserisAdmin(
                     usertable: DB.userstable,
-                    userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                        ['user_id']) ==
+                    userid:
+                        DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                            ['user_id']) ==
                 true
             ? true
             : false,
@@ -303,7 +306,20 @@ class Employ extends StatelessWidget {
     mainController.cloasedp();
   }
 
-  customInitforEdit({e}) {
+  customInitforEdit({e}) async {
+    DBController dbController = Get.find();
+    try {
+      await dbController.gettable(
+          list: users, usertable: users, table: 'users', tableid: 'user_id');
+      await dbController.gettable(
+          list: office,
+          usertable: users,
+          table: 'office',
+          tableid: 'office_id');
+    } catch (er) {
+      null;
+    }
+
     MainController mainController = Get.find();
     for (var i in Employ.employs) {
       i['error'] = null;
@@ -321,17 +337,39 @@ class Employ extends StatelessWidget {
     addping = e['addping'] == 1 ? true : false;
     addremind = e['addremind'] == 1 ? true : false;
     pbx = e['pbx'] == 1 ? true : false;
-    if ((!e['privilege'].contains('_') && e['admin'] == 0) ||
-        (!e['privilege'].contains('_') &&
+    if ((!users[users.indexWhere(
+                        (element) => element['user_id'] == e['user_id'])]
+                    ['privilege']
+                .contains('_') &&
+            e['admin'] == 0) ||
+        (!users[users.indexWhere(
+                        (element) => element['user_id'] == e['user_id'])]
+                    ['privilege']
+                .contains('_') &&
             e['admin'] == 1 &&
-            e['privilege'].length > 1)) {
-      for (var i = 0; i < e['privilege'].length; i++) {
-        if (e['privilege'][i] == 'مسؤول') {
+            users[users.indexWhere(
+                            (element) => element['user_id'] == e['user_id'])]
+                        ['privilege']
+                    .length >
+                1)) {
+      for (var i = 0;
+          i <
+              users[users.indexWhere(
+                          (element) => element['user_id'] == e['user_id'])]
+                      ['privilege']
+                  .length;
+          i++) {
+        if (users[users.indexWhere(
+                    (element) => element['user_id'] == e['user_id'])]
+                ['privilege'][i] ==
+            'مسؤول') {
           continue;
         } else {
           Employ.privilege.add({
-            'privilege': e['privilege'][i],
-            'office': DB.officetable[DB.officetable.indexWhere(
+            'privilege': users[users.indexWhere(
+                    (element) => element['user_id'] == e['user_id'])]
+                ['privilege'][i],
+            'office': office[office.indexWhere(
                     (element) => element['office_id'] == e['office'][i])]
                 ['officename']
           });
@@ -352,12 +390,18 @@ class Employ extends StatelessWidget {
   }
 
   getinfo({e}) {
-    List priv = e['privilege'];
-    List off = e['office'];
+    List priv = [], off = [];
+    for (var i in users) {
+      if (e['user_id'] == i['user_id']) {
+        priv = i['privilege'];
+        off = i['office'];
+      }
+    }
+
     String p = '';
     for (var i = 0; i < priv.length; i++) {
       p +=
-          "\n    * ${priv[i]} ${off[i] == '=' ? '' : off[i] == '_' ? '' : DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == off[i])]['officename']}";
+          "\n    * ${priv[i]} ${off[i] == '=' ? '' : off[i] == '_' ? '' : office[office.indexWhere((element) => element['office_id'] == off[i])]['officename']}";
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

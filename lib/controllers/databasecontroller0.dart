@@ -21,11 +21,10 @@ class DBController extends GetxController {
   void onInit() async {
     LogIn.obscuretext = true;
     LogIn.loginwait = true;
-    LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
     LogIn.Pref = await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
     // try {
-    // await DB().createuserstable();
+    //   await DB().createuserstable();
     //   await DB().createofficetable();
     //   await DB().createusersofficetable();
     //   await DB().createtaskstable();
@@ -61,7 +60,6 @@ class DBController extends GetxController {
   @override
   onReady() async {
     super.onReady();
-    mainController.getreminddate();
     update();
   }
 
@@ -703,7 +701,6 @@ $taskid,
   deleteuser({id}) async {
     await DB().customquery(query: '''
 update users_todo_comments set utdc_user_id=null where utdc_user_id=$id;''');
-
     await DB().customquery(query: '''
 update users_todo set editby_id=null where editby_id=$id;''');
     await DB().customquery(query: '''
@@ -715,9 +712,17 @@ update tasks set createby_id=null,createby=null where createby_id=$id;''');
     await DB().customquery(query: '''
 update tasks set editby_id=null,editby=null where editby_id=$id;''');
     await DB().customquery(query: '''
+update users_remind_comments set urc_user_id=null where urc_user_id=$id;''');
+    await DB().customquery(query: '''
+update users_remind set createby_id=null,createby=null where createby_id=$id;''');
+    await DB().customquery(query: '''
+update users_remind set editby_id=null,editby=null where editby_id=$id;''');
+
+    await DB().customquery(query: '''
 delete from users_tasks where ut_user_id=$id;''');
     await DB().customquery(query: '''
 delete from users_office where uf_user_id=$id;''');
+
     await DB().customquery(query: 'delete from users where user_id=$id;' '');
     Employ.mylista.removeWhere((element) => element['user_id'] == id);
     DB.userstable.removeWhere((element) => element['user_id'] == id);
@@ -732,6 +737,8 @@ delete from users_office where uf_user_id=$id;''');
   }
 
   deleteoffice({id}) async {
+    await DB().customquery(query: '''
+update task set task_office_id=null where task_office_id=$id;''');
     await DB().customquery(query: '''
 update todo set todo_office_id=null where todo_office_id=$id;''');
     await DB().customquery(query: '''
@@ -918,7 +925,7 @@ ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] ==
   mustchgpass=0
   where user_id=$id;
   ''');
-
+    await mainController.office_ids('office_id');
     await gettable(
       usertable: DB.userstable,
       list: Employ.mylista,
@@ -1440,7 +1447,6 @@ delete from users_remind where ur_remind_id=$id;''');
 delete from remind_every where revery_remind_id=$id;''');
     await DB().customquery(query: '''
 delete from remind where remind_id=$id;''');
-
     Remind.mylista.removeWhere((element) => element['remind_id'] == id);
     DB.remindtable.removeWhere((element) => element['remind_id'] == id);
     Home.searchlist = [

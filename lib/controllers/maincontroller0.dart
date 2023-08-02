@@ -336,7 +336,6 @@ class MainController extends GetxController {
   autosendnotifitasks() async {
     List<Map> office = [], users = [], tasks = [];
     DBController dbController = Get.find();
-    print('task');
     String mymsg = '';
     try {
       await dbController.gettable(
@@ -434,6 +433,7 @@ class MainController extends GetxController {
     await Process.run('Powershell.exe', ['taskkill /im powershell.exe /f /t']);
     String result = '';
     result = getExpiredate.stdout;
+    print(result);
     result = result.substring(0, result.indexOf(' '));
     result = result.replaceAll('/', '-');
     List y = result.split('-');
@@ -1578,6 +1578,7 @@ class MainController extends GetxController {
                             Get.back();
                             waitchg = false;
                           } catch (e) {
+                            print(e);
                             waitchg = false;
                             errornoconnect = "لا يمكن الوصول للمخدم";
                             update();
@@ -1624,7 +1625,9 @@ class MainController extends GetxController {
                       ['admin'] ==
                   1
               ? ''
-              : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+              : LogIn.office_ids.contains('= _')
+                  ? 'where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}'
+                  : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
         );
         await dbController.gettable(
           usertable: DB.userstable,
@@ -1647,7 +1650,9 @@ class MainController extends GetxController {
                         ['admin'] ==
                     1
                 ? ''
-                : 'where ${LogIn.office_ids}');
+                : LogIn.office_ids.contains('= _')
+                    ? 'where 1=2'
+                    : 'where ${LogIn.office_ids}');
 
         office_ids('todo_office_id');
         await dbController.gettable(
@@ -1659,7 +1664,9 @@ class MainController extends GetxController {
                         ['admin'] ==
                     1
                 ? ''
-                : 'where ${LogIn.office_ids}');
+                : LogIn.office_ids.contains('= _')
+                    ? 'where 1=2'
+                    : 'where ${LogIn.office_ids}');
         office_ids('remind_office_id');
         await dbController.gettable(
             usertable: DB.userstable,
@@ -1670,7 +1677,9 @@ class MainController extends GetxController {
                         ['admin'] ==
                     1
                 ? ''
-                : 'where ${LogIn.office_ids}');
+                : LogIn.office_ids.contains('= _')
+                    ? 'where 1=2'
+                    : 'where ${LogIn.office_ids}');
         Home.searchlist = [
           ...DB.officetable,
           ...DB.userstable,
@@ -1681,6 +1690,7 @@ class MainController extends GetxController {
         Home.logininfo = LogIn.username.text.toLowerCase();
         await Get.offNamed("/home");
       } catch (r) {
+        print(r);
         LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
       }
       LogIn.loginwait = false;
@@ -2095,7 +2105,6 @@ class MainController extends GetxController {
     DB.todotable.clear();
     DB.remindtable.clear();
     Home.selectall = true;
-    LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
     LogIn.loginwait = true;
     LogIn.errorMSglogin = '';
     update();
@@ -2105,7 +2114,6 @@ class MainController extends GetxController {
       try {
         await dbController.gettable(
             usertable: DB.userstable, list: DB.userstable, table: 'users');
-
         i:
         for (var i in DB.userstable) {
           if (LogIn.username.text.toLowerCase() ==
@@ -2187,7 +2195,6 @@ class MainController extends GetxController {
                       : LogIn.office_ids.contains('= _')
                           ? 'where 1=2'
                           : 'where ${LogIn.office_ids}');
-
               Home.searchlist = [
                 ...DB.officetable,
                 ...DB.userstable,
@@ -2239,7 +2246,6 @@ class MainController extends GetxController {
     DB.todotable.clear();
     DB.remindtable.clear();
     Home.selectall = true;
-    LogIn.errorMSglogin = "الرجاء الانتظار .. جار جلب المعلومات";
     LogIn.loginwait = true;
     update();
     try {

@@ -88,6 +88,8 @@ class LogIn extends StatelessWidget {
           },
         ];
     Future(() async => await mainController.autosendnotifitasks());
+    Future(() async => await mainController.getreminddate());
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(

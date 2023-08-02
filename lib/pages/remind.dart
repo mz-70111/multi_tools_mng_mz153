@@ -428,33 +428,42 @@ class Remind extends StatelessWidget {
       customWidgetofEdit: customWidgetofEdit(),
       textfeildlista: reminds,
       scrollController: scrollController,
-      mainEditvisible: () => (checkifUserisAdmin(
-                      usertable: DB.userstable,
-                      userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                          ['user_id']) ==
-                  true ||
-              (checkifUserisUserinOffice(
+      mainEditvisible: () =>
+          (checkifUserisAdmin(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) == true ||
+                  (checkifUserisUserinOffice(
+                              usertable: DB.userstable,
+                              userid:
+                                  DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                      ['user_id'],
+                              officeid: MYPAGE.eE['remind_office_id']) ==
+                          true &&
+                      DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                              ['addremind'] ==
+                          1) ||
+                  checkifUserisSupervisorinOffice(
                           usertable: DB.userstable,
-                          userid: DB.userstable[DB.userstable.indexWhere(
-                                  (element) => element['username'] == Home.logininfo)]
+                          userid:
+                              DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                  ['user_id'],
+                          officeid: MYPAGE.eE['remind_office_id']) ==
+                      true)
+              ? true
+              : false,
+      subeditvisible: () => ((checkifUserisUserinOffice(
+                          usertable: DB.userstable,
+                          userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
                               ['user_id'],
                           officeid: MYPAGE.eE['remind_office_id']) ==
                       true &&
-                  DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
-          ? true
-          : false,
-      subeditvisible: () => (checkifUserisUserinOffice(
+                  DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                          ['addremind'] ==
+                      1) ||
+              checkifUserisSupervisorinOffice(
                       usertable: DB.userstable,
-                      userid: DB.userstable[DB.userstable.indexWhere(
-                              (element) =>
-                                  element['username'] == Home.logininfo)]
-                          ['user_id'],
+                      userid: DB.userstable[DB.userstable
+                          .indexWhere((element) => element['username'] == Home.logininfo)]['user_id'],
                       officeid: MYPAGE.eE['remind_office_id']) ==
-                  true &&
-              DB.userstable[DB.userstable.indexWhere(
-                          (element) => element['username'] == Home.logininfo)]
-                      ['addremind'] ==
-                  1)
+                  true)
           ? true
           : false,
       mainAddvisible: checkifUserisinAnyOffice(
@@ -480,21 +489,20 @@ class Remind extends StatelessWidget {
       actionEdit: () => mainController.showeditpanel(),
       actionDelete: () => deleteremind(ctx: context, e: MYPAGE.eE),
       customeditpanelitem: () => Visibility(
-        visible: (checkifUserisAdmin(
+        visible: ((checkifUserisUserinOffice(
+                            usertable: DB.userstable,
+                            userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                ['user_id'],
+                            officeid: MYPAGE.eE['remind_office_id']) ==
+                        true &&
+                    DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                            ['addremind'] ==
+                        1) ||
+                checkifUserisSupervisorinOffice(
                         usertable: DB.userstable,
                         userid: DB.userstable[DB.userstable.indexWhere(
-                                (element) =>
-                                    element['username'] == Home.logininfo)]
-                            ['user_id']) ==
-                    true ||
-                checkifUserisUserinOffice(
-                      usertable: DB.userstable,
-                      userid: DB.userstable[DB.userstable.indexWhere(
-                              (element) =>
-                                  element['username'] == Home.logininfo)]
-                          ['user_id'],
-                      officeid: MYPAGE.eE['remind_office_id'],
-                    ) ==
+                            (element) => element['username'] == Home.logininfo)]['user_id'],
+                        officeid: MYPAGE.eE['remind_office_id']) ==
                     true)
             ? true
             : false,
@@ -560,11 +568,15 @@ ${e['reminddetails']}
                 ? Text(e['reminddate'].difference(DateTime.now()).inDays > 0
                     ? "المدة المتبقية  ${e['reminddate'].difference(DateTime.now()).inDays} يوم"
                     : e['reminddate'].difference(DateTime.now()).inDays == 0
-                        ? (int.parse("${e['startsendat']}".substring(0, 2)) -
+                        ? (int.parse("${e['startsendat']}".substring(
+                                        0,
+                                        e['startsendat']
+                                            .toString()
+                                            .indexOf(":"))) -
                                     DateTime.now().hour) >=
                                 0
-                            ? 'المدة المتبقية ${int.parse("${e['startsendat']}".substring(0, 2)) - DateTime.now().hour} ساعة'
-                            : 'المدة المتبقية منتهية منذ ${(int.parse("${e['startsendat']}".substring(0, 2)) - DateTime.now().hour) * -1} ساعة'
+                            ? 'المدة المتبقية ${int.parse("${e['startsendat']}".substring(0, e['startsendat'].toString().indexOf(":"))) - DateTime.now().hour} ساعة'
+                            : 'المدة المتبقية منتهية منذ ${(int.parse("${e['startsendat']}".substring(0, e['startsendat'].toString().indexOf(":"))) - DateTime.now().hour) * -1} ساعة'
                         : "المدة المتبقية منتهية منذ  ${e['reminddate'].difference(DateTime.now()).inDays} يوم")
                 : const SizedBox()),
         const Divider(),
