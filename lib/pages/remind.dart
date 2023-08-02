@@ -521,6 +521,7 @@ class Remind extends StatelessWidget {
   }
 
   getinfo({e, ctx}) {
+    print(e['reminddate']);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -731,7 +732,6 @@ ${e['reminddetails']}
           );
         }
       }
-      e['reminddate'] = Remind.remiddate;
     }
   }
 

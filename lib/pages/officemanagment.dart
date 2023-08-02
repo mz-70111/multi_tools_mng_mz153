@@ -315,14 +315,11 @@ class Office extends StatelessWidget {
         ),
         SelectableText("chatID: ${e['chatid']}"),
         Text("الاشعارات :${e['notifi'] == 1 ? "مفعلة" : "غير مفعلة"}"),
-        Align(
-          alignment: Alignment.topLeft,
-          child: IconButton(
-              onPressed: () {
-                gettaskinfoOffice(e: e, ctx: ctx);
-              },
-              icon: const Icon(Icons.task_outlined)),
-        ),
+        TextButton.icon(
+            onPressed: () {
+              gettaskinfoOffice(e: e, ctx: ctx);
+            },
+            icon: const Icon(Icons.task_outlined), label: Text('مهمات موظفي المكتب'),),
         Text("عدد موظفي المكتب ${users.length}"),
         supervisor.isEmpty
             ? const Text('مشرف المكتب _ لايوجد')

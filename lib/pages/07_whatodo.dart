@@ -213,8 +213,8 @@ class Whattodo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text("${e['todo_office_id'] ?? 'مكتب محذوف'}"),
-        SelectableText('''
+  Text(
+            "${DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == e['todo_office_id'])]['officename'] ?? 'مكتب محذوف'}"),        SelectableText('''
               # ${e['todo_id']} ${e['todoname']}
               ${e['tododetails']}
               '''),
