@@ -785,7 +785,6 @@ checkifUserisinAnyOffice({usertable, userid}) {
 checkifUserisUserinOffice({officeid, usertable, userid}) {
   bool result = false;
   for (var j in usertable) {
-    print(j['addremind']);
     for (var l = 0; l < j['office'].length; l++) {
       if (j['office'][l] == officeid &&
           j['privilege'][l] == 'موظف' &&
@@ -796,7 +795,6 @@ checkifUserisUserinOffice({officeid, usertable, userid}) {
       }
     }
   }
-  print(userid);
   return result;
 }
 

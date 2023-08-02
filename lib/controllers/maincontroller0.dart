@@ -270,9 +270,7 @@ class MainController extends GetxController {
           }
         }
       }
-    } catch (r) {
-      print(r);
-    }
+    } catch (r) {}
     update();
   }
 
@@ -418,8 +416,11 @@ class MainController extends GetxController {
   }
 
   getCert({required String host}) async {
-    var getExpiredate = await Process.run('Powershell.exe', [
-      '''
+  await Process.run('Powershell.exe', ['''
+    Set-ItemProperty -Path "HKCU:\\Control Panel\\International" -Name sShortDate -Value "yyyy/MM/dd";
+    ''']);
+
+  var getExpiredate = await Process.run('Powershell.exe', ['''
 # Ignore SSL Warning
 [Net.ServicePointManager]::ServerCertificateValidationCallback = { \$true }
 # Create Web Http request to URI
@@ -428,24 +429,12 @@ class MainController extends GetxController {
 \$webRequest.GetResponse() | Out-NULL
 # Get SSL Certificate Expiration Date
 \$webRequest.ServicePoint.Certificate.GetExpirationDateString()
-'''
-    ]);
-    await Process.run('Powershell.exe', ['taskkill /im powershell.exe /f /t']);
+''']);
     String result = '';
     result = getExpiredate.stdout;
-    print(result);
     result = result.substring(0, result.indexOf(' '));
     result = result.replaceAll('/', '-');
-    List y = result.split('-');
-    y[0].length == 1 ? y[0] = '0${y[0]}' : null;
-    y[1].length == 1 ? y[1] = '0${y[1]}' : null;
-    String MM = y[0];
-    String dd = y[1];
-    String yy = y[2];
-    y[0] = yy;
-    y[1] = MM;
-    y[2] = dd;
-    result = y.join('-');
+    print(result);
     return result;
   }
 
@@ -1152,7 +1141,6 @@ class MainController extends GetxController {
         }
       }
     } catch (r) {
-      print(r);
       null;
     }
     update();
@@ -1578,7 +1566,6 @@ class MainController extends GetxController {
                             Get.back();
                             waitchg = false;
                           } catch (e) {
-                            print(e);
                             waitchg = false;
                             errornoconnect = "لا يمكن الوصول للمخدم";
                             update();
@@ -1690,7 +1677,6 @@ class MainController extends GetxController {
         Home.logininfo = LogIn.username.text.toLowerCase();
         await Get.offNamed("/home");
       } catch (r) {
-        print(r);
         LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
       }
       LogIn.loginwait = false;
@@ -2216,7 +2202,6 @@ class MainController extends GetxController {
           }
         }
       } catch (e) {
-        print(e);
         LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
       }
     }
@@ -2234,7 +2219,6 @@ class MainController extends GetxController {
     LogIn.office_ids =
         LogIn.office_ids.substring(0, LogIn.office_ids.lastIndexOf(' or'));
     LogIn.office_ids = "(${LogIn.office_ids})";
-    print(LogIn.office_ids);
   }
 
   autologin() async {
@@ -2348,7 +2332,6 @@ class MainController extends GetxController {
         }
       }
     } catch (e) {
-      print(e);
       LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
     }
     update();
