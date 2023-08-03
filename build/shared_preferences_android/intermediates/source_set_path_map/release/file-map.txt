@@ -1,0 +1,12 @@
+io.flutter.plugins.sharedpreferences.shared_preferences_android-jetified-window-1.0.0-beta04-0 C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\res
+io.flutter.plugins.sharedpreferences.shared_preferences_android-core-1.6.0-1 C:\Users\Mz\.gradle\caches\transforms-3\6225987ffa1e666bf3cd01f4adeb1e35\transformed\core-1.6.0\res
+io.flutter.plugins.sharedpreferences.shared_preferences_android-jetified-window-java-1.0.0-beta04-2 C:\Users\Mz\.gradle\caches\transforms-3\6313c9ea85cafb7461e7f6eb0583f000\transformed\jetified-window-java-1.0.0-beta04\res
+io.flutter.plugins.sharedpreferences.shared_preferences_android-jetified-annotation-experimental-1.1.0-3 C:\Users\Mz\.gradle\caches\transforms-3\988057c6371343f7679e1ce708ae5c60\transformed\jetified-annotation-experimental-1.1.0\res
+io.flutter.plugins.sharedpreferences.shared_preferences_android-main-4 C:\Users\Mz\AppData\Local\Pub\Cache\hosted\pub.dev\shared_preferences_android-2.1.4\android\src\main\res
+io.flutter.plugins.sharedpreferences.shared_preferences_android-release-5 C:\Users\Mz\AppData\Local\Pub\Cache\hosted\pub.dev\shared_preferences_android-2.1.4\android\src\release\res
+io.flutter.plugins.sharedpreferences.shared_preferences_android-pngs-6 D:\dart\multi_tools_mng_mz153\build\shared_preferences_android\generated\res\pngs\release
+io.flutter.plugins.sharedpreferences.shared_preferences_android-resValues-7 D:\dart\multi_tools_mng_mz153\build\shared_preferences_android\generated\res\resValues\release
+io.flutter.plugins.sharedpreferences.shared_preferences_android-rs-8 D:\dart\multi_tools_mng_mz153\build\shared_preferences_android\generated\res\rs\release
+io.flutter.plugins.sharedpreferences.shared_preferences_android-mergeReleaseResources-9 D:\dart\multi_tools_mng_mz153\build\shared_preferences_android\intermediates\incremental\release\mergeReleaseResources\merged.dir
+io.flutter.plugins.sharedpreferences.shared_preferences_android-mergeReleaseResources-10 D:\dart\multi_tools_mng_mz153\build\shared_preferences_android\intermediates\incremental\release\mergeReleaseResources\stripped.dir
+io.flutter.plugins.sharedpreferences.shared_preferences_android-merged_res-11 D:\dart\multi_tools_mng_mz153\build\shared_preferences_android\intermediates\merged_res\release

@@ -1,0 +1,11 @@
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/data/icudtl.dat
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/flutter_windows.dll
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/data/flutter_assets/AssetManifest.bin
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/data/flutter_assets/AssetManifest.json
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/data/flutter_assets/FontManifest.json
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/data/flutter_assets/fonts/MaterialIcons-Regular.otf
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/data/flutter_assets/lib/assets/fonts/marhey/Marhey-Regular.ttf
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/data/flutter_assets/NOTICES.Z
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/data/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/data/flutter_assets/shaders/ink_sparkle.frag
+D:/dart/multi_tools_mng_mz153/build/windows/runner/Release/data/app.so

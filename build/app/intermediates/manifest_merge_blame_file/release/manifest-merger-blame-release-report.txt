@@ -1,0 +1,109 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.users_tasks_mz_153"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="16"
+8-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml
+9        android:targetSdkVersion="33" />
+9-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:2:2-64
+11-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:2:19-61
+12    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+12-->[:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:9:5-80
+12-->[:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:9:22-77
+13
+14    <queries>
+14-->[:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:11:5-17:15
+15        <intent>
+15-->[:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:12:9-16:18
+16            <action android:name="android.intent.action.GET_CONTENT" />
+16-->[:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:13:13-72
+16-->[:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:13:21-69
+17
+18            <data android:mimeType="*/*" />
+18-->[:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:15:13-44
+18-->[:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:15:19-41
+19        </intent>
+20    </queries>
+21
+22    <application
+23        android:name="android.app.Application"
+23-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:6:9-42
+24        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+24-->[androidx.core:core:1.6.0] C:\Users\Mz\.gradle\caches\transforms-3\6225987ffa1e666bf3cd01f4adeb1e35\transformed\core-1.6.0\AndroidManifest.xml:24:18-86
+25        android:icon="@mipmap/ic_launcher"
+25-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:7:9-43
+26        android:label="tasks_todo_mz_153" >
+26-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:5:9-42
+27        <activity
+27-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:8:9-28:20
+28            android:name="com.example.users_tasks_mz_153.MainActivity"
+28-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:9:13-41
+29            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+29-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:13:13-163
+30            android:exported="true"
+30-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:10:13-36
+31            android:hardwareAccelerated="true"
+31-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:14:13-47
+32            android:launchMode="singleTop"
+32-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:11:13-43
+33            android:theme="@style/LaunchTheme"
+33-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:12:13-47
+34            android:windowSoftInputMode="adjustResize" >
+34-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:15:13-55
+35
+36            <!--
+37                 Specifies an Android theme to apply to this Activity as soon as
+38                 the Android process has started. This theme is visible to the user
+39                 while the Flutter UI initializes. After that, this theme continues
+40                 to determine the Window background behind the Flutter UI.
+41            -->
+42            <meta-data
+42-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:20:13-23:17
+43                android:name="io.flutter.embedding.android.NormalTheme"
+43-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:21:15-70
+44                android:resource="@style/NormalTheme" />
+44-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:22:15-52
+45
+46            <intent-filter>
+46-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:24:13-27:29
+47                <action android:name="android.intent.action.MAIN" />
+47-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:25:17-68
+47-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:25:25-66
+48
+49                <category android:name="android.intent.category.LAUNCHER" />
+49-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:26:17-76
+49-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:26:27-74
+50            </intent-filter>
+51        </activity>
+52        <!--
+53             Don't delete the meta-data below.
+54             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
+55        -->
+56        <meta-data
+56-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:31:9-33:33
+57            android:name="flutterEmbedding"
+57-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:32:13-44
+58            android:value="2" />
+58-->D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:33:13-30
+59
+60        <uses-library
+60-->[androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:25:9-27:40
+61            android:name="androidx.window.extensions"
+61-->[androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:26:13-54
+62            android:required="false" />
+62-->[androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:27:13-37
+63        <uses-library
+63-->[androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:28:9-30:40
+64            android:name="androidx.window.sidecar"
+64-->[androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:29:13-51
+65            android:required="false" />
+65-->[androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:30:13-37
+66    </application>
+67
+68</manifest>

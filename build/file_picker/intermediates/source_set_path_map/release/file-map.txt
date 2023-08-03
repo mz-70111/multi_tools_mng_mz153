@@ -1,0 +1,13 @@
+com.mr.flutter.plugin.filepicker.file_picker-jetified-window-1.0.0-beta04-0 C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\res
+com.mr.flutter.plugin.filepicker.file_picker-core-1.6.0-1 C:\Users\Mz\.gradle\caches\transforms-3\6225987ffa1e666bf3cd01f4adeb1e35\transformed\core-1.6.0\res
+com.mr.flutter.plugin.filepicker.file_picker-jetified-window-java-1.0.0-beta04-2 C:\Users\Mz\.gradle\caches\transforms-3\6313c9ea85cafb7461e7f6eb0583f000\transformed\jetified-window-java-1.0.0-beta04\res
+com.mr.flutter.plugin.filepicker.file_picker-jetified-annotation-experimental-1.1.0-3 C:\Users\Mz\.gradle\caches\transforms-3\988057c6371343f7679e1ce708ae5c60\transformed\jetified-annotation-experimental-1.1.0\res
+com.mr.flutter.plugin.filepicker.file_picker-main-4 C:\Users\Mz\AppData\Local\Pub\Cache\hosted\pub.dev\file_picker-5.3.2\android\src\main\res
+com.mr.flutter.plugin.filepicker.file_picker-release-5 C:\Users\Mz\AppData\Local\Pub\Cache\hosted\pub.dev\file_picker-5.3.2\android\src\release\res
+com.mr.flutter.plugin.filepicker.file_picker-pngs-6 D:\dart\multi_tools_mng_mz153\build\file_picker\generated\res\pngs\release
+com.mr.flutter.plugin.filepicker.file_picker-resValues-7 D:\dart\multi_tools_mng_mz153\build\file_picker\generated\res\resValues\release
+com.mr.flutter.plugin.filepicker.file_picker-rs-8 D:\dart\multi_tools_mng_mz153\build\file_picker\generated\res\rs\release
+com.mr.flutter.plugin.filepicker.file_picker-mergeReleaseResources-9 D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\incremental\release\mergeReleaseResources\merged.dir
+com.mr.flutter.plugin.filepicker.file_picker-mergeReleaseResources-10 D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\incremental\release\mergeReleaseResources\stripped.dir
+com.mr.flutter.plugin.filepicker.file_picker-merged_res-11 D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_res\release
+com.mr.flutter.plugin.filepicker.file_picker-packaged_res-12 D:\dart\multi_tools_mng_mz153\build\flutter_plugin_android_lifecycle\intermediates\packaged_res\release

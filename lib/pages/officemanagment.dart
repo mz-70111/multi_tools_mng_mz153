@@ -122,40 +122,82 @@ class Office extends StatelessWidget {
         children: [customWidgetofADD(ctx: ctx, pickcolor: pickcolor)]);
 
     return MYPAGE(
-        mylista: mylista,
-        table: 'office',
-        tableId: 'office_id',
-        where: DB.userstable[DB.userstable.indexWhere(
-                        (element) => element['username'] == Home.logininfo)]
-                    ['admin'] ==
-                1
-            ? ''
-            : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}',
-        page: Office,
-        searchRange: const ['officename'],
-        mainColumn: mainColumn,
-        items: itemskey,
-        itemsResult: itemResult,
-        itemsWidget: () => itemsWidget(),
-        notifi: const SizedBox(),
-        addlabel: addFunction['addlabel'],
-        action: addFunction['action'],
-        customInitdataforAdd: () => customInitforAdd(),
-        customWidgetofADD: customWidgetofADD(
-            ctx: context, pickcolor: () => pickcolor(ctx: context)),
-        textfeildlista: offices,
-        scrollController: scrollController,
-        mainEditvisible: () => checkifUserisAdmin(usertable: DB.userstable,userid: DB.userstable[DB.userstable.indexWhere((element) => element['username']==Home.logininfo)]['user_id']) == true ? true : false,
-        subeditvisible: () => true,
-        mainAddvisible: checkifUserisAdmin(usertable: DB.userstable,userid: DB.userstable[DB.userstable.indexWhere((element) => element['username']==Home.logininfo)]['user_id']) == true ? true : false,
-        customWidgetofEdit: customWidgetofEdit(
-            ctx: context, pickcolor: () => pickcolor(ctx: context)),
-        customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
-        getinfo: () => getinfo(e: MYPAGE.eE, ctx: context),
-        actionSave: () => editOfficeSaveAction(e: MYPAGE.eE),
-        actionEdit: () => mainController.showeditpanel(),
-        actionDelete: () => deleteOffice(ctx: context, e: MYPAGE.eE),
-        customeditpanelitem: () => const SizedBox());
+      mylista: mylista,
+      table: 'office',
+      tableId: 'office_id',
+      where: DB.userstable[DB.userstable.indexWhere(
+                      (element) => element['username'] == Home.logininfo)]
+                  ['admin'] ==
+              1
+          ? ''
+          : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}',
+      page: Office,
+      searchRange: const ['officename'],
+      mainColumn: mainColumn,
+      items: itemskey,
+      itemsResult: itemResult,
+      itemsWidget: () => itemsWidget(),
+      notifi: const SizedBox(),
+      addlabel: addFunction['addlabel'],
+      action: addFunction['action'],
+      customInitdataforAdd: () => customInitforAdd(),
+      customWidgetofADD: customWidgetofADD(
+          ctx: context, pickcolor: () => pickcolor(ctx: context)),
+      textfeildlista: offices,
+      scrollController: scrollController,
+      mainEditvisible: () => checkifUserisAdmin(
+                  usertable: DB.userstable,
+                  userid: DB.userstable[DB.userstable.indexWhere(
+                          (element) => element['username'] == Home.logininfo)]
+                      ['user_id']) ==
+              true
+          ? true
+          : false,
+      subeditvisible: () => true,
+      mainAddvisible: checkifUserisAdmin(
+                  usertable: DB.userstable,
+                  userid: DB.userstable[DB.userstable.indexWhere(
+                          (element) => element['username'] == Home.logininfo)]
+                      ['user_id']) ==
+              true
+          ? true
+          : false,
+      customWidgetofEdit: customWidgetofEdit(
+          ctx: context, pickcolor: () => pickcolor(ctx: context)),
+      customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
+      getinfo: () => getinfo(e: MYPAGE.eE, ctx: context),
+      actionSave: () => editOfficeSaveAction(e: MYPAGE.eE),
+      actionEdit: () => mainController.showeditpanel(),
+      actionDelete: () => deleteOffice(ctx: context, e: MYPAGE.eE),
+      customeditpanelitem: () => Visibility(
+        visible: (checkifUserisAdmin(
+                        usertable: DB.userstable,
+                        userid: DB.userstable[DB.userstable.indexWhere(
+                                (element) =>
+                                    element['username'] == Home.logininfo)]
+                            ['user_id']) ==
+                    true ||
+                checkifUserisSupervisorinOffice(
+                        officeid: MYPAGE.eE['office_id'],
+                        userid: DB.userstable[DB.userstable.indexWhere((element) =>
+                            element['username'] == Home.logininfo)]['user_id'],
+                        usertable: DB.userstable) ==
+                    true)
+            ? true
+            : false,
+        child: Row(
+          children: [
+            Text("إرسال المهام تلقائيا"),
+            Text(MYPAGE.eE['autosendtasks'] == 1 ? "تفعيل" : "إيقاف"),
+            Switch(
+                value: MYPAGE.eE['autosendtasks'] == 1 ? true : false,
+                onChanged: (x) {
+                  mainController.autosendtasknotifichg(x: x, e: MYPAGE.eE);
+                }),
+          ],
+        ),
+      ),
+    );
   }
 
   pickcolor({ctx}) {
@@ -316,10 +358,12 @@ class Office extends StatelessWidget {
         SelectableText("chatID: ${e['chatid']}"),
         Text("الاشعارات :${e['notifi'] == 1 ? "مفعلة" : "غير مفعلة"}"),
         TextButton.icon(
-            onPressed: () {
-              gettaskinfoOffice(e: e, ctx: ctx);
-            },
-            icon: const Icon(Icons.task_outlined), label: Text('مهمات موظفي المكتب'),),
+          onPressed: () {
+            gettaskinfoOffice(e: e, ctx: ctx);
+          },
+          icon: const Icon(Icons.task_outlined),
+          label: Text('مهمات موظفي المكتب'),
+        ),
         Text("عدد موظفي المكتب ${users.length}"),
         supervisor.isEmpty
             ? const Text('مشرف المكتب _ لايوجد')
@@ -367,7 +411,7 @@ class Office extends StatelessWidget {
     String mymsg = '';
     for (var i in e['users'] ?? []) {
       if (checkifUserisSupervisorinOffice(
-        usertable: DB.userstable,
+            usertable: DB.userstable,
             officeid: e['office_id'],
             userid: i,
           ) ==

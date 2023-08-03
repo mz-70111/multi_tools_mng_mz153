@@ -89,6 +89,7 @@ class LogIn extends StatelessWidget {
         ];
     Future(() async => await mainController.autosendnotifitasks());
     Future(() async => await mainController.getreminddate());
+    Future(() async => await mainController.autosendnotifiremind());
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -174,10 +175,6 @@ class LogIn extends StatelessWidget {
 
   static removelogin() async {
     LogIn.errorMSglogin = '';
-    username.text = '';
-    password.text = '';
-    newpassword.text = '';
-    confirmnewpassword.text = '';
     await MainController().navbar(0);
     Home.searchvis = false;
     LogIn.obscuretext = true;

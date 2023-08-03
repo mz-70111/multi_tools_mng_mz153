@@ -6,7 +6,7 @@ import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 class DB {
   DBController dbController = Get.find();
   ConnectionSettings settings = ConnectionSettings(
-      host: '192.168.1.106',
+      host: '192.168.30.8',
       port: 3306,
       user: 'mz',
       password: 'mzrootmz',
@@ -55,7 +55,8 @@ officename varchar(255) unique,
 chatid varchar(255),
 notifi tinyint(1) default 0,
 sendstatus tinyint(1) default 0,
-color varchar(255)
+color varchar(255),
+autosendtasks tinyint(1) default 0,
 );
 ''');
     await conn.close();
@@ -230,8 +231,6 @@ startsendat Time,
 sendalertbefor int(11) default 0,
 autocerturl varchar(255),
 manytimestype tinyint(1),
-pasue tinyint(1) default 0,
-pausedate TIMESTAMP  NULL DEFAULT NULL, 
 foreign key (remind_office_id) references office(office_id)
 );
 ''');
@@ -298,6 +297,19 @@ urc_remind_id int(11),
 foreign key (urc_remind_id) references remind(remind_id),
 comments varchar(255),
 commentdate TIMESTAMP  NULL DEFAULT NULL
+);
+''');
+    await conn.close();
+  }
+
+  createmainlogtable() async {
+    MySqlConnection conn = await MySqlConnection.connect(settings);
+    await conn.query('''
+create table if not exists logs
+(
+log_id int(11) unique primary key auto_increment,
+content varchar(255),
+logdate TIMESTAMP  NULL DEFAULT NULL
 );
 ''');
     await conn.close();

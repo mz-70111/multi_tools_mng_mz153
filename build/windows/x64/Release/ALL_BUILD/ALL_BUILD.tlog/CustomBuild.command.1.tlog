@@ -1,0 +1,10 @@
+^D:\DART\MULTI_TOOLS_MNG_MZ153\WINDOWS\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:/dart/multi_tools_mng_mz153/windows -BD:/dart/multi_tools_mng_mz153/build/windows --check-stamp-file D:/dart/multi_tools_mng_mz153/build/windows/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

@@ -39,6 +39,7 @@ class DBController extends GetxController {
     //   await DB().createtodoimagetable();
     //   await DB().createremindlog();
     //   await DB().createremindrepeateevery();
+    //   await DB().createmainlogtable();
     // } catch (e) {
     //   "$e".contains('timed out')
     //       ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
@@ -377,9 +378,13 @@ ${Employ.pbx}
       });
       i[6] == 1 ? {pr.add('مسؤول'), of.add("=")} : null;
     }
+    String privilegeforlog = '';
 
     if (Employ.privilege.isNotEmpty) {
       for (var i in Employ.privilege) {
+        privilegeforlog += '''
+${i['privilege']} ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] == i['office'])]['officename']}
+''';
         await DB().customquery(query: '''
 insert into users_office (uf_user_id,uf_office_id,privilege)values
 (
@@ -420,6 +425,23 @@ ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] ==
         null;
       }
     }
+
+    String log = '';
+    log = '''
+قام ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']} 
+بإضافة حساب ${Employ.employs[0]['controller'].text}
+${Employ.employs[1]['controller'].text}
+الصلاحيات
+$privilegeforlog
+''';
+    Employ.admin == true ? "مسؤول" : null;
+    Employ.addping == true ? "إضافة بينغ" : null;
+    Employ.addremind == true ? "إضافة تذكير" : null;
+    Employ.addtodo == true ? "إضافة إجرائية" : null;
+    Employ.pbx == true ? "وصول لتسجيلات المقسم" : null;
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     update();
   }
 
@@ -447,6 +469,7 @@ ${Office.notifi},
         'notifi': i[3],
         'sendstatus': i[4],
         'color': i[5],
+        'autosendtasks': i[6],
         'users': [],
         'check': true,
         'visible': true
@@ -455,6 +478,14 @@ ${Office.notifi},
     DB.officetable.add(Office.mylista[Office.mylista.length - 1]);
     MYPAGE.officelist
         .add(Office.mylista[Office.mylista.length - 1]['officename']);
+    String log = '';
+    log = '''
+قام ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']} 
+بإضافة مكتب ${Office.offices[0]['controller'].text}
+chatID ${Office.offices[1]['controller'].text}''';
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     update();
   }
 
@@ -547,6 +578,14 @@ $todoid
     });
 
     DB.todotable.add(Whattodo.mylista[Whattodo.mylista.length - 1]);
+    String log = '';
+    log = '''
+قام ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']} 
+بإضافة إجرائية ${Whattodo.todos[0]['controller'].text}
+${Whattodo.todos[1]['controller'].text}''';
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     update();
   }
 
@@ -632,6 +671,20 @@ $taskid
     });
 
     DB.tasktable.add(Tasks.mylista[Tasks.mylista.length - 1]);
+    List usersintask = [];
+    for (var i in Tasks.usersfortaskswidget) {
+      usersintask.add(i['name']);
+    }
+    String log = '';
+    log = '''
+قام ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']} 
+بإضافة مهمة ${Tasks.tasks[0]['controller'].text}
+${Tasks.tasks[1]['controller'].text}
+الموظفين المكلفين بالمهمة $usersintask
+''';
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     update();
   }
 
@@ -698,6 +751,14 @@ $taskid,
   }
 
   deleteuser({id}) async {
+    String log = '';
+    log = '''
+قام ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']}
+بحذف حساب ${DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == id)]['username']}
+''';
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     await DB().customquery(query: '''
 update users_todo_comments set utdc_user_id=null where utdc_user_id=$id;''');
     await DB().customquery(query: '''
@@ -713,9 +774,9 @@ update tasks set editby_id=null,editby=null where editby_id=$id;''');
     await DB().customquery(query: '''
 update users_remind_comments set urc_user_id=null where urc_user_id=$id;''');
     await DB().customquery(query: '''
-update users_remind set createby_id=null,createby=null where createby_id=$id;''');
+update users_remind set createby_id=null where createby_id=$id;''');
     await DB().customquery(query: '''
-update users_remind set editby_id=null,editby=null where editby_id=$id;''');
+update users_remind set editby_id=null where editby_id=$id;''');
 
     await DB().customquery(query: '''
 delete from users_tasks where ut_user_id=$id;''');
@@ -732,12 +793,24 @@ delete from users_office where uf_user_id=$id;''');
       ...DB.todotable,
       ...DB.remindtable
     ];
+
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     update();
   }
 
   deleteoffice({id}) async {
+    String log = '';
+    log = '''
+قام ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']}
+بحذف مكتب ${DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == id)]['officename']}
+''';
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     await DB().customquery(query: '''
-update task set task_office_id=null where task_office_id=$id;''');
+update tasks set task_office_id=null where task_office_id=$id;''');
     await DB().customquery(query: '''
 update todo set todo_office_id=null where todo_office_id=$id;''');
     await DB().customquery(query: '''
@@ -756,10 +829,19 @@ delete from office where office_id=$id;''');
       ...DB.todotable,
       ...DB.remindtable
     ];
+
     update();
   }
 
   deletetodo({id}) async {
+    String log = '';
+    log = '''
+قام ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']}
+بحذف إجرائية ${DB.todotable[DB.todotable.indexWhere((element) => element['todo_id'] == id)]['todoname']}
+''';
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     await DB().customquery(query: '''
 delete from users_todo_comments where utdc_todo_id=$id;''');
     await DB().customquery(query: '''
@@ -778,10 +860,19 @@ delete from todo where todo_id=$id; ''');
       ...DB.todotable,
       ...DB.remindtable
     ];
+
     update();
   }
 
   deletetask({id}) async {
+    String log = '';
+    log = '''
+قام ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']}
+بحذف مهمة ${DB.tasktable[DB.tasktable.indexWhere((element) => element['task_id'] == id)]['taskname']}
+''';
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     await DB().customquery(query: '''
 delete from users_tasks_comments where utc_task_id=$id;''');
     await DB().customquery(query: '''
@@ -798,6 +889,7 @@ delete from tasks where task_id=$id;''');
       ...DB.todotable,
       ...DB.remindtable
     ];
+
     update();
   }
 
@@ -935,7 +1027,7 @@ ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] ==
                   ['admin'] ==
               1
           ? ''
-          : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+          : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids}',
     );
     DB.userstable[
             DB.userstable.indexWhere((element) => element['user_id'] == id)] =
@@ -1245,9 +1337,8 @@ ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Hom
 $remindid
 );
 ''');
-    var t = await DB().customquery(
-        query:
-            'select * from remind where remind_id=(Select max(remind_id)from remind);');
+    var t = await DB()
+        .customquery(query: 'select * from remind where remind_id=$remindid');
     Remind.mylista.add({});
     for (var i in t) {
       Remind.mylista[Remind.mylista.length - 1].addAll({
@@ -1267,13 +1358,10 @@ $remindid
         'sendalertbefor': i[13],
         'autocerturl': i[14],
         'manytimestype': i[15],
-        'pause': i[16],
-        'pasuedate': i[17],
         'visible': true,
         'check': true
       });
     }
-
     var evt = await DB().customquery(
         query:
             'select every from remind_every where revery_remind_id=(select Max(revery_remind_id) from remind_every where revery_id=(Select max(revery_id)from remind_every));');
@@ -1304,7 +1392,15 @@ $remindid
       });
     }
     DB.remindtable.add(Remind.mylista[Remind.mylista.length - 1]);
-
+    String log = '';
+    log = '''
+قام ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']} 
+بإضافة تذكير ${Remind.reminds[0]['controller'].text}
+${Remind.reminds[1]['controller'].text}
+''';
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     update();
   }
 
@@ -1440,6 +1536,14 @@ $id,
   }
 
   deleteremind({id}) async {
+    String log = '';
+    log = '''
+قام ${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['fullname']}
+بحذف تذكير ${DB.remindtable[DB.remindtable.indexWhere((element) => element['remind_id'] == id)]['remindname']}
+''';
+    await DB().customquery(
+        query:
+            'insert into logs (content,logdate)values("$log","${DateTime.now()}")');
     await DB().customquery(query: '''
 delete from users_remind where ur_remind_id=$id;''');
     await DB().customquery(query: '''
@@ -1455,6 +1559,7 @@ delete from remind where remind_id=$id;''');
       ...DB.todotable,
       ...DB.remindtable
     ];
+
     update();
   }
 }

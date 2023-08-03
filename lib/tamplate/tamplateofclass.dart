@@ -9,6 +9,7 @@ import 'package:users_tasks_mz_153/pages/02_home.dart';
 import 'package:users_tasks_mz_153/pages/employaccount.dart';
 import 'package:users_tasks_mz_153/pages/06_tasks.dart';
 import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
+import 'package:users_tasks_mz_153/pages/log.dart';
 import 'package:users_tasks_mz_153/pages/officemanagment.dart';
 import 'package:users_tasks_mz_153/pages/remind.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
@@ -682,42 +683,48 @@ class MYPAGE extends StatelessWidget {
                                                   return Visibility(
                                                     visible: e['visible'],
                                                     child: Row(children: [
-                                                      IconButton(
-                                                          onPressed: () {
-                                                            eE = e;
-                                                            infoEditItemWidget(
-                                                                page: page,
-                                                                mainEditvisible:
-                                                                    () =>
-                                                                        mainEditvisible(),
-                                                                subeditvisible:
-                                                                    () =>
-                                                                        subeditvisible(),
-                                                                e: e,
-                                                                ctx: context,
-                                                                scrollController:
-                                                                    scrollController,
-                                                                customInitforEdit:
-                                                                    () =>
-                                                                        customInitforEdit(),
-                                                                textfeildlista:
-                                                                    textfeildlista,
-                                                                customWidgetofEdit:
-                                                                    customWidgetofEdit,
-                                                                getinfo: () =>
-                                                                    getinfo(),
-                                                                actionSave: () =>
-                                                                    actionSave(),
-                                                                actionEdit: () =>
-                                                                    actionEdit(),
-                                                                actionDelete: () =>
-                                                                    actionDelete(),
-                                                                customeditpanelitem:
-                                                                    () =>
-                                                                        customeditpanelitem());
-                                                          },
-                                                          icon: const Icon(Icons
-                                                              .info_outline)),
+                                                      Visibility(
+                                                        visible: page == Logs
+                                                            ? false
+                                                            : true,
+                                                        child: IconButton(
+                                                            onPressed: () {
+                                                              eE = e;
+                                                              infoEditItemWidget(
+                                                                  page: page,
+                                                                  mainEditvisible:
+                                                                      () =>
+                                                                          mainEditvisible(),
+                                                                  subeditvisible:
+                                                                      () =>
+                                                                          subeditvisible(),
+                                                                  e: e,
+                                                                  ctx: context,
+                                                                  scrollController:
+                                                                      scrollController,
+                                                                  customInitforEdit:
+                                                                      () =>
+                                                                          customInitforEdit(),
+                                                                  textfeildlista:
+                                                                      textfeildlista,
+                                                                  customWidgetofEdit:
+                                                                      customWidgetofEdit,
+                                                                  getinfo: () =>
+                                                                      getinfo(),
+                                                                  actionSave: () =>
+                                                                      actionSave(),
+                                                                  actionEdit: () =>
+                                                                      actionEdit(),
+                                                                  actionDelete:
+                                                                      () =>
+                                                                          actionDelete(),
+                                                                  customeditpanelitem:
+                                                                      () =>
+                                                                          customeditpanelitem());
+                                                            },
+                                                            icon: const Icon(Icons
+                                                                .info_outline)),
+                                                      ),
                                                       Expanded(
                                                           child: itemsWidget()),
                                                     ]),

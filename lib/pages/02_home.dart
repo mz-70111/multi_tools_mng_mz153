@@ -18,6 +18,8 @@ import 'package:users_tasks_mz_153/tamplate/thememz.dart';
 import 'package:intl/intl.dart' as df;
 import 'package:users_tasks_mz_153/tamplate/tweenmz.dart';
 
+import 'log.dart';
+
 // ignore: must_be_immutable
 class Home extends StatelessWidget {
   ThemeController themeController = Get.find();
@@ -42,6 +44,13 @@ class Home extends StatelessWidget {
       'label': 'التقارير',
       'icon': Icons.departure_board,
       'page': Reports(),
+      'size': 50.0
+    },
+    {
+      'visible': false,
+      'label': 'السجل',
+      'icon': Icons.departure_board,
+      'page': Logs(),
       'size': 50.0
     },
     {
@@ -99,7 +108,7 @@ class Home extends StatelessWidget {
       'icon': Icons.mark_email_unread_outlined,
       'page': Checkemail(),
       'size': 50.0
-    }
+    },
   ];
   Home({super.key});
   @override

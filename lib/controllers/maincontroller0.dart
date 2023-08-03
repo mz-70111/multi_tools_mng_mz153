@@ -317,18 +317,58 @@ class MainController extends GetxController {
   }
 
   autosendnotifiremind() async {
-    int timenow = DateTime.now().hour;
-    if (timenow == 8) {
-      for (var i in DB.officetable) {
-        if (i['notifi'] == 1) {
-          for (var j in DB.remindtable) {
-            if (i['notifi'] == 1) {
-              if (i['reminddate'].difference(DateTime.now().add(Duration()))) {}
+    List<Map> office = [], users = [], remind = [];
+    DBController dbController = Get.find();
+    String mymsg = '';
+    try {
+      await dbController.gettable(
+          usertable: users, list: users, table: 'users', tableid: 'user_id');
+      await dbController.gettable(
+          usertable: users,
+          list: office,
+          table: 'office',
+          tableid: 'office_id');
+      await dbController.gettable(
+          usertable: users,
+          list: remind,
+          table: 'remind',
+          tableid: 'remind_id');
+    } catch (e) {
+      null;
+    }
+    for (var i in office) {
+      if (i['notifi'] == 1) {
+        for (var j in remind) {
+          if (j['notifi'] == 1) {
+            if (j['reminddate'] != null) {
+              if (j['reminddate']
+                      .difference(DateTime.now()
+                          .add(Duration(days: j['sendalertbefor'])))
+                      .inDays <=
+                  0) {
+                if (int.parse(j['startsendat'].toString().substring(
+                        0, j['startsendat'].toString().indexOf(':'))) <=
+                    DateTime.now().hour) {
+                  mymsg = '''
+تذكير مهام مجدولة
+${j['remindname']}
+${j['reminddetails']}
+${df.DateFormat('yyyy-MM-dd').format(j['reminddate'])}
+نمط التعيين ${j['type'] == '0' ? 'يدوي مرة واحدة' : j['type'] == '1' ? 'يدوي عدة مرات ${j['manytimestype'] == 0 ? "أسبوعي" : "شهري"}' : 'تلقائي'}
+${j['type'] == '2' ? 'مصدر الشهادة ${j['autocerturl']}' : ''}
+${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتبقية  ${j['reminddate'].difference(DateTime.now()).inDays} يوم" : j['reminddate'].difference(DateTime.now()).inDays == 0 ? (int.parse("${j['startsendat']}".substring(0, j['startsendat'].toString().indexOf(":"))) - DateTime.now().hour) >= 0 ? 'المدة المتبقية ${int.parse("${j['startsendat']}".substring(0, j['startsendat'].toString().indexOf(":"))) - DateTime.now().hour} ساعة' : 'المدة المتبقية منتهية منذ ${(int.parse("${j['startsendat']}".substring(0, j['startsendat'].toString().indexOf(":"))) - DateTime.now().hour) * -1} ساعة' : "المدة المتبقية منتهية منذ  ${j['reminddate'].difference(DateTime.now()).inDays} يوم"}         
+-------------------------------------------------------------
+''';
+                  Tasks.sendtask(msg: mymsg, chatid: i['chatid']);
+                }
+              }
             }
           }
         }
       }
     }
+    Future.delayed(
+        const Duration(hours: 1), () async => await autosendnotifiremind());
   }
 
   autosendnotifitasks() async {
@@ -349,58 +389,60 @@ class MainController extends GetxController {
       null;
     }
     int timenow = DateTime.now().hour;
-    if (timenow == 23) {
+    if (timenow == 9) {
       for (var i in office) {
-        List usershavetask = [];
-        mymsg = '';
-        if (i['sendstatus'] == 0) {
-          mymsg += 'مهمات ${i['officename']}\n';
-          if (i['notifi'] == 1) {
-            for (var j in tasks) {
-              var send = 0;
-              for (var t in i['users']) {
-                if (j['userstask_id'].contains(t)) {
-                  send++;
-                  if (j['notifi'] == 1) {
-                    usershavetask.add(t);
+        if (i['autosendtasks'] == 1) {
+          List usershavetask = [];
+          mymsg = '';
+          if (i['sendstatus'] == 0) {
+            mymsg += 'مهمات ${i['officename']}\n';
+            if (i['notifi'] == 1) {
+              for (var j in tasks) {
+                var send = 0;
+                for (var t in i['users']) {
+                  if (j['userstask_id'].contains(t)) {
+                    send++;
+                    if (j['notifi'] == 1) {
+                      usershavetask.add(t);
+                    }
+                  }
+                }
+                if (send > 0 && j['notifi'] == 1) {
+                  try {
+                    List userstaskname = [];
+                    userstaskname.clear();
+                    for (var ii in j['userstask_id']) {
+                      userstaskname.add(users[users.indexWhere(
+                          (element) => element['user_id'] == ii)]['fullname']);
+                    }
+                    mymsg += Tasks.mymsgTask(e: j);
+                  } catch (e) {
+                    null;
                   }
                 }
               }
-              if (send > 0 && j['notifi'] == 1) {
-                try {
-                  List userstaskname = [];
-                  userstaskname.clear();
-                  for (var ii in j['userstask_id']) {
-                    userstaskname.add(users[users.indexWhere(
-                        (element) => element['user_id'] == ii)]['fullname']);
-                  }
-                  mymsg += Tasks.mymsgTask(e: j);
-                } catch (e) {
-                  null;
+            }
+            for (var p in i['users']) {
+              if (!usershavetask.contains(p)) {
+                if (checkifUserisSupervisorinAnyOffice(
+                        userid: p, usertable: users) ==
+                    false) {
+                  mymsg +=
+                      ' * ${users[users.indexWhere((element) => element['user_id'] == p)]['fullname']} ليس لديه مهمة حاليا\n';
+                  mymsg += '--------------\n';
                 }
               }
             }
-          }
-          for (var p in i['users']) {
-            if (!usershavetask.contains(p)) {
-              if (checkifUserisSupervisorinAnyOffice(
-                      userid: p, usertable: users) ==
-                  false) {
-                mymsg +=
-                    ' * ${users[users.indexWhere((element) => element['user_id'] == p)]['fullname']} ليس لديه مهمة حاليا\n';
-                mymsg += '--------------\n';
-              }
-            }
-          }
-          mymsg += 'تم ارسال الاشعار بشكل تلقائي';
+            mymsg += 'تم ارسال الاشعار بشكل تلقائي';
 
-          if (mymsg.isNotEmpty) {
-            Tasks.sendtask(msg: mymsg, chatid: i['chatid']);
-          }
-          try {
-            await DB().customquery(query: 'update office set sendstatus=1');
-          } catch (e) {
-            null;
+            if (mymsg.isNotEmpty) {
+              Tasks.sendtask(msg: mymsg, chatid: i['chatid']);
+            }
+            try {
+              await DB().customquery(query: 'update office set sendstatus=1');
+            } catch (e) {
+              null;
+            }
           }
         }
       }
@@ -470,6 +512,7 @@ class MainController extends GetxController {
         }
         Get.back();
       } catch (e) {
+        print(e);
         "$e".contains('timed out')
             ? ADDEDITINFOItem.errormsg = 'لا يمكن الوصول للمخدم'
             : "$e".contains('Duplicat')
@@ -1426,6 +1469,16 @@ class MainController extends GetxController {
     update();
   }
 
+  autosendtasknotifichg({x, e}) async {
+    try {
+      await DB().customquery(
+          query:
+              "update office set autosendtasks=${x == true ? 1 : 0} where office_id=${e['office_id']}");
+      e['autosendtasks'] = x == true ? 1 : 0;
+    } catch (t) {}
+    update();
+  }
+
   remindnotifichg({x, e}) async {
     try {
       await DB().customquery(
@@ -1618,7 +1671,7 @@ class MainController extends GetxController {
               ? ''
               : LogIn.office_ids.contains('= _')
                   ? 'where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}'
-                  : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+                  : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids}',
         );
         await dbController.gettable(
           usertable: DB.userstable,
@@ -1992,9 +2045,8 @@ class MainController extends GetxController {
     } catch (e) {
       null;
     }
-
     update();
-    Future.delayed(Duration(hours: 3), () async {
+    Future.delayed(Duration(hours: 1), () async {
       for (var i in DB.remindtable) {
         await getreminddate(
             certsrc: i['autocerturl'],
@@ -2133,7 +2185,7 @@ class MainController extends GetxController {
                     ? ''
                     : LogIn.office_ids.contains('= _')
                         ? 'where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}'
-                        : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+                        : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids}',
               );
               await dbController.gettable(
                 usertable: DB.userstable,
@@ -2206,6 +2258,7 @@ class MainController extends GetxController {
           }
         }
       } catch (e) {
+        print(e);
         LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
       }
     }
@@ -2264,7 +2317,7 @@ class MainController extends GetxController {
                   ? ''
                   : LogIn.office_ids.contains('= _')
                       ? 'where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}'
-                      : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
+                      : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids}',
             );
             await dbController.gettable(
               usertable: DB.userstable,

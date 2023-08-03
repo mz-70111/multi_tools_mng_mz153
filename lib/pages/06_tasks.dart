@@ -84,9 +84,10 @@ class Tasks extends StatelessWidget {
     List colors = [];
     Widget itemsWidget() {
       colors.clear();
-      colors.add(DB.officetable[DB.officetable
-              .indexWhere((element) => element['office_id'] == itemResult[0])]
-          ['color']);
+      itemResult[0] != null
+          ? colors.add(DB.officetable[DB.officetable.indexWhere(
+              (element) => element['office_id'] == itemResult[0])]['color'])
+          : null;
       return Column(children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -342,8 +343,10 @@ class Tasks extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-            "${DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == e['task_office_id'])]['officename'] ?? 'مكتب محذوف'}"),
+        e['task_office_id'] != null
+            ? Text(
+                "${DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == e['task_office_id'])]['officename']}")
+            : Text("مكتب محذوف"),
         SelectableText('''
               # ${e['task_id']} ${e['taskname']}
               ${e['taskdetails']}
@@ -420,17 +423,21 @@ class Tasks extends StatelessWidget {
               Text(
                   " أنجزت بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['donedate'] ?? DateTime.now())}"),
             ])),
-        Comment(
-          comment: comment,
-          deletecomment: () => deletecomment(ctx: ctx, e: e),
-          editcomment: () => editcomment(ctx: ctx, e: e),
-          table: 'users_tasks_comments',
-          tableIdname: 'utc_task_id',
-          tableId: e['task_id'],
-          officeId: e['task_office_id'],
-          userId: 'utc_user_id',
-        ),
-        WriteComment(e: e, writeComment: () => addcomment(e: MYPAGE.eE))
+        taskofficeNameselected != null
+            ? Comment(
+                comment: comment,
+                deletecomment: () => deletecomment(ctx: ctx, e: e),
+                editcomment: () => editcomment(ctx: ctx, e: e),
+                table: 'users_tasks_comments',
+                tableIdname: 'utc_task_id',
+                tableId: e['task_id'],
+                officeId: e['task_office_id'],
+                userId: 'utc_user_id',
+              )
+            : SizedBox(),
+        taskofficeNameselected != null
+            ? WriteComment(e: e, writeComment: () => addcomment(e: MYPAGE.eE))
+            : SizedBox()
       ],
     );
   }
@@ -497,20 +504,25 @@ ${e['createdate'].add(Duration(days: e['duration'] + e['extratime'])).difference
         taskofficelist.add(i['officename']);
       }
     }
-    taskofficeNameselected = DB.officetable[DB.officetable.indexWhere(
-            (element) => element['office_id'] == e['task_office_id'])]
-        ['officename'];
+    taskofficeNameselected = e['task_office_id'] != null
+        ? DB.officetable[DB.officetable.indexWhere(
+                (element) => element['office_id'] == e['task_office_id'])]
+            ['officename']
+        : null;
+
     Tasks.duration = e['duration'].toDouble();
     Tasks.extratimecontroller.text = e['extratime'].toString();
     Tasks.taskname.text = e['taskname'];
     Tasks.taskdetails.text = e['taskdetails'];
     usersfortasks.clear();
     usersfortaskswidget.clear();
-    await getofficeUsers(
-        list: Tasks.usersfortasks,
-        officeid: DB.officetable[DB.officetable.indexWhere((element) =>
-                element['officename'] == Tasks.taskofficeNameselected)]
-            ['office_id']);
+    taskofficeNameselected != null
+        ? await getofficeUsers(
+            list: Tasks.usersfortasks,
+            officeid: DB.officetable[DB.officetable.indexWhere((element) =>
+                    element['officename'] == Tasks.taskofficeNameselected)]
+                ['office_id'])
+        : null;
     for (var i in e['userstask_name']) {
       usersfortaskswidget.add({'i': 0, 'name': i});
     }
