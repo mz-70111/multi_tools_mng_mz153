@@ -430,55 +430,19 @@ class Remind extends StatelessWidget {
       scrollController: scrollController,
       mainEditvisible: () =>
           (checkifUserisAdmin(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) == true ||
-                  (checkifUserisUserinOffice(
-                              usertable: DB.userstable,
-                              userid:
-                                  DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                      ['user_id'],
-                              officeid: MYPAGE.eE['remind_office_id']) ==
-                          true &&
-                      DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                              ['addremind'] ==
-                          1) ||
-                  checkifUserisSupervisorinOffice(
-                          usertable: DB.userstable,
-                          userid:
-                              DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                  ['user_id'],
-                          officeid: MYPAGE.eE['remind_office_id']) ==
-                      true)
-              ? true
-              : false,
-      subeditvisible: () => ((checkifUserisUserinOffice(
-                          usertable: DB.userstable,
-                          userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                              ['user_id'],
-                          officeid: MYPAGE.eE['remind_office_id']) ==
-                      true &&
-                  DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                          ['addremind'] ==
-                      1) ||
-              checkifUserisSupervisorinOffice(
-                      usertable: DB.userstable,
-                      userid: DB.userstable[DB.userstable
-                          .indexWhere((element) => element['username'] == Home.logininfo)]['user_id'],
-                      officeid: MYPAGE.eE['remind_office_id']) ==
-                  true)
-          ? true
-          : false,
-      mainAddvisible: checkifUserisinAnyOffice(
-                      usertable: DB.userstable,
-                      userid: DB.userstable[DB.userstable.indexWhere(
-                              (element) =>
-                                  element['username'] == Home.logininfo)]
-                          ['user_id']) ==
-                  true &&
-              DB.userstable[DB.userstable.indexWhere(
-                          (element) => element['username'] == Home.logininfo)]
-                      ['addremind'] ==
-                  1
-          ? true
-          : false,
+                    ((checkifUserisUserinOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'], officeid: MYPAGE.eE['todo_office_id']) == true ||
+                            checkifUserisSupervisorinOffice(
+                                    usertable: DB.userstable,
+                                    userid:
+                                        DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                            ['user_id'],
+                                    officeid: MYPAGE.eE['todo_office_id']) ==
+                                true) &&
+                        DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
+                ? true
+                : false,
+      subeditvisible: () => ((checkifUserisUserinOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'], officeid: MYPAGE.eE['todo_office_id']) == true || checkifUserisSupervisorinOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'], officeid: MYPAGE.eE['todo_office_id']) == true) && DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1) ? true : false,
+      mainAddvisible: (checkifUserisinAnyOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) == true || checkifUserisSupervisorinAnyOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) == true) && DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1 ? true : false,
       getinfo: () {
         return getinfo(
           e: MYPAGE.eE,
@@ -489,23 +453,18 @@ class Remind extends StatelessWidget {
       actionEdit: () => mainController.showeditpanel(),
       actionDelete: () => deleteremind(ctx: context, e: MYPAGE.eE),
       customeditpanelitem: () => Visibility(
-        visible: ((checkifUserisUserinOffice(
-                            usertable: DB.userstable,
-                            userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                ['user_id'],
-                            officeid: MYPAGE.eE['remind_office_id']) ==
-                        true &&
-                    DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                            ['addremind'] ==
-                        1) ||
-                checkifUserisSupervisorinOffice(
-                        usertable: DB.userstable,
-                        userid: DB.userstable[DB.userstable.indexWhere(
-                            (element) => element['username'] == Home.logininfo)]['user_id'],
-                        officeid: MYPAGE.eE['remind_office_id']) ==
-                    true)
-            ? true
-            : false,
+        visible: (checkifUserisAdmin(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) == true ||
+                    ((checkifUserisUserinOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'], officeid: MYPAGE.eE['todo_office_id']) == true ||
+                            checkifUserisSupervisorinOffice(
+                                    usertable: DB.userstable,
+                                    userid:
+                                        DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                            ['user_id'],
+                                    officeid: MYPAGE.eE['todo_office_id']) ==
+                                true) &&
+                        DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
+                ? true
+                : false,
         child: Row(
           children: [
             Text(MYPAGE.eE['notifi'] == 1 ? "إشعار مفعل" : "إشعار ملغى"),

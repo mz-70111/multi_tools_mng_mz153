@@ -416,11 +416,14 @@ class MainController extends GetxController {
   }
 
   getCert({required String host}) async {
-  await Process.run('Powershell.exe', ['''
+    await Process.run('Powershell.exe', [
+      '''
     Set-ItemProperty -Path "HKCU:\\Control Panel\\International" -Name sShortDate -Value "yyyy/MM/dd";
-    ''']);
+    '''
+    ]);
 
-  var getExpiredate = await Process.run('Powershell.exe', ['''
+    var getExpiredate = await Process.run('Powershell.exe', [
+      '''
 # Ignore SSL Warning
 [Net.ServicePointManager]::ServerCertificateValidationCallback = { \$true }
 # Create Web Http request to URI
@@ -429,7 +432,8 @@ class MainController extends GetxController {
 \$webRequest.GetResponse() | Out-NULL
 # Get SSL Certificate Expiration Date
 \$webRequest.ServicePoint.Certificate.GetExpirationDateString()
-''']);
+'''
+    ]);
     String result = '';
     result = getExpiredate.stdout;
     result = result.substring(0, result.indexOf(' '));

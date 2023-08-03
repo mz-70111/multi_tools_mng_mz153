@@ -536,8 +536,7 @@ $todoid
     }
 
     var imagest = await DB().customquery(
-        query:
-            'select * from todo_images where ti_todo_id=(select Max(ti_todo_id) from todo_images where ti_id=(Select max(ti_id)from todo_images));');
+        query: 'select * from todo_images where ti_todo_id=$todoid;');
     var images = [];
     images.clear();
     for (var i in imagest) {
