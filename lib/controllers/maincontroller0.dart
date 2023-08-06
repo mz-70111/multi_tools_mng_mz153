@@ -111,9 +111,7 @@ class MainController extends GetxController {
     // if (Whattodo.closebs == 1) {
     //   Get.back();
     // }
-    if (x != 0) {
-      BottomNBMZ.pageslist[0]['icon'] = Icons.arrow_back;
-    }
+   
     update();
   }
 
@@ -2215,7 +2213,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                     ? ''
                     : LogIn.office_ids.contains('= _')
                         ? 'where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}'
-                        : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids}',
+                        : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
               );
               await dbController.gettable(
                 usertable: DB.userstable,
@@ -2356,7 +2354,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                   ? ''
                   : LogIn.office_ids.contains('= _')
                       ? 'where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}'
-                      : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids}',
+                      : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
             );
             await dbController.gettable(
               usertable: DB.userstable,

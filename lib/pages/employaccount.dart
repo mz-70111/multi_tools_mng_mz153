@@ -257,7 +257,7 @@ class Employ extends StatelessWidget {
             ? ''
             : LogIn.office_ids.contains('= _')
                 ? 'where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}'
-                : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids}',
+                : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids} group by username',
         page: Employ,
         searchRange: const ['username', 'fullname'],
         mainColumn: mainColumn,
