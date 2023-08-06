@@ -32,7 +32,6 @@ class Logs extends StatelessWidget {
         }
       },
     ];
-
     Widget itemsWidget() {
       return Column(children: [
         Padding(
@@ -52,31 +51,33 @@ class Logs extends StatelessWidget {
     }
 
     return MYPAGE(
-        mylista: mylista,
-        table: 'logs',
-        tableId: 'log_id',
-        page: Logs,
-        searchRange: ['content'],
-        mainColumn: mainColumn,
-        notifi: const SizedBox(),
-        textfeildlista: logss,
-        customWidgetofADD: const SizedBox(),
-        customInitdataforAdd: () {},
-        customInitforEdit: () {},
-        scrollController: ScrollController(),
-        mainEditvisible: () => true,
-        mainAddvisible: true,
-        customWidgetofEdit: const SizedBox(),
-        action: () {},
-        addlabel: '',
-        getinfo: () {},
-        actionSave: () {},
-        actionEdit: () {},
-        actionDelete: () {},
-        items: itemskey,
-        itemsResult: itemResult,
-        itemsWidget: () => itemsWidget(),
-        subeditvisible: () => true,
-        customeditpanelitem: () => const SizedBox());
+      mylista: mylista,
+      table: 'logs',
+      tableId: 'log_id',
+      where: '',
+      page: Logs,
+      searchRange: const ['content'],
+      mainColumn: mainColumn,
+      items: itemskey,
+      itemsResult: itemResult,
+      itemsWidget: () => itemsWidget(),
+      notifi: const SizedBox(),
+      addlabel: '',
+      action: () {},
+      customInitdataforAdd: () {},
+      customWidgetofADD: SizedBox(),
+      customInitforEdit: () {},
+      customWidgetofEdit: SizedBox(),
+      textfeildlista: [],
+      scrollController: ScrollController(),
+      mainEditvisible: () => false,
+      subeditvisible: () => false,
+      mainAddvisible: false,
+      getinfo: () {},
+      actionSave: () {},
+      actionEdit: () {},
+      actionDelete: () {},
+      customeditpanelitem: () => false,
+    );
   }
 }

@@ -1,6 +1,8 @@
 -- Merging decision tree log ---
 application
 INJECTED from D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest.xml:4:5-34:19
+MERGED from [:url_launcher_android] D:\dart\multi_tools_mng_mz153\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:9:5-14:19
+MERGED from [:url_launcher_android] D:\dart\multi_tools_mng_mz153\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:9:5-14:19
 MERGED from [androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:24:5-31:19
 MERGED from [androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:24:5-31:19
 MERGED from [androidx.core:core:1.6.0] C:\Users\Mz\.gradle\caches\transforms-3\6225987ffa1e666bf3cd01f4adeb1e35\transformed\core-1.6.0\AndroidManifest.xml:24:5-89
@@ -24,6 +26,7 @@ INJECTED from D:\dart\multi_tools_mng_mz153\android\app\src\main\AndroidManifest
 MERGED from [:shared_preferences_android] D:\dart\multi_tools_mng_mz153\build\shared_preferences_android\intermediates\merged_manifest\release\AndroidManifest.xml:2:1-9:12
 MERGED from [:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:2:1-19:12
 MERGED from [:flutter_plugin_android_lifecycle] D:\dart\multi_tools_mng_mz153\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\release\AndroidManifest.xml:2:1-9:12
+MERGED from [:url_launcher_android] D:\dart\multi_tools_mng_mz153\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:2:1-16:12
 MERGED from [androidx.window:window-java:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\6313c9ea85cafb7461e7f6eb0583f000\transformed\jetified-window-java-1.0.0-beta04\AndroidManifest.xml:17:1-23:12
 MERGED from [androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:17:1-33:12
 MERGED from [androidx.fragment:fragment:1.1.0] C:\Users\Mz\.gradle\caches\transforms-3\322f2fe3312ed0e7a3d6acdeff67b38d\transformed\fragment-1.1.0\AndroidManifest.xml:17:1-24:12
@@ -72,6 +75,8 @@ MERGED from [:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\inter
 MERGED from [:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-7:41
 MERGED from [:flutter_plugin_android_lifecycle] D:\dart\multi_tools_mng_mz153\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-7:41
 MERGED from [:flutter_plugin_android_lifecycle] D:\dart\multi_tools_mng_mz153\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-7:41
+MERGED from [:url_launcher_android] D:\dart\multi_tools_mng_mz153\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-7:41
+MERGED from [:url_launcher_android] D:\dart\multi_tools_mng_mz153\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-7:41
 MERGED from [androidx.window:window-java:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\6313c9ea85cafb7461e7f6eb0583f000\transformed\jetified-window-java-1.0.0-beta04\AndroidManifest.xml:19:5-21:41
 MERGED from [androidx.window:window-java:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\6313c9ea85cafb7461e7f6eb0583f000\transformed\jetified-window-java-1.0.0-beta04\AndroidManifest.xml:19:5-21:41
 MERGED from [androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:20:5-22:41
@@ -170,6 +175,14 @@ data
 ADDED from [:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:15:13-44
 	android:mimeType
 		ADDED from [:file_picker] D:\dart\multi_tools_mng_mz153\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:15:19-41
+activity#io.flutter.plugins.urllauncher.WebViewActivity
+ADDED from [:url_launcher_android] D:\dart\multi_tools_mng_mz153\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:10:9-13:74
+	android:exported
+		ADDED from [:url_launcher_android] D:\dart\multi_tools_mng_mz153\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:12:13-37
+	android:theme
+		ADDED from [:url_launcher_android] D:\dart\multi_tools_mng_mz153\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:13:13-71
+	android:name
+		ADDED from [:url_launcher_android] D:\dart\multi_tools_mng_mz153\build\url_launcher_android\intermediates\merged_manifest\release\AndroidManifest.xml:11:13-74
 uses-library#androidx.window.extensions
 ADDED from [androidx.window:window:1.0.0-beta04] C:\Users\Mz\.gradle\caches\transforms-3\11d66f75cca45772e0c63f7f8555a29c\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:25:9-27:40
 	android:required

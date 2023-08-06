@@ -48,4 +48,17 @@ class TweenMZ {
           );
         });
   }
+
+  static transperant({begin = 0.0, end = 1.0, duration = 0, child0}) {
+    return TweenAnimationBuilder<double>(
+        curve: Curves.easeInOut,
+        tween: Tween(begin: begin, end: end),
+        duration: Duration(milliseconds: duration),
+        builder: (_, end0, child) {
+          return Opacity(
+            opacity: end0,
+            child: child0,
+          );
+        });
+  }
 }

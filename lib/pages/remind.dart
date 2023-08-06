@@ -48,7 +48,7 @@ class Remind extends StatelessWidget {
   ];
   static DateTime onetimeremid = DateTime.now();
   static DateTime? remiddate;
-
+  static DateTime pausedate = DateTime.now().add(Duration(days: 1));
   static int repeat = 15;
   static List days = [];
   static List<Map> reminds = [
@@ -115,49 +115,51 @@ class Remind extends StatelessWidget {
       colors.add(DB.officetable[DB.officetable
               .indexWhere((element) => element['office_id'] == itemResult[0])]
           ['color']);
-      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(mainAxisSize: MainAxisSize.max, children: [
-            ...colors.map((c) =>
-                Container(height: 50, width: 10, color: Color(int.parse(c)))),
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                      child: Text(
-                    "# ${itemResult[1]}_ ${itemResult[2]}",
-                    style: const TextStyle(fontSize: 13),
-                  )),
-                  Expanded(
-                      child: Text(itemResult[3] == '0'
-                          ? 'يدوي مرة واحدة'
-                          : itemResult[3] == '1'
-                              ? 'يدوي عدة مرات ${itemResult[5] == 1 ? "شهري" : "أسبوعي"}'
-                              : 'تلقائي')),
-                  Expanded(
-                      child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 10,
-                          width: 20,
-                          color: itemResult[4] == 1 ? Colors.red : Colors.green,
+      return Card(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(mainAxisSize: MainAxisSize.max, children: [
+              ...colors.map((c) =>
+                  Container(height: 50, width: 10, color: Color(int.parse(c)))),
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: Text(
+                      "# ${itemResult[1]}_ ${itemResult[2]}",
+                      style: const TextStyle(fontSize: 13),
+                    )),
+                    Expanded(
+                        child: Text(itemResult[3] == '0'
+                            ? 'يدوي مرة واحدة'
+                            : itemResult[3] == '1'
+                                ? 'يدوي عدة مرات ${itemResult[5] == 1 ? "شهري" : "أسبوعي"}'
+                                : 'تلقائي')),
+                    Expanded(
+                        child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 10,
+                            width: 20,
+                            color: itemResult[4] == 1 ? Colors.red : Colors.green,
+                          ),
                         ),
-                      ),
-                      const Expanded(child: SizedBox())
-                    ],
-                  ))
-                ],
-              ),
-            )),
-          ]),
-        ),
-        Text(itemResult[6] == 1 ? "إشعار مفعل" : "إشعار ملغى"),
-        const Divider(),
-      ]);
+                        const Expanded(child: SizedBox())
+                      ],
+                    ))
+                  ],
+                ),
+              )),
+            ]),
+          ),
+          Text(itemResult[6] == 1 ? "إشعار مفعل" : "إشعار ملغى"),
+          const Divider(),
+        ]),
+      );
     }
 
     Map addFunction = {
@@ -366,31 +368,6 @@ class Remind extends StatelessWidget {
                     const Text("يوم/أيام"),
                   ],
                 ),
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text("تكرار التذكير كل"),
-                    ),
-                    Column(
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              mainController.repeatalertbeforremindadd();
-                            },
-                            icon: Icon(Icons.add)),
-                        IconButton(
-                            onPressed: () {
-                              mainController.repeatalertbeforremindmin();
-                            },
-                            icon: Icon(Icons.minimize)),
-                      ],
-                    ),
-                    Text(repeat < 60
-                        ? '$repeat دقيقة'
-                        : '${(repeat / 60).floor()} ساعة')
-                  ],
-                ),
               ]);
         });
     Widget customWidgetofEdit() =>
@@ -491,42 +468,100 @@ class Remind extends StatelessWidget {
       actionSave: () => editremind(e: MYPAGE.eE),
       actionEdit: () => mainController.showeditpanel(),
       actionDelete: () => deleteremind(ctx: context, e: MYPAGE.eE),
-      customeditpanelitem: () => Visibility(
-        visible: (checkifUserisAdmin(
-                        usertable: DB.userstable,
-                        userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                            ['user_id']) ==
-                    true ||
-                ((checkifUserisUserinOffice(
-                                usertable: DB.userstable,
-                                userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                    ['user_id'],
-                                officeid: MYPAGE.eE['remind_office_id']) ==
-                            true ||
-                        checkifUserisSupervisorinOffice(
-                                usertable: DB.userstable,
-                                userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                    ['user_id'],
-                                officeid: MYPAGE.eE['remind_office_id']) ==
-                            true) &&
-                    DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
-            ? true
-            : false,
-        child: Row(
-          children: [
-            Text(MYPAGE.eE['notifi'] == 1 ? "إشعار مفعل" : "إشعار ملغى"),
-            Switch(
-                value: MYPAGE.eE['notifi'] == 1 ? true : false,
-                onChanged: (x) {
-                  mainController.remindnotifichg(x: x, e: MYPAGE.eE);
-                }),
-          ],
-        ),
+      customeditpanelitem: () => Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Visibility(
+            visible: (checkifUserisAdmin(
+                            usertable: DB.userstable,
+                            userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                ['user_id']) ==
+                        true ||
+                    ((checkifUserisUserinOffice(
+                                    usertable: DB.userstable,
+                                    userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                        ['user_id'],
+                                    officeid: MYPAGE.eE['remind_office_id']) ==
+                                true ||
+                            checkifUserisSupervisorinOffice(
+                                    usertable: DB.userstable,
+                                    userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                        ['user_id'],
+                                    officeid: MYPAGE.eE['remind_office_id']) ==
+                                true) &&
+                        DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
+                ? true
+                : false,
+            child: Row(
+              children: [
+                Text(MYPAGE.eE['notifi'] == 1 ? "إشعار مفعل" : "إشعار ملغى"),
+                Switch(
+                    value: MYPAGE.eE['notifi'] == 1 ? true : false,
+                    onChanged: (x) {
+                      mainController.remindnotifichg(x: x, e: MYPAGE.eE);
+                    }),
+              ],
+            ),
+          ),
+          Visibility(
+            visible: (checkifUserisAdmin(
+                            usertable: DB.userstable,
+                            userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                ['user_id']) ==
+                        true ||
+                    ((checkifUserisUserinOffice(
+                                    usertable: DB.userstable,
+                                    userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                        ['user_id'],
+                                    officeid: MYPAGE.eE['remind_office_id']) ==
+                                true ||
+                            checkifUserisSupervisorinOffice(
+                                    usertable: DB.userstable,
+                                    userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                        ['user_id'],
+                                    officeid: MYPAGE.eE['remind_office_id']) ==
+                                true) &&
+                        DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
+                ? true
+                : false,
+            child: Row(
+              children: [
+                Visibility(
+                    visible: MYPAGE.eE['pause'] == 1 ? true : false,
+                    child: TextButton(
+                        onPressed: () async {
+                          await mainController.setpausedate(
+                              ctx: context, e: MYPAGE.eE);
+                        },
+                        child: Text(
+                            "إلى تاريخ ${df.DateFormat("yyyy-MM-dd").format(MYPAGE.eE['pausedate'] ?? pausedate)}"))),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text("إيقاف مؤقت"),
+                ),
+                Switch(
+                    value: MYPAGE.eE['pause'] == 1 ? true : false,
+                    onChanged: (x) {
+                      mainController.remindpausechg(x: x, e: MYPAGE.eE);
+                    }),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   getinfo({e, ctx}) {
+    int pause = 0;
+    if (e['pause'] == 1) {
+      if (e['pausedate'] != null) {
+        if (e['pausedate'].difference(DateTime.now()).inHours > 0) {
+          pause =
+              ((e['pausedate'].difference(DateTime.now()).inHours) / 24).ceil();
+        }
+      }
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -543,6 +578,13 @@ ${e['reminddetails']}
             : e['autocerturl'] != null
                 ? const Text(".. يتم محاولة جلب المعلومات في حال توفرها")
                 : const Text("تاريخ الانتهاء غير محدد"),
+        Visibility(
+          visible: e['reminddate'] == null ? false : true,
+          child: e['reminddate'] != null
+              ? Text(
+                  "المدة المتبقية لارسال التنبيه ${((e['reminddate'].add(Duration(days: pause)).difference(DateTime.now().add(Duration(days: e['sendalertbefor']))).inHours) / 24).ceil()} يوم")
+              : SizedBox(),
+        ),
         Text(
             "نمط التعيين : ${e['type'] == '0' ? 'يدوي مرة واحدة' : e['type'] == '1' ? 'يدوي عدة مرات ${e['manytimestype'] == 0 ? "أسبوعي" : "شهري"}' : 'تلقائي'}"),
         const Divider(),
@@ -564,7 +606,16 @@ ${e['reminddetails']}
             : e['type'] == '2'
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [Text("مصدر الشهادة"), Text(e['autocerturl'])],
+                    children: [
+                      Text("مصدر الشهادة"),
+                      InkWell(
+                        child: Text(e['autocerturl']),
+                        onTap: () async {
+                          await mainController.url_launch(
+                              url: e['autocerturl']);
+                        },
+                      )
+                    ],
                   )
                 : SizedBox(),
         Divider(),
@@ -572,8 +623,11 @@ ${e['reminddetails']}
             visible: e['reminddate'] == null ? false : true,
             child: e['reminddate'] != null
                 ? Text(e['reminddate'].difference(DateTime.now()).inDays > 0
-                    ? "المدة المتبقية  ${e['reminddate'].difference(DateTime.now()).inDays} يوم"
-                    : e['reminddate'].difference(DateTime.now()).inDays == 0
+                    ? "المدة المتبقية  ${((e['reminddate'].difference(DateTime.now()).inHours) / 24).ceil()} يوم"
+                    : ((e['reminddate'].difference(DateTime.now()).inHours) /
+                                    24)
+                                .ceil() ==
+                            0
                         ? (int.parse("${e['startsendat']}".substring(
                                         0,
                                         e['startsendat']
@@ -583,7 +637,7 @@ ${e['reminddetails']}
                                 0
                             ? 'المدة المتبقية ${int.parse("${e['startsendat']}".substring(0, e['startsendat'].toString().indexOf(":"))) - DateTime.now().hour} ساعة'
                             : 'المدة المتبقية منتهية منذ ${(int.parse("${e['startsendat']}".substring(0, e['startsendat'].toString().indexOf(":"))) - DateTime.now().hour) * -1} ساعة'
-                        : "المدة المتبقية منتهية منذ  ${e['reminddate'].difference(DateTime.now()).inDays} يوم")
+                        : "المدة المتبقية منتهية منذ  ${((e['reminddate'].difference(DateTime.now()).inHours) / 24).ceil()} يوم")
                 : const SizedBox()),
         const Divider(),
         Comment(

@@ -131,6 +131,7 @@
 -keep class android.app.Application { <init>(); }
 -keep class androidx.core.app.CoreComponentFactory { <init>(); }
 -keep class com.example.users_tasks_mz_153.MainActivity { <init>(); }
+-keep class io.flutter.plugins.urllauncher.WebViewActivity { <init>(); }
 
 # End of content from D:\dart\multi_tools_mng_mz153\build\app\intermediates\aapt_proguard_file\release\aapt_rules.txt
 # The proguard configuration file for the following section is D:\dart\multi_tools_mng_mz153\build\flutter_plugin_android_lifecycle\intermediates\consumer_proguard_dir\release\lib0\proguard.txt
@@ -302,7 +303,7 @@
 }
 
 # End of content from C:\Users\Mz\.gradle\caches\transforms-3\7318535e00a6ce2fa64b814f2a8871d5\transformed\lifecycle-viewmodel-2.1.0\proguard.txt
-# The proguard configuration file for the following section is C:\Users\Mz\.gradle\caches\transforms-3\c0c49e0337328f1c41a14cc512cf27dc\transformed\rules\lib\META-INF\proguard\androidx-annotations.pro
+# The proguard configuration file for the following section is C:\Users\Mz\.gradle\caches\transforms-3\69187a84b928deff67ac5fd227e0330b\transformed\rules\lib\META-INF\proguard\androidx-annotations.pro
 -keep,allowobfuscation @interface androidx.annotation.Keep
 -keep @androidx.annotation.Keep class * {*;}
 
@@ -322,7 +323,7 @@
   @androidx.annotation.DoNotInline <methods>;
 }
 
-# End of content from C:\Users\Mz\.gradle\caches\transforms-3\c0c49e0337328f1c41a14cc512cf27dc\transformed\rules\lib\META-INF\proguard\androidx-annotations.pro
+# End of content from C:\Users\Mz\.gradle\caches\transforms-3\69187a84b928deff67ac5fd227e0330b\transformed\rules\lib\META-INF\proguard\androidx-annotations.pro
 # The proguard configuration file for the following section is C:\Users\Mz\.gradle\caches\transforms-3\988057c6371343f7679e1ce708ae5c60\transformed\jetified-annotation-experimental-1.1.0\proguard.txt
 # Copyright (C) 2020 The Android Open Source Project
 #

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/themeController.dart';
+import 'package:users_tasks_mz_153/db/database.dart';
 
 import 'package:users_tasks_mz_153/pages/03_reports.dart';
 import 'package:users_tasks_mz_153/pages/checkemail.dart';
@@ -30,20 +31,14 @@ class Home extends StatelessWidget {
   static bool searchvis = false;
   static List<Map> searchlist = [];
   static bool selectall = true;
+  static String backlabel = '';
   static String? connectionerrorIN;
   static List pages = [
     {
       'visible': false,
       'label': 'الصفحة الرئيسية',
-      'icon': Icons.home_filled,
-      'page': Home(),
-      'size': 50.0
-    },
-    {
-      'visible': false,
-      'label': 'التقارير',
       'icon': Icons.departure_board,
-      'page': Reports(),
+      'page': Home(),
       'size': 50.0
     },
     {
@@ -113,6 +108,7 @@ class Home extends StatelessWidget {
   Home({super.key});
   @override
   Widget build(BuildContext context) {
+    Future(() async => await mainController.loginlogoutlog(1));
     return Scaffold(
       body: GetBuilder<ThemeController>(
         init: themeController,
@@ -124,6 +120,23 @@ class Home extends StatelessWidget {
                 builder: (_) => Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "تكامل",
+                          style: TextStyle(fontSize: 30),
+                        ),
+                        TweenMZ.transperant(
+                          duration: 2000,
+                          child0: Image.asset(
+                            'lib\\assets\\images\\takamollogo.png',
+                            width: 100,
+                            height: 100,
+                          ),
+                        ),
+                      ],
+                    ),
                     Expanded(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,

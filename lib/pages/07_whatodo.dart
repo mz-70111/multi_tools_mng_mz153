@@ -62,37 +62,39 @@ class Whattodo extends StatelessWidget {
       colors.add(DB.officetable[DB.officetable
               .indexWhere((element) => element['office_id'] == itemResult[0])]
           ['color']);
-      return Column(children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              ...colors.map((c) =>
-                  Container(height: 50, width: 10, color: Color(int.parse(c)))),
-              Expanded(
-                  child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: Text(
-                      "# ${itemResult[1]}_ ${itemResult[2]}",
-                      style: const TextStyle(fontSize: 13),
-                    )),
-                    Expanded(
-                        child: itemResult[3].length > 10
-                            ? Text(
-                                "${itemResult[3].toString().substring(0, 10)} ...")
-                            : Text(itemResult[3]))
-                  ],
-                ),
-              )),
-            ],
+      return Card(
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                ...colors.map((c) =>
+                    Container(height: 50, width: 10, color: Color(int.parse(c)))),
+                Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Text(
+                        "# ${itemResult[1]}_ ${itemResult[2]}",
+                        style: const TextStyle(fontSize: 13),
+                      )),
+                      Expanded(
+                          child: itemResult[3].length > 10
+                              ? Text(
+                                  "${itemResult[3].toString().substring(0, 10)} ...")
+                              : Text(itemResult[3]))
+                    ],
+                  ),
+                )),
+              ],
+            ),
           ),
-        ),
-        const Divider(),
-      ]);
+          const Divider(),
+        ]),
+      );
     }
 
     Map addFunction = {
@@ -255,7 +257,6 @@ class Whattodo extends StatelessWidget {
               ? 'تم تعديلها بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['editdate'] ?? DateTime.now())} بواسطة ${DB.userstable[DB.userstable.indexWhere((y) => y['user_id'] == e['editby_id'])]['fullname']}'
               : 'تم تعديلها بتاريخ ${df.DateFormat("HH:mm ||yyyy-MM-dd").format(e['editdate'] ?? DateTime.now())} بواسطة حساب محذوف'),
         ),
-        const Divider(),
         const Divider(),
         Comment(
           comment: comment,

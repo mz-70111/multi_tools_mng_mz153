@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/databasecontroller0.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
+import 'package:users_tasks_mz_153/controllers/themeController.dart';
 import 'package:users_tasks_mz_153/db/database.dart';
 import 'package:intl/intl.dart' as df;
 import 'package:users_tasks_mz_153/pages/00_login.dart';
@@ -48,6 +51,7 @@ class TextFieldMZ extends StatelessWidget {
               ? 500
               : MediaQuery.of(context).size.width,
           child: TextField(
+            focusNode: FocusNode(),
             maxLines: maxlines,
             controller: textEditingController,
             obscureText: obscureText,
@@ -254,20 +258,20 @@ class Comment extends StatelessWidget {
                         Visibility(
                           visible: checkifUserisSame(
                                           userid: e[userId],
-                                          usertable: DB.userstable) ==
+                                          usertable: LogIn.allusers) ==
                                       true ||
                                   checkifUserisSupervisorinOffice(
-                                          usertable: DB.userstable,
-                                          userid: DB.userstable[DB.userstable
+                                          usertable: LogIn.allusers,
+                                          userid: LogIn.allusers[LogIn.allusers
                                                   .indexWhere(
                                                       (element) => element['username'] == Home.logininfo)]
                                               ['user_id'],
                                           officeid: officeId) ==
                                       true ||
                                   checkifUserisAdmin(
-                                          usertable: DB.userstable,
+                                          usertable: LogIn.allusers,
                                           userid:
-                                              DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                              LogIn.allusers[LogIn.allusers.indexWhere((element) => element['username'] == Home.logininfo)]
                                                   ['user_id']) ==
                                       true
                               ? true
@@ -279,7 +283,7 @@ class Comment extends StatelessWidget {
                                   ? true
                                   : checkifUserisSame(
                                               userid: e[userId],
-                                              usertable: DB.userstable) ==
+                                              usertable: LogIn.allusers) ==
                                           true
                                       ? true
                                       : false,
@@ -295,7 +299,7 @@ class Comment extends StatelessWidget {
                         ),
                         Text(
                           e[userId] != null
-                              ? "${DB.userstable[DB.userstable.indexWhere((element) => element['user_id'] == e[userId])]['fullname']}"
+                              ? "${LogIn.allusers[LogIn.allusers.indexWhere((element) => element['user_id'] == e[userId])]['fullname']}"
                               : "حساب محذوف",
                           softWrap: true,
                         ),
@@ -326,7 +330,6 @@ class Comment extends StatelessWidget {
 
 deletecommentT({e, ctx, actiondelete}) {
   Comment.errmsg = null;
-
   MainController mainController = Get.find();
   showDialog(
       context: ctx,
@@ -365,7 +368,7 @@ deletecommentT({e, ctx, actiondelete}) {
 }
 
 editcommentT({e, ctx, actionedit, controller}) {
-  Comment.errmsg = null;
+  // Comment.errmsg = null;
 
   MainController mainController = Get.find();
   showDialog(
@@ -545,28 +548,6 @@ class MYPAGE extends StatelessWidget {
                                     child: const Icon(Icons.refresh))
                               ]));
                         } else {
-                          if (checkifUserisinAnyOffice(
-                                      usertable: DB.userstable,
-                                      userid: DB.userstable[DB.userstable
-                                          .indexWhere((element) =>
-                                              element['username'] ==
-                                              Home.logininfo)]['user_id']) ==
-                                  false &&
-                              page == Whattodo) {
-                            Future(() => mainController.snakbar(context,
-                                'لست عضوا في اي مكتب لا يمكنك اضافة إجرايئات'));
-                          }
-                          if (checkifUserisSupervisorinAnyOffice(
-                                      usertable: DB.userstable,
-                                      userid: DB.userstable[DB.userstable
-                                          .indexWhere((element) =>
-                                              element['username'] ==
-                                              Home.logininfo)]['user_id']) ==
-                                  false &&
-                              page == Tasks) {
-                            Future(() => mainController.snakbar(context,
-                                'لست مشرفا في اي مكتب لا يمكنك اضافة مهام'));
-                          }
                           return GetBuilder<MainController>(
                               init: mainController,
                               builder: (_) {
@@ -623,27 +604,30 @@ class MYPAGE extends StatelessWidget {
                                             ),
                                           ),
                                           Expanded(
-                                            child: TextFieldMZ(
-                                                suffixIcon: Visibility(
-                                                    visible: page == Tasks
-                                                        ? true
-                                                        : false,
-                                                    child: IconButton(
-                                                        onPressed: () {
-                                                          searchbydate(
-                                                              ctx: context);
-                                                        },
-                                                        icon: const Icon(
-                                                            Icons.date_range))),
-                                                label: "بحث",
-                                                onChanged: (word) {
-                                                  mainController.search(
-                                                      word: word,
-                                                      list: mylista,
-                                                      range: searchRange
-                                                          .map((e) => e)
-                                                          .toList());
-                                                }),
+                                            child: GetBuilder<ThemeController>(
+                                              init: themeController,
+                                              builder: (_) => TextFieldMZ(
+                                                  suffixIcon: Visibility(
+                                                      visible: page == Tasks
+                                                          ? true
+                                                          : false,
+                                                      child: IconButton(
+                                                          onPressed: () {
+                                                            searchbydate(
+                                                                ctx: context);
+                                                          },
+                                                          icon: const Icon(Icons
+                                                              .date_range))),
+                                                  label: "بحث",
+                                                  onChanged: (word) {
+                                                    mainController.search(
+                                                        word: word,
+                                                        list: mylista,
+                                                        range: searchRange
+                                                            .map((e) => e)
+                                                            .toList());
+                                                  }),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -684,49 +668,47 @@ class MYPAGE extends StatelessWidget {
                                                     visible: e['visible'],
                                                     child: Row(children: [
                                                       Visibility(
-                                                        visible: page == Logs
-                                                            ? false
-                                                            : true,
-                                                        child: IconButton(
-                                                            onPressed: () {
-                                                              eE = e;
-                                                              infoEditItemWidget(
-                                                                  page: page,
-                                                                  mainEditvisible:
-                                                                      () =>
-                                                                          mainEditvisible(),
-                                                                  subeditvisible:
-                                                                      () =>
-                                                                          subeditvisible(),
-                                                                  e: e,
-                                                                  ctx: context,
-                                                                  scrollController:
-                                                                      scrollController,
-                                                                  customInitforEdit:
-                                                                      () =>
-                                                                          customInitforEdit(),
-                                                                  textfeildlista:
-                                                                      textfeildlista,
-                                                                  customWidgetofEdit:
-                                                                      customWidgetofEdit,
-                                                                  getinfo: () =>
-                                                                      getinfo(),
-                                                                  actionSave: () =>
-                                                                      actionSave(),
-                                                                  actionEdit: () =>
-                                                                      actionEdit(),
-                                                                  actionDelete:
-                                                                      () =>
-                                                                          actionDelete(),
-                                                                  customeditpanelitem:
-                                                                      () =>
-                                                                          customeditpanelitem());
-                                                            },
-                                                            icon: const Icon(Icons
-                                                                .info_outline)),
-                                                      ),
-                                                      Expanded(
-                                                          child: itemsWidget()),
+                                                          visible: page == Logs
+                                                              ? false
+                                                              : true,
+                                                          child: Expanded(
+                                                              child:
+                                                                  GestureDetector(
+                                                                      onTap:
+                                                                          () {
+                                                                        eE = e;
+                                                                        infoEditItemWidget(
+                                                                            page:
+                                                                                page,
+                                                                            mainEditvisible: () =>
+                                                                                mainEditvisible(),
+                                                                            subeditvisible: () =>
+                                                                                subeditvisible(),
+                                                                            e:
+                                                                                e,
+                                                                            ctx:
+                                                                                context,
+                                                                            scrollController:
+                                                                                scrollController,
+                                                                            customInitforEdit: () =>
+                                                                                customInitforEdit(),
+                                                                            textfeildlista:
+                                                                                textfeildlista,
+                                                                            customWidgetofEdit:
+                                                                                customWidgetofEdit,
+                                                                            getinfo: () =>
+                                                                                getinfo(),
+                                                                            actionSave: () =>
+                                                                                actionSave(),
+                                                                            actionEdit: () =>
+                                                                                actionEdit(),
+                                                                            actionDelete: () =>
+                                                                                actionDelete(),
+                                                                            customeditpanelitem: () =>
+                                                                                customeditpanelitem());
+                                                                      },
+                                                                      child:
+                                                                          itemsWidget()))),
                                                     ]),
                                                   );
                                                 })
@@ -767,7 +749,6 @@ class MYPAGE extends StatelessWidget {
                               ))),
 
                       //notification
-                      Positioned(left: 0, child: Notificationm()),
                       //personal panel(logout and chang password)
                       Positioned(left: 0, child: PersonPanel()),
                     ],
@@ -936,7 +917,8 @@ class ADDEDITINFOItem extends StatelessWidget {
                                             onPressed: () =>
                                                 mainController.firstbackpage(),
                                             icon: const Icon(
-                                                Icons.arrow_circle_right)),
+                                              Icons.arrow_back,
+                                            )),
                                         addpanel,
                                       ],
                                     )),
@@ -946,8 +928,12 @@ class ADDEDITINFOItem extends StatelessWidget {
                                       onPressed: () {
                                         mainController.firstbackpage();
                                       },
-                                      icon:
-                                          const Icon(Icons.arrow_circle_left)),
+                                      icon: Transform.rotate(
+                                        angle: 180 * pi / 180,
+                                        child: const Icon(
+                                          Icons.arrow_back,
+                                        ),
+                                      )),
                                 )
                               ],
                             ),
@@ -1135,6 +1121,7 @@ class Editpanel extends StatelessWidget {
     MainController mainController = Get.find();
     List edititems() => [
           {
+            'n': 0,
             'visible1': true,
             'visible0': page == Employ
                 ? e['username'] == Home.logininfo
@@ -1147,6 +1134,7 @@ class Editpanel extends StatelessWidget {
             'color': Colors.redAccent
           },
           {
+            'n': 1,
             'visible1': true,
             'visible0': subeditvisible(),
             'visible': !savevisible,
@@ -1155,6 +1143,7 @@ class Editpanel extends StatelessWidget {
             'color': Colors.indigoAccent
           },
           {
+            'n': 2,
             'visible1': !ADDEDITINFOItem.firstpage,
             'visible0': subeditvisible(),
             'visible': savevisible,
@@ -1163,20 +1152,20 @@ class Editpanel extends StatelessWidget {
             'color': Colors.indigoAccent
           },
           {
+            'n': 3,
             'visible1': ADDEDITINFOItem.firstpage,
             'visible0': subeditvisible(),
             'visible': savevisible,
-            'icon': Icons.arrow_circle_left,
+            'icon': Icons.arrow_back,
             'action': () => mainController.firstbackpage(),
-            'color': Colors.indigoAccent
           },
           {
+            'n': 4,
             'visible1': !ADDEDITINFOItem.firstpage,
             'visible0': subeditvisible(),
             'visible': savevisible,
-            'icon': Icons.arrow_circle_right,
+            'icon': Icons.arrow_back,
             'action': () => mainController.firstbackpage(),
-            'color': Colors.indigoAccent
           }
         ];
     return Visibility(
@@ -1194,12 +1183,22 @@ class Editpanel extends StatelessWidget {
                         visible: e['visible0'],
                         child: Visibility(
                           visible: e['visible'],
-                          child: IconButton(
-                              onPressed: e['action'],
-                              icon: Icon(
-                                e['icon'],
-                                color: e['color'],
-                              )),
+                          child: e['n'] == 4
+                              ? Transform.rotate(
+                                  angle: 180 * pi / 180,
+                                  child: IconButton(
+                                      onPressed: e['action'],
+                                      icon: Icon(
+                                        e['icon'],
+                                        color: e['color'],
+                                      )),
+                                )
+                              : IconButton(
+                                  onPressed: e['action'],
+                                  icon: Icon(
+                                    e['icon'],
+                                    color: e['color'],
+                                  )),
                         ),
                       ),
                     )),

@@ -1,5 +1,5 @@
 android.content.res.Resources#getIdentifier present: true
-Web content present: false
+Web content present: true
 Referenced Strings:
 exception
 cancel
@@ -20,22 +20,22 @@ GeneratedPluginsRegister
 java.lang.CharSequence
 LANDSCAPE_RIGHT
 LEFT
-_handled
 givenName
+_handled
 androidx.window.layout.WindowInfoTrac...
 ActivityRule
 click
 0
 size
 kotlin.jvm.functions.
+kotlinx.coroutines.DefaultExecutor
 left
 WindowInfoTrackerImpl.kt
-kotlinx.coroutines.DefaultExecutor
 TextInputClient.updateEditingStateWit...
 registerWith
 SystemSoundType.alert
-kotlin.internal.JRE7PlatformImplement...
 REDUCE_MOTION
+kotlin.internal.JRE7PlatformImplement...
 DECREASE
 $splitPairFilters
 PORTRAIT_DOWN
@@ -183,11 +183,12 @@ TextInputType.multiline
 getChildId
 PRIVATE
 framework
+dev.flutter.pigeon.UrlLauncherApi.can...
 java.util.concurrent.ForkJoinPool
 LIGHT_IMPACT
 DESTROYED
-New
 selectionExtent
+New
 SystemChrome.setEnabledSystemUIOverlays
 MouseCursorChannel
 ATOMIC
@@ -218,17 +219,17 @@ UNEXPECTED:
 getDirectory
 kotlin.Int
 basic
-kotlin.Throwable
 collect
+kotlin.Throwable
 sidecarDisplayFeatures
 parkedWorkersStack
 IS_IMAGE
-COMPLETING_ALREADY
 PHONE
+COMPLETING_ALREADY
 systemNavigationBarColor
 PlatformPlugin
-displayCutout
 cause
+displayCutout
 media
 java.lang.Iterable
 rect
@@ -239,6 +240,7 @@ synchronizeToNativeViewHierarchy
 packageName
 LANDSCAPE_LEFT
 info.displayFeatures
+enableJavaScript
 direction
 BITMAP
 windowConfiguration
@@ -269,8 +271,8 @@ state
 secondaryActivityStack.activities
 CompanionObject
 element
-cache
 creditCardExpirationMonth
+cache
 deltaText
 zoomIn
 Destroying.
@@ -283,12 +285,13 @@ kotlin.collections.ListIterator
 oemFeature.bounds
 dev.flutter.pigeon.SharedPreferencesA...
 CUSTOM_ACTION
-delimiters
 TextInputClient.updateEditingStateWit...
+delimiters
 PROTECTED
 STANDARD
 cached_engine_id
 setRemoveOnCancelPolicy
+NO_ACTIVITY
 newLayoutInfo
 IS_LIVE_REGION
 forbidden
@@ -366,6 +369,7 @@ primitiveFqNames.values
 DATETIME
 enableSuggestions
 PASTE
+android.intent.action.VIEW
 IS_MULTILINE
 short
 middleName
@@ -412,6 +416,7 @@ newPassword
 POSTAL_ADDRESS
 smsOTPCode
 flutter_deeplinking_enabled
+com.android.browser.headers
 SystemChannel
 viewFocused
 HEAVY_IMPACT
@@ -425,6 +430,7 @@ RETRY_ATOMIC
 getDisplayFeatures
 BLOCKING
 uninstallDeferredComponent
+UrlLauncherPlugin
 primary
 java.lang.Throwable
 BOLD_TEXT
@@ -483,12 +489,13 @@ deltaEnd
 kind
 GeneratedPluginRegistrant
 SplitPairFilter
+dev.flutter.pigeon.UrlLauncherApi.clo...
 io.flutter.embedding.android.EnableIm...
 _consensus
 SCROLL_UP
 WrongConstant
-CLOSED_EMPTY
 dev.flutter.pigeon.SharedPreferencesA...
+CLOSED_EMPTY
 kotlin.collections.Iterator
 job
 TextInputClient.requestExistingInputS...
@@ -524,7 +531,6 @@ suggestions
 $splitRule
 getModule
 extent
-java.specification.version
 sidecarCompat
 resizeColumn
 plugins
@@ -547,8 +553,8 @@ ON_ANY
 MOVE_CURSOR_BACKWARD_BY_WORD
 removeViewImmediate
 kotlinx.coroutines.scheduler.resoluti...
-kotlin.Unit
 removeView
+kotlin.Unit
 route
 ON_PAUSE
 birthdayDay
@@ -585,6 +591,7 @@ MEDIUM_IMPACT
 feature.rect
 missingDelimiterValue
 listener
+dev.flutter.pigeon.UrlLauncherApi.ope...
 dir
 BanParcelableUsage
 installDeferredComponent
@@ -706,6 +713,7 @@ EmbeddingCompat
 addView
 uri
 off
+url
 resizeLeftRight
 platformBrightness
 splitInfo.secondaryActivityStack
@@ -716,9 +724,9 @@ onSaveInstanceState
 io.flutter.EntrypointUri
 mH
 VIRTUAL_DISPLAY_PLATFORM_VIEW
+newIndent
 loadingUnitId
 IS_SLIDER
-newIndent
 resizeUpLeftDownRight
 KeyboardManager
 RESUMED
@@ -765,8 +773,8 @@ kotlin.Comparable
 consumer
 show_password
 on
-nativeSpellCheckServiceDefined
 baseKey
+nativeSpellCheckServiceDefined
 unknown_activity
 vm_snapshot_data
 currentDisplay
@@ -794,14 +802,15 @@ EMAIL_ADDRESS
 java.lang.Long
 metaState
 java.util.Map
-INTERNAL
 TextInputPlugin
+INTERNAL
 height
 CUT
 BOTTOM_OVERLAYS
 android.intent.action.OPEN_DOCUMENT_TREE
 _decision
 kotlinx.coroutines.flow.AbstractFlow
+dev.flutter.pigeon.UrlLauncherApi.lau...
 input_method
 oldText
 Clipboard.hasStrings
@@ -814,8 +823,8 @@ kotlin.Function
 RTL
 long
 SystemUiMode.immersive
-HALF_OPENED
 kotlinx.coroutines.channels.defaultBu...
+HALF_OPENED
 activity.windowManager.currentWindowM...
 audio
 $this$$receiver
@@ -853,6 +862,7 @@ rules
 personGivenName
 pairs
 TextInput.setEditingState
+enableDomStorage
 ON_START
 birthDateFull
 windowMetrics.bounds
@@ -894,8 +904,8 @@ onWindowLayoutChangeListenerRemoved
 Dispatchers.Main.immediate
 splitRules
 ON_CLOSE_HANDLER_INVOKED
-REMOVED_TASK
 location
+REMOVED_TASK
 java.lang.Object
 splitInfo
 SystemChrome.setSystemUIChangeListener
@@ -937,8 +947,8 @@ kotlinx.coroutines.scheduler
 gender
 java.lang.Double
 AppLifecycleState.detached
-range
 resizeRow
+range
 usesVirtualDisplay
 flutter/spellcheck
 IS_TOGGLED
@@ -1084,6 +1094,9 @@ Marking id:accessibility_custom_action_7:2131034142 used because it matches stri
 Marking id:accessibility_custom_action_8:2131034143 used because it matches string pool constant acc
 Marking id:accessibility_custom_action_9:2131034144 used because it matches string pool constant acc
 Marking id:locale:2131034162 used because it matches string pool constant locale
+Marking id:locale:2131034162 used because it matches string pool constant locale
+Marking attr:secondaryActivityName:2130771991 used because it matches string pool constant secondaryActivityName.className
+Marking id:info:2131034158 used because it matches string pool constant info.displayFeatures
 Marking id:accessibility_action_clickable_span:2131034112 used because it matches string pool constant accessibility
 Marking id:accessibility_custom_action_0:2131034113 used because it matches string pool constant accessibility
 Marking id:accessibility_custom_action_1:2131034114 used because it matches string pool constant accessibility
@@ -1118,13 +1131,18 @@ Marking id:accessibility_custom_action_7:2131034142 used because it matches stri
 Marking id:accessibility_custom_action_8:2131034143 used because it matches string pool constant accessibility
 Marking id:accessibility_custom_action_9:2131034144 used because it matches string pool constant accessibility
 Marking attr:primaryActivityName:2130771988 used because it matches string pool constant primaryActivityName
+Marking attr:primaryActivityName:2130771988 used because it matches string pool constant primaryActivityName
 Marking color:androidx_core_ripple_material_light:2130837504 used because it matches string pool constant android
 Marking color:androidx_core_secondary_text_default_material_light:2130837505 used because it matches string pool constant android
 Marking id:androidx_window_activity_scope:2131034150 used because it matches string pool constant android
 Marking attr:shortcutMatchRequired:2130771992 used because it matches string pool constant short
+Marking attr:primaryActivityName:2130771988 used because it matches string pool constant primaryActivityName.packageName
 Marking attr:primaryActivityName:2130771988 used because it matches string pool constant primary
 Marking attr:clearTop:2130771972 used because it matches string pool constant clear
+Marking attr:primaryActivityName:2130771988 used because it matches string pool constant primaryActivityName.className
 Marking attr:secondaryActivityName:2130771991 used because it matches string pool constant secondaryActivityName
+Marking attr:secondaryActivityName:2130771991 used because it matches string pool constant secondaryActivityName
+Marking id:info:2131034158 used because it matches string pool constant info
 Marking id:info:2131034158 used because it matches string pool constant info
 Marking attr:primaryActivityName:2130771988 used because it matches string pool constant primaryActivity
 Marking attr:secondaryActivityAction:2130771990 used because it matches string pool constant secondaryActivity
@@ -1136,9 +1154,11 @@ Marking id:action_image:2131034147 used because it matches string pool constant 
 Marking id:action_text:2131034148 used because it matches string pool constant action
 Marking id:actions:2131034149 used because it matches string pool constant action
 Marking id:text:2131034184 used because it matches string pool constant text
+Marking id:text:2131034184 used because it matches string pool constant text
 Marking id:text2:2131034185 used because it matches string pool constant text
 Marking attr:activityAction:2130771968 used because it matches string pool constant activity
 Marking attr:activityName:2130771969 used because it matches string pool constant activity
+Marking attr:secondaryActivityName:2130771991 used because it matches string pool constant secondaryActivityName.packageName
 Marking id:line1:2131034160 used because it matches string pool constant line
 Marking id:line3:2131034161 used because it matches string pool constant line
 @attr/activityAction : reachable=true

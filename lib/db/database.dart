@@ -17,7 +17,20 @@ class DB {
       tasktable = [],
       todotable = [],
       usersOffice = [],
-      remindtable = [];
+      remindtable = [],
+      logstable = [];
+
+  createappversiontable() async {
+    MySqlConnection conn = await MySqlConnection.connect(settings);
+    await conn.query('''
+create table if not exists version
+(
+version varchar(255)
+);
+''');
+    await conn.close();
+  }
+
   createuserstable() async {
     MySqlConnection conn = await MySqlConnection.connect(settings);
     await conn.query('''
@@ -35,7 +48,8 @@ mustchgpass tinyint(1) default 1,
 addtodo tinyint(1) default 1,
 addremind tinyint(1) default 0,
 addping tinyint(1) default 0,
-pbx tinyint(1) default 0
+pbx tinyint(1) default 0,
+logstatus tinyint(1) default 0
 );
 ''');
     String cpassword = codepassword(word: 'admin');
@@ -54,9 +68,10 @@ office_id int(11) unique primary key auto_increment,
 officename varchar(255) unique,
 chatid varchar(255),
 notifi tinyint(1) default 0,
-sendstatus tinyint(1) default 0,
+lastsendtask timestamp null default null,
 color varchar(255),
 autosendtasks tinyint(1) default 0,
+lastsendremind timestamp null default null
 );
 ''');
     await conn.close();
@@ -231,7 +246,9 @@ startsendat Time,
 sendalertbefor int(11) default 0,
 autocerturl varchar(255),
 manytimestype tinyint(1),
-foreign key (remind_office_id) references office(office_id)
+foreign key (remind_office_id) references office(office_id),
+pasue int(11) default 0,
+pausedate timestamp null default null
 );
 ''');
     await conn.close();

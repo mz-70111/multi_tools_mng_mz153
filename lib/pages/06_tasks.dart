@@ -88,47 +88,60 @@ class Tasks extends StatelessWidget {
           ? colors.add(DB.officetable[DB.officetable.indexWhere(
               (element) => element['office_id'] == itemResult[0])]['color'])
           : null;
-      return Column(children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              ...colors.map((c) =>
-                  Container(height: 50, width: 10, color: Color(int.parse(c)))),
-              Expanded(
-                  child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Text(
-                          "# ${itemResult[1]}_ ${itemResult[2]}",
-                          style: const TextStyle(fontSize: 13),
-                        )),
-                        Expanded(
-                            child: Text(
-                                itemResult[3] == 1 ? "منجزة" : "غير منجزة",
-                                style: const TextStyle(fontSize: 13))),
-                        Expanded(
-                            child: Column(children: [
-                          ...itemResult[4].map((t) =>
-                              Text(t, style: const TextStyle(fontSize: 13)))
-                        ]))
-                      ],
-                    ),
-                    Text(itemResult[5] == 1 ? "إشعار مفعل" : "إشعار ملغى")
-                  ],
-                ),
-              )),
-            ],
+      return Card(
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                ...colors.map((c) => Container(
+                    height: 50, width: 10, color: Color(int.parse(c)))),
+                Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Text(
+                            "# ${itemResult[1]}_ ${itemResult[2]}",
+                            style: const TextStyle(fontSize: 13),
+                          )),
+                          Expanded(
+                              child: Row(
+                            children: [
+                              Container(
+                                  height: 30,
+                                  width: 15,
+                                  color: itemResult[5] == 1
+                                      ? Colors.green
+                                      : Colors.grey),
+                              Text(itemResult[3] == 1 ? "منجزة" : "غير منجزة",
+                                  style: const TextStyle(fontSize: 13)),
+                            ],
+                          )),
+                          Expanded(
+                              child: Column(children: [
+                            ...itemResult[4].map((t) =>
+                                Text(t, style: const TextStyle(fontSize: 13)))
+                          ]))
+                        ],
+                      ),
+                      Text(itemResult[5] == 1
+                          ? "(قيد الانجاز) إشعار مفعل"
+                          : "(مغلقة) إشعار ملغى")
+                    ],
+                  ),
+                )),
+              ],
+            ),
           ),
-        ),
-        const Divider(),
-      ]);
+          const Divider(),
+        ]),
+      );
     }
 
     Map addFunction = {

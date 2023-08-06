@@ -23,35 +23,36 @@ class DBController extends GetxController {
     LogIn.loginwait = true;
     LogIn.Pref = await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
-    // try {
-    //   await DB().createuserstable();
-    //   await DB().createofficetable();
-    //   await DB().createusersofficetable();
-    //   await DB().createtaskstable();
-    //   await DB().createuserstasktable();
-    //   await DB().createuserstasksCommentstable();
-    //   await DB().createtodotable();
-    //   await DB().createuserstodo();
-    //   await DB().createuserstodoCommentstable();
-    //   await DB().createremindtable();
-    //   await DB().createusersremindtable();
-    //   await DB().createusersremindCommentable();
-    //   await DB().createtodoimagetable();
-    //   await DB().createremindlog();
-    //   await DB().createremindrepeateevery();
-    //   await DB().createmainlogtable();
-    // } catch (e) {
-    //   "$e".contains('timed out')
-    //       ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
-    //       : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
-    // }
+    try {
+      await DB().createappversiontable();
+      await DB().createuserstable();
+      await DB().createofficetable();
+      await DB().createusersofficetable();
+      await DB().createtaskstable();
+      await DB().createuserstasktable();
+      await DB().createuserstasksCommentstable();
+      await DB().createtodotable();
+      await DB().createuserstodo();
+      await DB().createuserstodoCommentstable();
+      await DB().createremindtable();
+      await DB().createusersremindtable();
+      await DB().createusersremindCommentable();
+      await DB().createtodoimagetable();
+      await DB().createremindlog();
+      await DB().createremindrepeateevery();
+      await DB().createmainlogtable();
+    } catch (e) {
+      "$e".contains('timed out')
+          ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
+          : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
+    }
     if (LogIn.autologin.isNotEmpty) {
       LogIn.username.text = LogIn.autologin[0];
       LogIn.password.text = LogIn.autologin[1];
       await mainController.autologin();
       Home.logininfo = LogIn.username.text.toLowerCase();
     } else {
-      LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
+      LogIn.errorMSglogin = '';
     }
     LogIn.loginwait = false;
     super.onInit();
@@ -61,6 +62,7 @@ class DBController extends GetxController {
   @override
   onReady() async {
     super.onReady();
+
     update();
   }
 
@@ -110,7 +112,7 @@ class DBController extends GetxController {
         list[x].addAll({j[0]: i[y]});
         y++;
       }
-      list[x].addAll({'check': true, 'checkin': false, 'visible': true});
+      list[x].addAll({'check': true, 'visible': true});
       x++;
     }
     List ui = [], un = [], ndx = [];
@@ -156,9 +158,19 @@ class DBController extends GetxController {
           'users': [...usersOffice],
         });
       } else if (i.keys.toList().first == 'todo_id') {
-        xx = await DB().customquery(
-            query:
-                'select * from users_todo where utd_todo_id=${i['todo_id']}');
+        mainController.office_ids('uf_office_id');
+        if (checkifUserisAdmin(
+                usertable: DB.userstable,
+                userid: DB.userstable[DB.userstable.indexWhere(
+                        (element) => element['username'] == Home.logininfo)]
+                    ['user_id']) ==
+            true) {
+          xx = await DB().customquery(query: 'select * from users_todo');
+        } else {
+          xx = await DB().customquery(
+              query:
+                  'select * from users_todo join users_office on uf_user_id=createby_id where ${LogIn.office_ids}');
+        }
         for (var t in xx) {
           list[list.indexOf(i)].addAll({
             'createby_id': t[1],
@@ -173,24 +185,6 @@ class DBController extends GetxController {
                 : null,
           });
         }
-        yy = await DB().customquery(
-            query:
-                "select * from users_todo_comments where utdc_todo_id=${i['todo_id']};");
-        usersC.clear();
-        usersIdC.clear();
-        comment.clear();
-        commentdate.clear();
-        commentId.clear();
-        for (var o in yy) {
-          commentId.add(o[0]);
-          commentdate.add(o[4]);
-          usersIdC.add(o[1]);
-          usersC.add(o[1] != null
-              ? usertable[usertable.indexWhere(
-                  (element) => element['user_id'] == o[1])]['fullname']
-              : null);
-          comment.add(o[3]);
-        }
         list[list.indexOf(i)].addAll({
           'comment_id': [...commentId],
           'users_id_comment': [...usersIdC],
@@ -201,6 +195,7 @@ class DBController extends GetxController {
           'waitsend': true,
           'error': null
         });
+
         zz = await DB().customquery(
             query:
                 'select * from todo_images where ti_todo_id=${i['todo_id']}');
@@ -213,9 +208,19 @@ class DBController extends GetxController {
           'images': [...images]
         });
       } else if (i.keys.toList().first == 'task_id') {
-        xx = await DB().customquery(
-            query:
-                'select * from users_tasks where ut_task_id=${i['task_id']}');
+        mainController.office_ids('uf_office_id');
+        if (checkifUserisAdmin(
+                usertable: DB.userstable,
+                userid: DB.userstable[DB.userstable.indexWhere(
+                        (element) => element['username'] == Home.logininfo)]
+                    ['user_id']) ==
+            true) {
+          xx = await DB().customquery(query: 'select * from users_tasks');
+        } else {
+          xx = await DB().customquery(
+              query:
+                  'select * from users_tasks join users_office on uf_user_id=ut_user_id where ${LogIn.office_ids}');
+        }
         ui.clear();
         un.clear();
         for (var t in xx) {
@@ -230,24 +235,7 @@ class DBController extends GetxController {
           'userstask_id': [...ui],
           'userstask_name': [...un],
         });
-        yy = await DB().customquery(
-            query:
-                'select * from users_tasks_comments where utc_task_id=${i['task_id']}');
-        usersC.clear();
-        usersIdC.clear();
-        comment.clear();
-        commentdate.clear();
-        commentId.clear();
-        for (var o in yy) {
-          commentId.add(o[0]);
-          commentdate.add(o[4]);
-          usersIdC.add(o[1]);
-          usersC.add(o[1] != null
-              ? usertable[usertable.indexWhere(
-                  (element) => element['user_id'] == o[1])]['fullname']
-              : null);
-          comment.add(o[3]);
-        }
+
         list[list.indexOf(i)].addAll({
           'comment_id': [...commentId],
           'users_id_comment': [...usersIdC],
@@ -269,10 +257,19 @@ class DBController extends GetxController {
         list[list.indexOf(i)].addAll({
           'every': [...every]
         });
-
-        xx = await DB().customquery(
-            query:
-                'select * from users_remind where ur_remind_id=${i['remind_id']}');
+        mainController.office_ids('uf_office_id');
+        if (checkifUserisAdmin(
+                usertable: DB.userstable,
+                userid: DB.userstable[DB.userstable.indexWhere(
+                        (element) => element['username'] == Home.logininfo)]
+                    ['user_id']) ==
+            true) {
+          xx = await DB().customquery(query: 'select * from users_remind');
+        } else {
+          xx = await DB().customquery(
+              query:
+                  'select * from users_remind join users_office on uf_user_id=createby_id where ${LogIn.office_ids}');
+        }
         for (var t in xx) {
           list[list.indexOf(i)].addAll({
             'createby_id': t[1],
@@ -289,25 +286,7 @@ class DBController extends GetxController {
             'editdate': t[4]
           });
         }
-        yy = await DB().customquery(
-            query:
-                "select * from users_remind_comments where urc_remind_id=${i['remind_id']};");
-        usersC.clear();
-        usersIdC.clear();
-        comment.clear();
-        commentdate.clear();
-        commentId.clear();
-        for (var o in yy) {
-          commentId.add(o[0]);
-          commentdate.add(o[4]);
-          usersIdC.add(o[1]);
-          usersC.add(o[1] != null
-              ? DB.userstable[DB.userstable
-                      .indexWhere((element) => element['user_id'] == o[1])]
-                  ['fullname']
-              : null);
-          comment.add(o[3]);
-        }
+
         list[list.indexOf(i)].addAll({
           'comment_id': [...commentId],
           'users_id_comment': [...usersIdC],
@@ -454,7 +433,7 @@ values
 "${Office.offices[0]['controller'].text}",
 "${Office.offices[1]['controller'].text}",
 ${Office.notifi},
-"${Office.selectcolor.toString().contains("Material") ? Office.selectcolor.toString().substring(Office.selectcolor.toString().indexOf('value: Color(') + 13, Office.selectcolor.toString().length - 2) : Office.selectcolor.toString().substring(Office.selectcolor.toString().indexOf('Color(') + 6, Office.selectcolor.toString().length - 1)}"
+"${Office.selectcolor.toString().substring(Office.selectcolor.toString().indexOf('0x'), Office.selectcolor.toString().indexOf('0x') + 10)}"
 );
 ''');
     var t = await DB().customquery(
@@ -467,9 +446,10 @@ ${Office.notifi},
         'officename': i[1],
         'chatid': i[2],
         'notifi': i[3],
-        'sendstatus': i[4],
+        'lastsendtask': i[4],
         'color': i[5],
         'autosendtasks': i[6],
+        'lastsendremind': i[7],
         'users': [],
         'check': true,
         'visible': true
@@ -1016,30 +996,6 @@ ${DB.officetable[DB.officetable.indexWhere((element) => element['officename'] ==
   mustchgpass=0
   where user_id=$id;
   ''');
-    await mainController.office_ids('office_id');
-    await gettable(
-      usertable: DB.userstable,
-      list: Employ.mylista,
-      table: 'users',
-      tableid: 'user_id',
-      where: DB.userstable[DB.userstable.indexWhere(
-                      (element) => element['username'] == Home.logininfo)]
-                  ['admin'] ==
-              1
-          ? ''
-          : 'join users_office on uf_user_id=user_id join office on uf_office_id=office_id where ${LogIn.office_ids}',
-    );
-    DB.userstable[
-            DB.userstable.indexWhere((element) => element['user_id'] == id)] =
-        Employ.mylista[
-            Employ.mylista.indexWhere((element) => element['user_id'] == id)];
-    Home.searchlist = [
-      ...DB.officetable,
-      ...DB.userstable,
-      ...DB.tasktable,
-      ...DB.todotable,
-      ...DB.remindtable
-    ];
     update();
   }
 
@@ -1049,7 +1005,7 @@ update office set
 officename="${Office.offices[0]['controller'].text}",
 chatid="${Office.offices[1]['controller'].text}",
 notifi=${Office.notifi == true ? 1 : 0},
-color="${Office.selectcolor.toString().contains("Material") ? Office.selectcolor.toString().substring(Office.selectcolor.toString().indexOf('value: Color(') + 13, Office.selectcolor.toString().length - 2) : Office.selectcolor.toString().substring(Office.selectcolor.toString().indexOf('Color(') + 6, Office.selectcolor.toString().length - 1)}"
+color="${Office.selectcolor.toString().substring(Office.selectcolor.toString().indexOf('0x'), Office.selectcolor.toString().indexOf('0x') + 10)}"
 where office_id=$id;
 ''');
     await gettable(
@@ -1185,15 +1141,18 @@ mobile="$mobile",
 email="$email"
 where user_id=$id;
 ''');
+    mainController.office_ids('office');
+    List<Map> users = [];
+
     await gettable(
-        usertable: DB.userstable,
-        list: Employ.mylista,
-        table: 'users',
-        tableid: 'user_id');
+      usertable: users,
+      list: users,
+      table: 'users',
+      tableid: 'user_id',
+    );
     DB.userstable[
             DB.userstable.indexWhere((element) => element['user_id'] == id)] =
-        Employ.mylista[
-            Employ.mylista.indexWhere((element) => element['user_id'] == id)];
+        users[users.indexWhere((element) => element['user_id'] == id)];
     Home.searchlist = [
       ...DB.officetable,
       ...DB.userstable,
@@ -1358,6 +1317,8 @@ $remindid
         'sendalertbefor': i[13],
         'autocerturl': i[14],
         'manytimestype': i[15],
+        'pause': i[16],
+        'pausedate': i[17],
         'visible': true,
         'check': true
       });

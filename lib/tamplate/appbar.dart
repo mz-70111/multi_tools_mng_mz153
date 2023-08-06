@@ -159,7 +159,7 @@ class Notificationm extends StatelessWidget {
   }
 }
 
-AppBarMZ() {
+AppBarMZ(ctx) {
   MainController mainController = Get.find();
   ThemeController themeController = Get.find();
 
@@ -177,43 +177,54 @@ AppBarMZ() {
       ),
     ),
     actions: [
-      GetBuilder<MainController>(
-          init: mainController,
-          builder: (_) {
-            HomePage.notifitask = 0;
-            Notificationm.notifilist.clear();
-            for (var i in DB.tasktable) {
-              if (i['notifi'] == 1 &&
-                  i['userstask_id'].contains(DB.userstable[DB.userstable
-                      .indexWhere((element) =>
-                          element['username'] == Home.logininfo)]['user_id'])) {
-                HomePage.notifitask++;
-              }
-            }
-            if (HomePage.notifitask > 0) {
-              Notificationm.notifilist.add({
-                'label': "لديك مهام حالية ${HomePage.notifitask}",
-                'action': () async {
-                  await MainController().opennotifi();
-                }
-              });
-            }
-            return IconButton(
-                onPressed: () {
-                  PersonPanel.dropend = -150.0;
-                },
-                icon: HomePage.notifitask == 0
-                    ? const Icon(Icons.notifications)
-                    : Stack(
-                        children: [
-                          const Icon(
-                            Icons.notifications,
-                            color: Colors.orangeAccent,
-                          ),
-                          Text(HomePage.notifitask.toString())
-                        ],
-                      ));
-          }),
+      // GetBuilder<MainController>(
+      //     init: mainController,
+      //     builder: (_) {
+      //       HomePage.notifitask = 0;
+      //       Notificationm.notifilist.clear();
+      //       for (var i in DB.tasktable) {
+      //         if (i['notifi'] == 1 &&
+      //             i['userstask_id'].contains(DB.userstable[DB.userstable
+      //                 .indexWhere((element) =>
+      //                     element['username'] == Home.logininfo)]['user_id'])) {
+      //           HomePage.notifitask++;
+      //         }
+      //       }
+      //       if (HomePage.notifitask > 0) {
+      //         Notificationm.notifilist.add({
+      //           'label': "لديك مهام حالية ${HomePage.notifitask}",
+      //           'action': () async {
+      //             await MainController().opennotifi();
+      //           }
+      //         });
+      //       }
+      //       return IconButton(
+      //           onPressed: () {
+      //             PersonPanel.dropend = -150.0;
+      //           },
+      //           icon: HomePage.notifitask == 0
+      //               ? const Icon(Icons.notifications)
+      //               : Stack(
+      //                   children: [
+      //                     const Icon(
+      //                       Icons.notifications,
+      //                       color: Colors.orangeAccent,
+      //                     ),
+      //                     Text(HomePage.notifitask.toString())
+      //                   ],
+      //                 ));
+      //     }),
+      Visibility(
+          visible: checkifUserisAdmin(
+              usertable: DB.userstable,
+              userid: DB.userstable[DB.userstable.indexWhere(
+                      (element) => element['username'] == Home.logininfo)]
+                  ['user_id']),
+          child: IconButton(
+              onPressed: () {
+                showusersonline(ctx);
+              },
+              icon: Icon(Icons.online_prediction))),
       IconButton(
           onPressed: () {
             mainController.personalpanelshow();
@@ -231,4 +242,26 @@ AppBarMZ() {
                   child0: Icon(ThemeMZ().modeicon())))),
     ],
   );
+}
+
+showusersonline(ctx) async {
+  try {
+    List users = [];
+    String userson = 'المستخدمون الذين قاموا بتسجيل الدخول حاليا';
+    var t = await DB()
+        .customquery(query: 'select fullname from users where logstatus=1');
+    for (var i in t) {
+      users.add(i[0]);
+    }
+    for (var i in users) {
+      userson += '\n$i';
+    }
+    showDialog(
+        context: ctx,
+        builder: (_) {
+          return AlertDialog(
+            content: Text(userson),
+          );
+        });
+  } catch (e) {}
 }

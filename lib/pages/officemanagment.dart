@@ -74,20 +74,22 @@ class Office extends StatelessWidget {
     Widget itemsWidget() {
       colors.clear();
       colors.add(itemResult[0]);
-      return Column(children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              ...colors.map((c) =>
-                  Container(height: 40, width: 10, color: Color(int.parse(c)))),
-              Expanded(child: Text("# ${itemResult[1]}_ ${itemResult[2]}")),
-            ],
+      return Card(
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                ...colors.map((c) => Container(
+                    height: 40, width: 10, color: Color(int.parse(c)))),
+                Expanded(child: Text("# ${itemResult[1]}_ ${itemResult[2]}")),
+              ],
+            ),
           ),
-        ),
-        Divider(),
-      ]);
+          Divider(),
+        ]),
+      );
     }
 
     Map addFunction = {
@@ -392,13 +394,9 @@ class Office extends StatelessWidget {
     e['officename'] = Office.offices[0]['controller'].text;
     e['chatid'] = Office.offices[1]['controller'].text;
     e['notifi'] = Office.notifi == true ? 1 : 0;
-    e['color'] = Office.selectcolor.toString().contains("Material")
-        ? Office.selectcolor.toString().substring(
-            Office.selectcolor.toString().indexOf('value: Color(') + 13,
-            Office.selectcolor.toString().length - 2)
-        : Office.selectcolor.toString().substring(
-            Office.selectcolor.toString().indexOf('Color(') + 6,
-            Office.selectcolor.toString().length - 1);
+    e['color'] = Office.selectcolor.toString().substring(
+        Office.selectcolor.toString().indexOf('0x'),
+        Office.selectcolor.toString().indexOf('0x') + 10);
   }
 
   deleteOffice({e, ctx}) async {

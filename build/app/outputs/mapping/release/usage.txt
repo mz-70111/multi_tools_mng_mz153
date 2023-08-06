@@ -123,6 +123,8 @@ androidx.annotation.PluralsRes
 androidx.annotation.Px
 androidx.annotation.RawRes
 androidx.annotation.RequiresApi
+androidx.annotation.RequiresExtension$Container
+androidx.annotation.RequiresExtension
 androidx.annotation.RequiresFeature
 androidx.annotation.RequiresOptIn$Level
 androidx.annotation.RequiresOptIn
@@ -2275,6 +2277,31 @@ io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin:
     private static final java.lang.String SHARED_PREFERENCES_NAME
     private static final java.lang.String TAG
     public static void registerWith(io.flutter.plugin.common.PluginRegistry$Registrar)
+io.flutter.plugins.urllauncher.BuildConfig
+io.flutter.plugins.urllauncher.Messages$WebViewOptions$Builder
+io.flutter.plugins.urllauncher.Messages:
+    public void <init>()
+io.flutter.plugins.urllauncher.R$attr
+io.flutter.plugins.urllauncher.R$color
+io.flutter.plugins.urllauncher.R$dimen
+io.flutter.plugins.urllauncher.R$drawable
+io.flutter.plugins.urllauncher.R$id
+io.flutter.plugins.urllauncher.R$integer
+io.flutter.plugins.urllauncher.R$layout
+io.flutter.plugins.urllauncher.R$string
+io.flutter.plugins.urllauncher.R$style
+io.flutter.plugins.urllauncher.R$styleable
+io.flutter.plugins.urllauncher.R
+io.flutter.plugins.urllauncher.UrlLauncher:
+    private static final java.lang.String TAG
+io.flutter.plugins.urllauncher.UrlLauncherPlugin:
+    private static final java.lang.String TAG
+    public static void registerWith(io.flutter.plugin.common.PluginRegistry$Registrar)
+io.flutter.plugins.urllauncher.WebViewActivity:
+    public static final java.lang.String ACTION_CLOSE
+    static final java.lang.String ENABLE_DOM_EXTRA
+    static final java.lang.String ENABLE_JS_EXTRA
+    static final java.lang.String URL_EXTRA
 io.flutter.util.HandlerCompat:
     public void <init>()
 io.flutter.util.PathUtils:
@@ -2350,10 +2377,9 @@ kotlin.ExceptionsKt__ExceptionsKt:
     private static final void printStackTrace(java.lang.Throwable,java.io.PrintStream)
     private static final void printStackTrace(java.lang.Throwable,java.io.PrintWriter)
     public static final java.lang.String stackTraceToString(java.lang.Throwable)
-kotlin.Experimental$Level
-kotlin.Experimental
 kotlin.ExperimentalMultiplatform
 kotlin.ExperimentalStdlibApi
+kotlin.ExperimentalSubclassOptIn
 kotlin.ExperimentalUnsignedTypes
 kotlin.ExtensionFunctionType
 kotlin.HashCodeKt
@@ -2445,6 +2471,7 @@ kotlin.SinceKotlin
 kotlin.StandardKt
 kotlin.StandardKt__StandardKt
 kotlin.StandardKt__SynchronizedKt
+kotlin.SubclassOptInRequired
 kotlin.Suppress
 kotlin.SuspendKt
 kotlin.SynchronizedLazyImpl:
@@ -2487,7 +2514,6 @@ kotlin.UninitializedPropertyAccessException:
 kotlin.UnsafeLazyImpl
 kotlin.UnsafeVariance
 kotlin.UnsignedKt
-kotlin.UseExperimental
 kotlin.WasExperimental
 kotlin._Assertions
 kotlin.annotation.AnnotationRetention
@@ -4542,15 +4568,12 @@ kotlin.collections.ArraysKt___ArraysKt:
 kotlin.collections.ArraysUtilJVM:
     void <init>()
 kotlin.collections.BooleanIterator
-kotlin.collections.BrittleContainsOptimizationKt
 kotlin.collections.ByteIterator
 kotlin.collections.CharIterator
-kotlin.collections.CollectionSystemProperties
 kotlin.collections.CollectionsKt:
     private void <init>()
 kotlin.collections.CollectionsKt__CollectionsJVMKt:
     public void <init>()
-    public static final boolean brittleContainsOptimizationEnabled()
     public static final java.util.List build(java.util.List)
     private static final java.util.List buildListInternal(int,kotlin.jvm.functions.Function1)
     private static final java.util.List buildListInternal(kotlin.jvm.functions.Function1)
@@ -4626,6 +4649,7 @@ kotlin.collections.CollectionsKt__MutableCollectionsKt:
     public void <init>()
     public static final boolean addAll(java.util.Collection,kotlin.sequences.Sequence)
     public static final boolean addAll(java.util.Collection,java.lang.Object[])
+    public static final java.util.Collection convertToListIfNotCollection(java.lang.Iterable)
     private static final boolean filterInPlace$CollectionsKt__MutableCollectionsKt(java.lang.Iterable,kotlin.jvm.functions.Function1,boolean)
     private static final boolean filterInPlace$CollectionsKt__MutableCollectionsKt(java.util.List,kotlin.jvm.functions.Function1,boolean)
     private static final void minusAssign(java.util.Collection,java.lang.Iterable)
@@ -5193,26 +5217,21 @@ kotlin.collections.unsigned.UArraysKt___UArraysKt$withIndex$4
 kotlin.collections.unsigned.UArraysKt___UArraysKt
 kotlin.comparisons.ComparisonsKt:
     private void <init>()
-kotlin.comparisons.ComparisonsKt__ComparisonsKt$compareBy$1
 kotlin.comparisons.ComparisonsKt__ComparisonsKt$compareBy$2
 kotlin.comparisons.ComparisonsKt__ComparisonsKt$compareBy$3
 kotlin.comparisons.ComparisonsKt__ComparisonsKt$compareByDescending$1
 kotlin.comparisons.ComparisonsKt__ComparisonsKt$compareByDescending$2
-kotlin.comparisons.ComparisonsKt__ComparisonsKt$nullsFirst$1
-kotlin.comparisons.ComparisonsKt__ComparisonsKt$nullsLast$1
-kotlin.comparisons.ComparisonsKt__ComparisonsKt$then$1
 kotlin.comparisons.ComparisonsKt__ComparisonsKt$thenBy$1
 kotlin.comparisons.ComparisonsKt__ComparisonsKt$thenBy$2
 kotlin.comparisons.ComparisonsKt__ComparisonsKt$thenByDescending$1
 kotlin.comparisons.ComparisonsKt__ComparisonsKt$thenByDescending$2
 kotlin.comparisons.ComparisonsKt__ComparisonsKt$thenComparator$1
-kotlin.comparisons.ComparisonsKt__ComparisonsKt$thenDescending$1
 kotlin.comparisons.ComparisonsKt__ComparisonsKt:
     public void <init>()
-    public static final synthetic int access$compareValuesByImpl(java.lang.Object,java.lang.Object,kotlin.jvm.functions.Function1[])
     private static final java.util.Comparator compareBy(java.util.Comparator,kotlin.jvm.functions.Function1)
     private static final java.util.Comparator compareBy(kotlin.jvm.functions.Function1)
     public static final varargs java.util.Comparator compareBy(kotlin.jvm.functions.Function1[])
+    private static final int compareBy$lambda$0$ComparisonsKt__ComparisonsKt(kotlin.jvm.functions.Function1[],java.lang.Object,java.lang.Object)
     private static final java.util.Comparator compareByDescending(java.util.Comparator,kotlin.jvm.functions.Function1)
     private static final java.util.Comparator compareByDescending(kotlin.jvm.functions.Function1)
     private static final int compareValuesBy(java.lang.Object,java.lang.Object,java.util.Comparator,kotlin.jvm.functions.Function1)
@@ -5222,17 +5241,21 @@ kotlin.comparisons.ComparisonsKt__ComparisonsKt:
     public static final java.util.Comparator naturalOrder()
     private static final java.util.Comparator nullsFirst()
     public static final java.util.Comparator nullsFirst(java.util.Comparator)
+    private static final int nullsFirst$lambda$3$ComparisonsKt__ComparisonsKt(java.util.Comparator,java.lang.Object,java.lang.Object)
     private static final java.util.Comparator nullsLast()
     public static final java.util.Comparator nullsLast(java.util.Comparator)
+    private static final int nullsLast$lambda$4$ComparisonsKt__ComparisonsKt(java.util.Comparator,java.lang.Object,java.lang.Object)
     public static final java.util.Comparator reverseOrder()
     public static final java.util.Comparator reversed(java.util.Comparator)
     public static final java.util.Comparator then(java.util.Comparator,java.util.Comparator)
+    private static final int then$lambda$1$ComparisonsKt__ComparisonsKt(java.util.Comparator,java.util.Comparator,java.lang.Object,java.lang.Object)
     private static final java.util.Comparator thenBy(java.util.Comparator,java.util.Comparator,kotlin.jvm.functions.Function1)
     private static final java.util.Comparator thenBy(java.util.Comparator,kotlin.jvm.functions.Function1)
     private static final java.util.Comparator thenByDescending(java.util.Comparator,java.util.Comparator,kotlin.jvm.functions.Function1)
     private static final java.util.Comparator thenByDescending(java.util.Comparator,kotlin.jvm.functions.Function1)
     private static final java.util.Comparator thenComparator(java.util.Comparator,kotlin.jvm.functions.Function2)
     public static final java.util.Comparator thenDescending(java.util.Comparator,java.util.Comparator)
+    private static final int thenDescending$lambda$2$ComparisonsKt__ComparisonsKt(java.util.Comparator,java.util.Comparator,java.lang.Object,java.lang.Object)
 kotlin.comparisons.ComparisonsKt___ComparisonsJvmKt:
     public void <init>()
     private static final byte maxOf(byte,byte)
@@ -5295,6 +5318,7 @@ kotlin.concurrent.ThreadsKt$thread$thread$1
 kotlin.concurrent.ThreadsKt
 kotlin.concurrent.TimersKt$timerTask$1
 kotlin.concurrent.TimersKt
+kotlin.concurrent.VolatileKt
 kotlin.contracts.CallsInPlace
 kotlin.contracts.ConditionalEffect
 kotlin.contracts.ContractBuilder$DefaultImpls
@@ -5376,7 +5400,15 @@ kotlin.coroutines.jvm.internal.RestrictedSuspendLambda
 kotlin.coroutines.jvm.internal.RunSuspend
 kotlin.coroutines.jvm.internal.RunSuspendKt
 kotlin.coroutines.jvm.internal.SuspendFunction
+kotlin.enums.EnumEntries
+kotlin.enums.EnumEntriesKt$enumEntries$1
+kotlin.enums.EnumEntriesKt
+kotlin.enums.EnumEntriesList
+kotlin.enums.EnumEntriesSerializationProxy$Companion
+kotlin.enums.EnumEntriesSerializationProxy
 kotlin.experimental.BitwiseOperationsKt
+kotlin.experimental.ExperimentalObjCName
+kotlin.experimental.ExperimentalObjCRefinement
 kotlin.experimental.ExperimentalTypeInference
 kotlin.internal.AccessibleLateinitPropertyLiteral
 kotlin.internal.ContractsDsl
@@ -5447,10 +5479,46 @@ kotlin.io.SerializableKt
 kotlin.io.TerminateException
 kotlin.io.TextStreamsKt$readLines$1
 kotlin.io.TextStreamsKt
+kotlin.io.encoding.Base64$Default
+kotlin.io.encoding.Base64
+kotlin.io.encoding.Base64JVMKt
+kotlin.io.encoding.Base64Kt
+kotlin.io.encoding.DecodeInputStream
+kotlin.io.encoding.EncodeOutputStream
+kotlin.io.encoding.ExperimentalEncodingApi
+kotlin.io.encoding.StreamEncodingKt
+kotlin.io.encoding.StreamEncodingKt__Base64IOStreamKt
+kotlin.io.path.CopyActionContext
+kotlin.io.path.CopyActionResult
+kotlin.io.path.DefaultCopyActionContext
+kotlin.io.path.DirectoryEntriesReader
+kotlin.io.path.ExceptionsCollector
 kotlin.io.path.ExperimentalPathApi
+kotlin.io.path.FileVisitorBuilder
+kotlin.io.path.FileVisitorBuilderImpl
+kotlin.io.path.FileVisitorImpl
+kotlin.io.path.LinkFollowing
+kotlin.io.path.OnErrorResult
+kotlin.io.path.PathNode
 kotlin.io.path.PathRelativizer
+kotlin.io.path.PathTreeWalk$bfsIterator$1
+kotlin.io.path.PathTreeWalk$dfsIterator$1
+kotlin.io.path.PathTreeWalk
+kotlin.io.path.PathTreeWalkKt
+kotlin.io.path.PathWalkOption
 kotlin.io.path.PathsKt
 kotlin.io.path.PathsKt__PathReadWriteKt
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt$WhenMappings
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt$copyToRecursively$1
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt$copyToRecursively$2
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt$copyToRecursively$3
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt$copyToRecursively$4
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt$copyToRecursively$5$1
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt$copyToRecursively$5$2
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt$copyToRecursively$5$3
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt$copyToRecursively$5$4
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt$copyToRecursively$5
+kotlin.io.path.PathsKt__PathRecursiveFunctionsKt
 kotlin.io.path.PathsKt__PathUtilsKt
 kotlin.jdk7.AutoCloseableKt
 kotlin.js.ExperimentalJsExport
@@ -5475,6 +5543,7 @@ kotlin.jvm.JvmName
 kotlin.jvm.JvmOverloads
 kotlin.jvm.JvmPackageName
 kotlin.jvm.JvmRecord
+kotlin.jvm.JvmSerializableLambda
 kotlin.jvm.JvmStatic
 kotlin.jvm.JvmSuppressWildcards
 kotlin.jvm.JvmSynthetic
@@ -5721,6 +5790,7 @@ kotlin.jvm.internal.RepeatableContainer
 kotlin.jvm.internal.SerializedIr
 kotlin.jvm.internal.ShortCompanionObject
 kotlin.jvm.internal.ShortSpreadBuilder
+kotlin.jvm.internal.SourceDebugExtension
 kotlin.jvm.internal.SpreadBuilder
 kotlin.jvm.internal.StringCompanionObject
 kotlin.jvm.internal.TypeIntrinsics:
@@ -5774,6 +5844,8 @@ kotlin.jvm.internal.markers.KMutableMap$Entry
 kotlin.jvm.internal.markers.KMutableMap
 kotlin.jvm.internal.markers.KMutableSet
 kotlin.jvm.internal.unsafe.MonitorKt
+kotlin.jvm.jdk8.JvmRepeatableKt
+kotlin.jvm.optionals.OptionalsKt
 kotlin.math.Constants
 kotlin.math.MathKt
 kotlin.math.MathKt__MathHKt
@@ -5859,11 +5931,15 @@ kotlin.ranges.ClosedFloatingPointRange$DefaultImpls
 kotlin.ranges.ClosedFloatingPointRange
 kotlin.ranges.ClosedRange$DefaultImpls
 kotlin.ranges.ClosedRange
+kotlin.ranges.ComparableOpenEndRange
 kotlin.ranges.ComparableRange
 kotlin.ranges.IntProgressionIterator:
     public final int getStep()
 kotlin.ranges.IntRange:
     public synthetic bridge boolean contains(java.lang.Comparable)
+    public synthetic bridge java.lang.Comparable getEndExclusive()
+    public java.lang.Integer getEndExclusive()
+    public static synthetic void getEndExclusive$annotations()
     public synthetic bridge java.lang.Comparable getEndInclusive()
     public synthetic bridge java.lang.Comparable getStart()
 kotlin.ranges.LongProgression$Companion
@@ -5871,15 +5947,23 @@ kotlin.ranges.LongProgression
 kotlin.ranges.LongProgressionIterator
 kotlin.ranges.LongRange$Companion
 kotlin.ranges.LongRange
+kotlin.ranges.OpenEndDoubleRange
+kotlin.ranges.OpenEndFloatRange
+kotlin.ranges.OpenEndRange$DefaultImpls
+kotlin.ranges.OpenEndRange
 kotlin.ranges.RangesKt:
     private void <init>()
 kotlin.ranges.RangesKt__RangesKt:
     public void <init>()
     public static final void checkStepIsPositive(boolean,java.lang.Number)
-    private static final boolean contains(java.lang.Iterable,java.lang.Object)
+    private static final boolean contains(kotlin.ranges.ClosedRange,java.lang.Object)
+    private static final boolean contains(kotlin.ranges.OpenEndRange,java.lang.Object)
     public static final kotlin.ranges.ClosedFloatingPointRange rangeTo(double,double)
     public static final kotlin.ranges.ClosedFloatingPointRange rangeTo(float,float)
     public static final kotlin.ranges.ClosedRange rangeTo(java.lang.Comparable,java.lang.Comparable)
+    public static final kotlin.ranges.OpenEndRange rangeUntil(double,double)
+    public static final kotlin.ranges.OpenEndRange rangeUntil(float,float)
+    public static final kotlin.ranges.OpenEndRange rangeUntil(java.lang.Comparable,java.lang.Comparable)
 kotlin.ranges.RangesKt___RangesKt:
     public void <init>()
     public static final synthetic boolean byteRangeContains(kotlin.ranges.ClosedRange,double)
@@ -5887,6 +5971,9 @@ kotlin.ranges.RangesKt___RangesKt:
     public static final boolean byteRangeContains(kotlin.ranges.ClosedRange,int)
     public static final boolean byteRangeContains(kotlin.ranges.ClosedRange,long)
     public static final boolean byteRangeContains(kotlin.ranges.ClosedRange,short)
+    public static final boolean byteRangeContains(kotlin.ranges.OpenEndRange,int)
+    public static final boolean byteRangeContains(kotlin.ranges.OpenEndRange,long)
+    public static final boolean byteRangeContains(kotlin.ranges.OpenEndRange,short)
     public static final byte coerceAtLeast(byte,byte)
     public static final double coerceAtLeast(double,double)
     public static final float coerceAtLeast(float,float)
@@ -5908,13 +5995,20 @@ kotlin.ranges.RangesKt___RangesKt:
     public static final java.lang.Comparable coerceIn(java.lang.Comparable,kotlin.ranges.ClosedRange)
     public static final short coerceIn(short,short,short)
     private static final boolean contains(kotlin.ranges.CharRange,java.lang.Character)
+    private static final boolean contains(kotlin.ranges.IntRange,byte)
+    private static final boolean contains(kotlin.ranges.IntRange,long)
     private static final boolean contains(kotlin.ranges.IntRange,java.lang.Integer)
+    private static final boolean contains(kotlin.ranges.IntRange,short)
+    private static final boolean contains(kotlin.ranges.LongRange,byte)
+    private static final boolean contains(kotlin.ranges.LongRange,int)
     private static final boolean contains(kotlin.ranges.LongRange,java.lang.Long)
+    private static final boolean contains(kotlin.ranges.LongRange,short)
     public static final synthetic boolean doubleRangeContains(kotlin.ranges.ClosedRange,byte)
     public static final boolean doubleRangeContains(kotlin.ranges.ClosedRange,float)
     public static final synthetic boolean doubleRangeContains(kotlin.ranges.ClosedRange,int)
     public static final synthetic boolean doubleRangeContains(kotlin.ranges.ClosedRange,long)
     public static final synthetic boolean doubleRangeContains(kotlin.ranges.ClosedRange,short)
+    public static final boolean doubleRangeContains(kotlin.ranges.OpenEndRange,float)
     public static final kotlin.ranges.CharProgression downTo(char,char)
     public static final kotlin.ranges.IntProgression downTo(byte,byte)
     public static final kotlin.ranges.IntProgression downTo(byte,int)
@@ -5947,6 +6041,9 @@ kotlin.ranges.RangesKt___RangesKt:
     public static final synthetic boolean intRangeContains(kotlin.ranges.ClosedRange,float)
     public static final boolean intRangeContains(kotlin.ranges.ClosedRange,long)
     public static final boolean intRangeContains(kotlin.ranges.ClosedRange,short)
+    public static final boolean intRangeContains(kotlin.ranges.OpenEndRange,byte)
+    public static final boolean intRangeContains(kotlin.ranges.OpenEndRange,long)
+    public static final boolean intRangeContains(kotlin.ranges.OpenEndRange,short)
     public static final char last(kotlin.ranges.CharProgression)
     public static final int last(kotlin.ranges.IntProgression)
     public static final long last(kotlin.ranges.LongProgression)
@@ -5958,6 +6055,9 @@ kotlin.ranges.RangesKt___RangesKt:
     public static final synthetic boolean longRangeContains(kotlin.ranges.ClosedRange,float)
     public static final boolean longRangeContains(kotlin.ranges.ClosedRange,int)
     public static final boolean longRangeContains(kotlin.ranges.ClosedRange,short)
+    public static final boolean longRangeContains(kotlin.ranges.OpenEndRange,byte)
+    public static final boolean longRangeContains(kotlin.ranges.OpenEndRange,int)
+    public static final boolean longRangeContains(kotlin.ranges.OpenEndRange,short)
     private static final char random(kotlin.ranges.CharRange)
     public static final char random(kotlin.ranges.CharRange,kotlin.random.Random)
     private static final int random(kotlin.ranges.IntRange)
@@ -5978,6 +6078,9 @@ kotlin.ranges.RangesKt___RangesKt:
     public static final synthetic boolean shortRangeContains(kotlin.ranges.ClosedRange,float)
     public static final boolean shortRangeContains(kotlin.ranges.ClosedRange,int)
     public static final boolean shortRangeContains(kotlin.ranges.ClosedRange,long)
+    public static final boolean shortRangeContains(kotlin.ranges.OpenEndRange,byte)
+    public static final boolean shortRangeContains(kotlin.ranges.OpenEndRange,int)
+    public static final boolean shortRangeContains(kotlin.ranges.OpenEndRange,long)
     public static final kotlin.ranges.CharProgression step(kotlin.ranges.CharProgression,int)
     public static final kotlin.ranges.IntProgression step(kotlin.ranges.IntProgression,int)
     public static final kotlin.ranges.LongProgression step(kotlin.ranges.LongProgression,long)
@@ -6413,7 +6516,6 @@ kotlin.streams.jdk8.StreamsKt$asSequence$$inlined$Sequence$1
 kotlin.streams.jdk8.StreamsKt$asSequence$$inlined$Sequence$2
 kotlin.streams.jdk8.StreamsKt$asSequence$$inlined$Sequence$3
 kotlin.streams.jdk8.StreamsKt$asSequence$$inlined$Sequence$4
-kotlin.streams.jdk8.StreamsKt$asStream$1
 kotlin.streams.jdk8.StreamsKt
 kotlin.system.ProcessKt
 kotlin.system.TimingKt
@@ -6570,6 +6672,7 @@ kotlin.text.StringsKt__StringBuilderJVMKt:
 kotlin.text.StringsKt__StringBuilderKt:
     public void <init>()
     private static final java.lang.StringBuilder append(java.lang.StringBuilder,java.lang.Object)
+    private static final java.lang.StringBuilder append(java.lang.StringBuilder,char[],int,int)
     public static final varargs java.lang.StringBuilder append(java.lang.StringBuilder,java.lang.Object[])
     public static final varargs java.lang.StringBuilder append(java.lang.StringBuilder,java.lang.String[])
     private static final java.lang.StringBuilder appendLine(java.lang.StringBuilder)
@@ -7037,6 +7140,8 @@ kotlin.time.AbstractDoubleTimeSource
 kotlin.time.AbstractLongTimeSource$LongTimeMark
 kotlin.time.AbstractLongTimeSource
 kotlin.time.AdjustedTimeMark
+kotlin.time.ComparableTimeMark$DefaultImpls
+kotlin.time.ComparableTimeMark
 kotlin.time.Duration$Companion
 kotlin.time.Duration
 kotlin.time.DurationJvmKt
@@ -7058,8 +7163,8 @@ kotlin.time.TimeMark
 kotlin.time.TimeSource$Companion
 kotlin.time.TimeSource$Monotonic$ValueTimeMark
 kotlin.time.TimeSource$Monotonic
+kotlin.time.TimeSource$WithComparableMarks
 kotlin.time.TimeSource
-kotlin.time.TimeSourceKt
 kotlin.time.TimedValue
 kotlin.time.jdk8.DurationConversionsJDK8Kt
 kotlinx.coroutines.AbstractCoroutine:
@@ -8693,6 +8798,8 @@ io.flutter.plugin.common.BinaryMessenger$-CC:
 io.flutter.plugin.platform.PlatformView$-CC
 io.flutter.plugin.platform.VirtualDisplayController:
     private static java.lang.String TAG
+io.flutter.plugins.urllauncher.UrlLauncher:
+    static final synthetic boolean $assertionsDisabled
 io.flutter.view.TextureRegistry$SurfaceTextureEntry$-CC
 kotlin.collections.ArraysKt:
     public static synthetic bridge java.util.List sortedWith(java.lang.Object[],java.util.Comparator)

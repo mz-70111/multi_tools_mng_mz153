@@ -113,24 +113,26 @@ class Employ extends StatelessWidget {
           }
         }
       }
-      return Column(children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              ...colors.map((c) =>
-                  Container(height: 40, width: 10, color: Color(int.parse(c)))),
-              Icon(
-                Icons.person,
-                color: itemResult[3] == 1 ? Colors.green : Colors.grey,
-              ),
-              Expanded(child: Text("# ${itemResult[1]}_ ${itemResult[2]}")),
-            ],
+      return Card(
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                ...colors.map((c) =>
+                    Container(height: 40, width: 10, color: Color(int.parse(c)))),
+                Icon(
+                  Icons.person,
+                  color: itemResult[3] == 1 ? Colors.green : Colors.grey,
+                ),
+                Expanded(child: Text("# ${itemResult[1]}_ ${itemResult[2]}")),
+              ],
+            ),
           ),
-        ),
-        const Divider(),
-      ]);
+          const Divider(),
+        ]),
+      );
     }
 
     Map addFunction = {
@@ -307,19 +309,6 @@ class Employ extends StatelessWidget {
   }
 
   customInitforEdit({e}) async {
-    DBController dbController = Get.find();
-    try {
-      await dbController.gettable(
-          list: users, usertable: users, table: 'users', tableid: 'user_id');
-      await dbController.gettable(
-          list: office,
-          usertable: users,
-          table: 'office',
-          tableid: 'office_id');
-    } catch (er) {
-      null;
-    }
-
     MainController mainController = Get.find();
     for (var i in Employ.employs) {
       i['error'] = null;
@@ -336,40 +325,43 @@ class Employ extends StatelessWidget {
     Employ.admin = e['admin'] == 1 ? true : false;
     addping = e['addping'] == 1 ? true : false;
     addremind = e['addremind'] == 1 ? true : false;
+    addtodo = e['addtodo']==1?true:false;
     pbx = e['pbx'] == 1 ? true : false;
-    if ((!users[users.indexWhere(
+    if ((!DB.userstable[DB.userstable.indexWhere(
                         (element) => element['user_id'] == e['user_id'])]
                     ['privilege']
                 .contains('_') &&
             e['admin'] == 0) ||
-        (!users[users.indexWhere(
-                        (element) => element['user_id'] == e['user_id'])]
+        (!DB.userstable[DB.userstable
+                        .indexWhere((element) => element['user_id'] == e['user_id'])]
                     ['privilege']
                 .contains('_') &&
             e['admin'] == 1 &&
-            users[users.indexWhere(
+            DB
+                    .userstable[DB.userstable.indexWhere(
                             (element) => element['user_id'] == e['user_id'])]
                         ['privilege']
                     .length >
                 1)) {
       for (var i = 0;
           i <
-              users[users.indexWhere(
+              DB
+                  .userstable[DB.userstable.indexWhere(
                           (element) => element['user_id'] == e['user_id'])]
                       ['privilege']
                   .length;
           i++) {
-        if (users[users.indexWhere(
+        if (DB.userstable[DB.userstable.indexWhere(
                     (element) => element['user_id'] == e['user_id'])]
                 ['privilege'][i] ==
             'مسؤول') {
           continue;
         } else {
           Employ.privilege.add({
-            'privilege': users[users.indexWhere(
+            'privilege': DB.userstable[DB.userstable.indexWhere(
                     (element) => element['user_id'] == e['user_id'])]
                 ['privilege'][i],
-            'office': office[office.indexWhere(
+            'office': DB.officetable[DB.officetable.indexWhere(
                     (element) => element['office_id'] == e['office'][i])]
                 ['officename']
           });
@@ -391,7 +383,7 @@ class Employ extends StatelessWidget {
 
   getinfo({e}) {
     List priv = [], off = [];
-    for (var i in users) {
+    for (var i in DB.userstable) {
       if (e['user_id'] == i['user_id']) {
         priv = i['privilege'];
         off = i['office'];
@@ -401,7 +393,7 @@ class Employ extends StatelessWidget {
     String p = '';
     for (var i = 0; i < priv.length; i++) {
       p +=
-          "\n    * ${priv[i]} ${off[i] == '=' ? '' : off[i] == '_' ? '' : office[office.indexWhere((element) => element['office_id'] == off[i])]['officename']}";
+          "\n    * ${priv[i]} ${off[i] == '=' ? '' : off[i] == '_' ? '' : DB.officetable[DB.officetable.indexWhere((element) => element['office_id'] == off[i])]['officename']}";
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
