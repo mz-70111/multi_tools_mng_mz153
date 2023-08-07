@@ -23,34 +23,37 @@ class DBController extends GetxController {
     LogIn.loginwait = true;
     LogIn.Pref = await SharedPreferences.getInstance();
     LogIn.autologin = await getlogin() ?? [];
-    try {
-      await DB().createappversiontable();
-      await DB().createuserstable();
-      await DB().createofficetable();
-      await DB().createusersofficetable();
-      await DB().createtaskstable();
-      await DB().createuserstasktable();
-      await DB().createuserstasksCommentstable();
-      await DB().createtodotable();
-      await DB().createuserstodo();
-      await DB().createuserstodoCommentstable();
-      await DB().createremindtable();
-      await DB().createusersremindtable();
-      await DB().createusersremindCommentable();
-      await DB().createtodoimagetable();
-      await DB().createremindlog();
-      await DB().createremindrepeateevery();
-      await DB().createmainlogtable();
-    } catch (e) {
-      "$e".contains('timed out')
-          ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
-          : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
-    }
+    // try {
+    //   await DB().createappversiontable();
+    //   await DB().createuserstable();
+    //   await DB().createofficetable();
+    //   await DB().createusersofficetable();
+    //   await DB().createtaskstable();
+    //   await DB().createuserstasktable();
+    //   await DB().createuserstasksCommentstable();
+    //   await DB().createtodotable();
+    //   await DB().createuserstodo();
+    //   await DB().createuserstodoCommentstable();
+    //   await DB().createremindtable();
+    //   await DB().createusersremindtable();
+    //   await DB().createusersremindCommentable();
+    //   await DB().createtodoimagetable();
+    //   await DB().createremindlog();
+    //   await DB().createremindrepeateevery();
+    //   await DB().createmainlogtable();
+    // } catch (e) {
+    //   print(e);
+    //   "$e".contains('timed out')
+    //       ? LogIn.errorMSglogin = "لايمكن الوصول للمخدم"
+    //       : LogIn.errorMSglogin = "يجب ادخال كلمة المرور واسم المستخدم";
+    // }
     if (LogIn.autologin.isNotEmpty) {
-      LogIn.username.text = LogIn.autologin[0];
-      LogIn.password.text = LogIn.autologin[1];
-      await mainController.autologin();
-      Home.logininfo = LogIn.username.text.toLowerCase();
+      Future.delayed(Duration(seconds: 2), () async {
+        LogIn.username.text = LogIn.autologin[0];
+        LogIn.password.text = LogIn.autologin[1];
+        await mainController.autologin();
+        Home.logininfo = LogIn.username.text.toLowerCase();
+      });
     } else {
       LogIn.errorMSglogin = '';
     }
@@ -67,7 +70,8 @@ class DBController extends GetxController {
   }
 
   gettable(
-      {required List<Map> list,
+      {type = 'custom',
+      required List<Map> list,
       table,
       where = '',
       tableid = '',
@@ -158,10 +162,15 @@ class DBController extends GetxController {
           'users': [...usersOffice],
         });
       } else if (i.keys.toList().first == 'todo_id') {
-        mainController.office_ids('uf_office_id');
+        if (type == 'custom') {
+          await mainController.office_ids(
+              offname: 'uf_office_id', type: 'custom');
+        } else {
+          await mainController.office_ids(offname: 'uf_office_id', type: 'all');
+        }
         if (checkifUserisAdmin(
-                usertable: DB.userstable,
-                userid: DB.userstable[DB.userstable.indexWhere(
+                usertable: usertable,
+                userid: usertable[usertable.indexWhere(
                         (element) => element['username'] == Home.logininfo)]
                     ['user_id']) ==
             true) {
@@ -208,10 +217,15 @@ class DBController extends GetxController {
           'images': [...images]
         });
       } else if (i.keys.toList().first == 'task_id') {
-        mainController.office_ids('uf_office_id');
+        if (type == 'custom') {
+          await mainController.office_ids(
+              offname: 'uf_office_id', type: 'custom');
+        } else {
+          await mainController.office_ids(offname: 'uf_office_id', type: 'all');
+        }
         if (checkifUserisAdmin(
-                usertable: DB.userstable,
-                userid: DB.userstable[DB.userstable.indexWhere(
+                usertable: usertable,
+                userid: usertable[usertable.indexWhere(
                         (element) => element['username'] == Home.logininfo)]
                     ['user_id']) ==
             true) {
@@ -247,6 +261,12 @@ class DBController extends GetxController {
           'error': null
         });
       } else if (i.keys.toList().first == 'remind_id') {
+        if (type == 'custom') {
+          await mainController.office_ids(
+              offname: 'uf_office_id', type: 'custom');
+        } else {
+          await mainController.office_ids(offname: 'uf_office_id', type: 'all');
+        }
         ww = await DB().customquery(
             query:
                 'select every from remind_every where revery_remind_id=${i['remind_id']}');
@@ -257,10 +277,10 @@ class DBController extends GetxController {
         list[list.indexOf(i)].addAll({
           'every': [...every]
         });
-        mainController.office_ids('uf_office_id');
+
         if (checkifUserisAdmin(
-                usertable: DB.userstable,
-                userid: DB.userstable[DB.userstable.indexWhere(
+                usertable: usertable,
+                userid: usertable[usertable.indexWhere(
                         (element) => element['username'] == Home.logininfo)]
                     ['user_id']) ==
             true) {
@@ -692,9 +712,7 @@ $todoid,
   addcommentremind({userid, remindid, comment}) async {
     await DB().customquery(query: '''
 insert into users_remind_comments
-(urc_user_id,urc_remind_id,comments,commentdate)
-values
-(
+(urc
 $userid,
 $remindid,
 "$comment",
@@ -1141,7 +1159,7 @@ mobile="$mobile",
 email="$email"
 where user_id=$id;
 ''');
-    mainController.office_ids('office');
+    mainController.office_ids(offname: 'office_id');
     List<Map> users = [];
 
     await gettable(

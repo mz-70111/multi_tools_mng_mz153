@@ -17,6 +17,7 @@ import 'package:users_tasks_mz_153/pages/officemanagment.dart';
 import 'package:users_tasks_mz_153/pages/employaccount.dart';
 import 'package:users_tasks_mz_153/pages/06_tasks.dart';
 import 'package:users_tasks_mz_153/pages/07_whatodo.dart';
+import 'package:users_tasks_mz_153/pages/pbx.dart';
 import 'package:users_tasks_mz_153/pages/remind.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/bottomnavbar.dart';
@@ -111,7 +112,7 @@ class MainController extends GetxController {
     // if (Whattodo.closebs == 1) {
     //   Get.back();
     // }
-   
+
     update();
   }
 
@@ -294,19 +295,25 @@ class MainController extends GetxController {
   }
 
   autosendnotifiremind() async {
+    Home.logininfo = 'admin';
     List<Map> office = [], users = [], remind = [];
     DBController dbController = Get.find();
     String mymsg = '';
-    int pause = 0;
     try {
       await dbController.gettable(
-          usertable: users, list: users, table: 'users', tableid: 'user_id');
+          type: 'all',
+          usertable: users,
+          list: users,
+          table: 'users',
+          tableid: 'user_id');
       await dbController.gettable(
+          type: 'all',
           usertable: users,
           list: office,
           table: 'office',
           tableid: 'office_id');
       await dbController.gettable(
+          type: 'all',
           usertable: users,
           list: remind,
           table: 'remind',
@@ -320,35 +327,31 @@ class MainController extends GetxController {
           i['lastsendremind'] =
               ils[0] ?? DateTime.now().add(Duration(hours: -1));
         }
-        if (i['lastsendremind'].hour < DateTime.now().hour ||
-            i['lastsendremind'].day < DateTime.now().day) {
+        print(i['lastsendremind'].difference(DateTime.now()).inHours);
+        if (i['lastsendremind'].difference(DateTime.now()).inHours < 0) {
           if (i['notifi'] == 1) {
             for (var j in remind) {
-              if (j['pause'] == 1) {
-                if (j['pausedate'] != null) {
-                  if (j['pausedate'].difference(DateTime.now()).inHours > 0) {
-                    pause =
-                        ((j['pausedate'].difference(DateTime.now()).inHours) /
-                                24)
-                            .ceil();
-                  }
-                }
-              }
-
               if (j['notifi'] == 1) {
                 if (j['reminddate'] != null) {
-                  if (((j['reminddate']
-                                  .add(Duration(days: pause))
-                                  .difference(DateTime.now()
-                                      .add(Duration(days: j['sendalertbefor'])))
-                                  .inHours) /
-                              24)
-                          .ceil() <=
-                      0) {
-                    if (int.parse(j['startsendat'].toString().substring(
-                            0, j['startsendat'].toString().indexOf(':'))) <=
-                        DateTime.now().hour) {
-                      mymsg = '''
+                  var calcrd;
+                  if (j['pause'] == 1) {
+                    calcrd = j['pausedate']
+                        .difference(DateTime.now()
+                            .add(Duration(days: j['sendalertbefor'])))
+                        .inDays;
+                  } else {
+                    calcrd = j['reminddate']
+                        .difference(DateTime.now()
+                            .add(Duration(days: j['sendalertbefor'])))
+                        .inDays;
+                  }
+                  if (calcrd <= 0) {
+                    await DB().customquery(
+                        query:
+                            'update remind set status=1 where remind_id=${j['remind_id']}');
+                    j['status'] = 1;
+
+                    mymsg = '''
 تذكير مهام مجدولة
 ${j['remindname']}
 ${j['reminddetails']}
@@ -358,47 +361,95 @@ ${j['type'] == '2' ? 'مصدر الشهادة ${j['autocerturl']}' : ''}
 ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتبقية  ${j['reminddate'].difference(DateTime.now()).inDays} يوم" : j['reminddate'].difference(DateTime.now()).inDays == 0 ? (int.parse("${j['startsendat']}".substring(0, j['startsendat'].toString().indexOf(":"))) - DateTime.now().hour) >= 0 ? 'المدة المتبقية ${int.parse("${j['startsendat']}".substring(0, j['startsendat'].toString().indexOf(":"))) - DateTime.now().hour} ساعة' : 'المدة المتبقية منتهية منذ ${(int.parse("${j['startsendat']}".substring(0, j['startsendat'].toString().indexOf(":"))) - DateTime.now().hour) * -1} ساعة' : "المدة المتبقية منتهية منذ  ${j['reminddate'].difference(DateTime.now()).inDays} يوم"}         
 -------------------------------------------------------------
 ''';
-                      Tasks.sendtask(msg: mymsg, chatid: i['chatid']);
-                    }
+                    Tasks.sendtask(msg: mymsg, chatid: i['chatid']);
+
                     await DB().customquery(
                         query:
                             'update office set lastsendremind="${DateTime.now()}" where office_id=${i['office_id']}');
+                  } else {
+                    await DB().customquery(
+                        query:
+                            'update remind set status=0 where remind_id=${j['remind_id']}');
+                    j['status'] = 0;
                   }
                 }
               }
             }
           }
         }
-
         Future.delayed(const Duration(hours: 1), () async {
           return await autosendnotifiremind();
         });
       }
     } catch (e) {
+      print(e);
       null;
     }
+    Home.logininfo = LogIn.username.text.toLowerCase();
+  }
+
+  calcremind({e}) async {
+    DBController dbController = Get.find();
+    var calcrd = 0;
+    if (e['pause'] == 1) {
+      if (e['pausedate'] != null) {
+        calcrd = e['pausedate']
+            .difference(DateTime.now().add(Duration(days: e['sendalertbefor'])))
+            .inDays;
+      }
+    } else {
+      if (e['reminddate'] != null) {
+        calcrd = e['reminddate']
+            .difference(DateTime.now().add(Duration(days: e['sendalertbefor'])))
+            .inDays;
+      }
+    }
+    if (calcrd <= 0) {
+      try {
+        await DB().customquery(
+            query:
+                'update remind set status=1 where remind_id=${e['remind_id']}');
+      } catch (err) {}
+    } else {
+      try {
+        await DB().customquery(
+            query:
+                'update remind set status=0 where remind_id=${e['remind_id']}');
+      } catch (err) {}
+    }
+    dbController.update();
+    return calcrd;
   }
 
   autosendnotifitasks() async {
+    Home.logininfo = 'admin';
     List<Map> office = [], users = [], tasks = [];
     DBController dbController = Get.find();
     String mymsg = '';
     try {
       await dbController.gettable(
-          usertable: users, list: users, table: 'users', tableid: 'user_id');
+          type: 'all',
+          usertable: users,
+          list: users,
+          table: 'users',
+          tableid: 'user_id');
       await dbController.gettable(
+          type: 'all',
           usertable: users,
           list: office,
           table: 'office',
           tableid: 'office_id');
       await dbController.gettable(
-          usertable: users, list: tasks, table: 'tasks', tableid: 'task_id');
+          type: 'all',
+          usertable: users,
+          list: tasks,
+          table: 'tasks',
+          tableid: 'task_id');
     } catch (e) {
       null;
     }
     int timenow = DateTime.now().hour;
-
-    if (timenow == 9) {
+    if (timenow == 1) {
       for (var i in office) {
         if (i['autosendtasks'] == 1) {
           List usershavetask = [];
@@ -472,6 +523,8 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
     }
     Future.delayed(
         const Duration(hours: 1), () async => await autosendnotifitasks());
+    Home.logininfo = LogIn.username.text.toLowerCase();
+    print(Home.logininfo);
   }
 
   getCert({required String host}) async {
@@ -1375,6 +1428,11 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
     update();
   }
 
+  choosesearchvalue(x) {
+    PBX.searchvalue = x;
+    update();
+  }
+
   addimagetotodo({required ScrollController scrollcontroller}) async {
     x() async {
       File result;
@@ -1452,24 +1510,35 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
 
   setpausedate({ctx, e}) async {
     DateTime? d = await showDatePicker(
-        context: ctx,
-        initialDate: Remind.pausedate,
-        firstDate: DateTime.now(),
-        lastDate: DateTime.now().add(Duration(days: 30)));
+      context: ctx,
+      initialDate: e['reminddate'] != null
+          ? e['reminddate'].add(Duration(days: 1))
+          : DateTime.now().add(Duration(days: 1)),
+      firstDate: e['reminddate'] != null
+          ? e['reminddate'].add(Duration(days: 1))
+          : DateTime.now().add(Duration(days: 1)),
+      lastDate: e['reminddate'] != null
+          ? e['reminddate'].add(Duration(days: 30))
+          : DateTime.now().add(Duration(days: 30)),
+    );
     if (d != null) {
       if (e['pause'] == 1) {
         try {
           await DB().customquery(
               query:
-                  'update remind set pausedate="$d" where remind_id=${e['remind_id']}');
+                  'update remind set pausedate="${df.DateFormat("yyyy-MM-dd").format(d)}" where remind_id=${e['remind_id']}');
           e['pausedate'] = d;
         } catch (e) {}
       }
     }
+    Remind.calcrd = await calcremind(e: e);
     update();
   }
 
   remindpausechg({x, e}) async {
+    if (e['reminddate'] != null) {
+      Remind.pausedate = e['reminddate'].add(Duration(days: 1));
+    }
     try {
       await DB().customquery(
           query:
@@ -1483,9 +1552,10 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
       } else {
         await DB().customquery(
             query:
-                'update remind set pausedate="${Remind.pausedate}" where remind_id=${e['remind_id']}');
+                'update remind set pausedate="${df.DateFormat("yyyy-MM-dd").format(Remind.pausedate)}" where remind_id=${e['remind_id']}');
       }
     } catch (t) {}
+    Remind.calcrd = await calcremind(e: e);
     update();
   }
 
@@ -1659,7 +1729,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
             username: LogIn.username.text.toLowerCase(),
             password: LogIn.newpassword.text);
         Home.logininfo = LogIn.username.text.toLowerCase();
-        office_ids('office_id');
+        office_ids(offname: 'office_id');
         await dbController.gettable(
           usertable: DB.userstable,
           list: DB.userstable,
@@ -1684,7 +1754,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
               ? ''
               : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}',
         );
-        office_ids('task_office_id');
+        office_ids(offname: 'task_office_id');
         await dbController.gettable(
             usertable: DB.userstable,
             list: DB.tasktable,
@@ -1698,7 +1768,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                     ? 'where 1=2'
                     : 'where ${LogIn.office_ids}');
 
-        office_ids('todo_office_id');
+        office_ids(offname: 'todo_office_id');
         await dbController.gettable(
             usertable: DB.userstable,
             list: DB.todotable,
@@ -1711,7 +1781,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                 : LogIn.office_ids.contains('= _')
                     ? 'where 1=2'
                     : 'where ${LogIn.office_ids}');
-        office_ids('remind_office_id');
+        office_ids(offname: 'remind_office_id');
         await dbController.gettable(
             usertable: DB.userstable,
             list: DB.remindtable,
@@ -1734,7 +1804,6 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
         Home.logininfo = LogIn.username.text.toLowerCase();
         await Get.offNamed("/home");
       } catch (r) {
-        print(r);
         LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
       }
       LogIn.loginwait = false;
@@ -1929,13 +1998,12 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
   getalluserstable() async {
     try {
       await DBController().gettable(
+          type: 'all',
           list: LogIn.allusers,
           usertable: LogIn.allusers,
           table: 'users',
           tableid: 'user_id');
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   getappverion() async {
@@ -1944,7 +2012,6 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
       for (var v in vt) {
         LogIn.getversion = v[0];
         LogIn.constatus = true;
-        print(LogIn.constatus);
         update();
       }
     } catch (e) {
@@ -1977,111 +2044,111 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
     } else if (DateTime.now().month == 2) {
       monthdays = 28;
     }
-    try {
-      if (Remind.typevalue == Remind.typelist[1] || type == '1') {
-        var t = await DB().customquery(
-            query:
-                "select every from remind_every where revery_remind_id=$id;");
-        if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0] ||
-            manytimestype == 0) {
-          for (var i in t) {
-            if (gettodayinweek() - getday(dayinString: i[0]) < 0) {
-              dateandlist.add(
-                  -1 * (gettodayinweek() - getday(dayinString: i[0])) as int);
-            } else if (gettodayinweek() - getday(dayinString: i[0]) > 0) {
-              dateandlist.add(
-                  7 - (gettodayinweek() - getday(dayinString: i[0])) as int);
-            } else {
-              dateandlist.add(gettodayinweek() - getday(dayinString: i[0]));
-            }
-          }
-          dateandlist.sort();
-          dateand0 = dateandlist[0];
-          if (dateand0 != null) {
-            reminddate = DateTime.now().add(Duration(days: dateand0));
-            await DB().customquery(
-                query:
-                    'update remind set reminddate="$reminddate" where remind_id=$id;');
-            Remind.remiddate = reminddate;
-          }
-        } else if (Remind.manytimesremindgroup ==
-                Remind.manytimesremindlist[1] ||
-            manytimestype == 1) {
-          int daynum = 0;
-          for (var i in t) {
-            if (i[0] == 'last') {
-              if (DateTime.now().month == 1 ||
-                  DateTime.now().month == 3 ||
-                  DateTime.now().month == 5 ||
-                  DateTime.now().month == 7 ||
-                  DateTime.now().month == 8 ||
-                  DateTime.now().month == 10 ||
-                  DateTime.now().month == 12) {
-                daynum = 31;
-              } else if (DateTime.now().month == 1 ||
-                  DateTime.now().month == 4 ||
-                  DateTime.now().month == 6 ||
-                  DateTime.now().month == 9 ||
-                  DateTime.now().month == 11) {
-                daynum = 30;
-              } else if (DateTime.now().month == 2) {
-                daynum = 28;
-              }
-            } else {
-              daynum = int.parse(i[0]);
-            }
-            dateandlist.add(daynum);
-          }
-          dateandlist.sort();
-          for (var i in dateandlist) {
-            if (i - DateTime.now().day < 0) {
-              dateand0 = monthdays! + i;
-            } else {
-              dateand0 = i;
-              break;
-            }
-          }
-          if (dateand0 != null) {
-            reminddate = DateTime.now()
-                .add(Duration(days: dateand0 - DateTime.now().day));
-            await DB().customquery(
-                query:
-                    'update remind set reminddate="$reminddate" where remind_id=$id;');
-            Remind.remiddate = reminddate;
+
+    if (Remind.typevalue == Remind.typelist[1] || type == '1') {
+      var t = await DB().customquery(
+          query: "select every from remind_every where revery_remind_id=$id;");
+      if (Remind.manytimesremindgroup == Remind.manytimesremindlist[0] ||
+          manytimestype == 0) {
+        for (var i in t) {
+          if (gettodayinweek() - getday(dayinString: i[0]) < 0) {
+            dateandlist.add(
+                -1 * (gettodayinweek() - getday(dayinString: i[0])) as int);
+          } else if (gettodayinweek() - getday(dayinString: i[0]) > 0) {
+            dateandlist
+                .add(7 - (gettodayinweek() - getday(dayinString: i[0])) as int);
+          } else {
+            dateandlist.add(gettodayinweek() - getday(dayinString: i[0]));
           }
         }
-      } else if (Remind.typevalue == Remind.typelist[2] || type == '2') {
-        certsrc.startsWith('www.') ? certsrc = certsrc.substring(4) : null;
-        certsrc.startsWith('https://') ? null : certsrc = 'https://$certsrc';
-        await DB().customquery(
-            query:
-                'update remind set autocerturl="$certsrc" where remind_id=$id;');
-        if (Platform.isWindows) {
-          String cert = await getCert(host: certsrc);
+        dateandlist.sort();
+        dateand0 = dateandlist[0];
+        if (dateand0 != null) {
+          reminddate = DateTime.now().add(Duration(days: dateand0));
           await DB().customquery(
               query:
-                  'update remind set reminddate="${DateTime.parse(cert)}" where remind_id=$id;');
-          Remind.remiddate = DateTime.parse(cert);
-        } else {
-          var tr = await DB().customquery(
-              query: 'select reminddate from remind where remind_id=$id;');
-          for (var rd in tr) {
-            Remind.remiddate = rd[0];
+                  'update remind set reminddate="$reminddate" where remind_id=$id;');
+          Remind.remiddate = reminddate;
+        }
+      } else if (Remind.manytimesremindgroup == Remind.manytimesremindlist[1] ||
+          manytimestype == 1) {
+        int daynum = 0;
+        for (var i in t) {
+          if (i[0] == 'last') {
+            if (DateTime.now().month == 1 ||
+                DateTime.now().month == 3 ||
+                DateTime.now().month == 5 ||
+                DateTime.now().month == 7 ||
+                DateTime.now().month == 8 ||
+                DateTime.now().month == 10 ||
+                DateTime.now().month == 12) {
+              daynum = 31;
+            } else if (DateTime.now().month == 1 ||
+                DateTime.now().month == 4 ||
+                DateTime.now().month == 6 ||
+                DateTime.now().month == 9 ||
+                DateTime.now().month == 11) {
+              daynum = 30;
+            } else if (DateTime.now().month == 2) {
+              daynum = 28;
+            }
+          } else {
+            daynum = int.parse(i[0]);
+          }
+          dateandlist.add(daynum);
+        }
+        dateandlist.sort();
+        for (var i in dateandlist) {
+          if (i - DateTime.now().day < 0) {
+            dateand0 = monthdays! + i;
+          } else {
+            dateand0 = i;
+            break;
           }
         }
+        if (dateand0 != null) {
+          reminddate =
+              DateTime.now().add(Duration(days: dateand0 - DateTime.now().day));
+          await DB().customquery(
+              query:
+                  'update remind set reminddate="$reminddate" where remind_id=$id;');
+          Remind.remiddate = reminddate;
+        }
       }
-    } catch (e) {
-      null;
+    } else if (Remind.typevalue == Remind.typelist[2] || type == '2') {
+      certsrc.startsWith('www.') ? certsrc = certsrc.substring(4) : null;
+      certsrc.startsWith('https://') ? null : certsrc = 'https://$certsrc';
+      await DB().customquery(
+          query:
+              'update remind set autocerturl="$certsrc" where remind_id=$id;');
+      if (Platform.isWindows) {
+        String cert = await getCert(host: certsrc);
+        await DB().customquery(
+            query:
+                'update remind set reminddate="${DateTime.parse(cert)}" where remind_id=$id;');
+        Remind.remiddate = DateTime.parse(cert);
+      } else {
+        var tr = await DB().customquery(
+            query: 'select reminddate from remind where remind_id=$id;');
+        for (var rd in tr) {
+          Remind.remiddate = rd[0];
+        }
+      }
     }
+
     update();
     Future.delayed(Duration(hours: 1), () async {
-      for (var i in DB.remindtable) {
-        await getreminddate(
-            certsrc: i['autocerturl'],
-            id: i['remind_id'],
-            type: i['type'],
-            manytimestype: i['manytimestype'],
-            ereminddate: i['reminddate']);
+      try {
+        for (var i in DB.remindtable) {
+          await getreminddate(
+              certsrc: i['autocerturl'],
+              id: i['remind_id'],
+              type: i['type'],
+              manytimestype: i['manytimestype'],
+              ereminddate: i['reminddate']);
+        }
+      } catch (e) {
+        null;
       }
     });
   }
@@ -2183,7 +2250,10 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
     } else {
       try {
         await dbController.gettable(
-            usertable: DB.userstable, list: DB.userstable, table: 'users');
+            usertable: DB.userstable,
+            list: DB.userstable,
+            table: 'users',
+            type: 'all');
         i:
         for (var i in DB.userstable) {
           if (LogIn.username.text.toLowerCase() ==
@@ -2202,7 +2272,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                   username: LogIn.username.text.toLowerCase(),
                   password: LogIn.password.text);
               Home.logininfo = LogIn.username.text.toLowerCase();
-              office_ids('office_id');
+              office_ids(offname: 'office_id');
               await dbController.gettable(
                 usertable: DB.userstable,
                 list: DB.userstable,
@@ -2225,7 +2295,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                     ? ''
                     : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}',
               );
-              office_ids('task_office_id');
+              office_ids(offname: 'task_office_id');
               await dbController.gettable(
                   usertable: DB.userstable,
                   list: DB.tasktable,
@@ -2239,7 +2309,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                           ? 'where 1=2'
                           : 'where ${LogIn.office_ids}');
 
-              office_ids('todo_office_id');
+              office_ids(offname: 'todo_office_id');
               await dbController.gettable(
                   usertable: DB.userstable,
                   list: DB.todotable,
@@ -2252,7 +2322,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                       : LogIn.office_ids.contains('= _')
                           ? 'where 1=2'
                           : 'where ${LogIn.office_ids}');
-              office_ids('remind_office_id');
+              office_ids(offname: 'remind_office_id');
               await dbController.gettable(
                   usertable: DB.userstable,
                   list: DB.remindtable,
@@ -2293,16 +2363,20 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
     update();
   }
 
-  office_ids(offname) {
+  office_ids({offname, type = 'custom'}) {
     LogIn.office_ids = '';
-    for (var i in DB.userstable[DB.userstable
-            .indexWhere((element) => element['username'] == Home.logininfo)]
-        ['office']) {
-      LogIn.office_ids += '$offname= $i or ';
+    if (type == 'custom') {
+      for (var i in DB.userstable[DB.userstable
+              .indexWhere((element) => element['username'] == Home.logininfo)]
+          ['office']) {
+        LogIn.office_ids += '$offname= $i or ';
+      }
+      LogIn.office_ids =
+          LogIn.office_ids.substring(0, LogIn.office_ids.lastIndexOf(' or'));
+      LogIn.office_ids = "(${LogIn.office_ids})";
+    } else {
+      LogIn.office_ids = '""';
     }
-    LogIn.office_ids =
-        LogIn.office_ids.substring(0, LogIn.office_ids.lastIndexOf(' or'));
-    LogIn.office_ids = "(${LogIn.office_ids})";
   }
 
   loginlogoutlog(status) async {
@@ -2326,9 +2400,11 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
     update();
     try {
       await dbController.gettable(
-          usertable: DB.userstable, list: DB.userstable, table: 'users');
-           await dbController.gettable(
-          usertable: DB.userstable, list: DB.logstable, table: 'logs');
+          usertable: DB.userstable,
+          list: DB.userstable,
+          table: 'users',
+          type: 'all');
+
       i:
       for (var i in DB.userstable) {
         if (LogIn.username.text.toLowerCase() == i['username'].toLowerCase() &&
@@ -2343,7 +2419,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
             LogIn.oldpassvisible = false;
           } else {
             Home.logininfo = LogIn.username.text.toLowerCase();
-            office_ids('office_id');
+            office_ids(offname: 'office_id');
             await dbController.gettable(
               usertable: DB.userstable,
               list: DB.userstable,
@@ -2366,7 +2442,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                   ? ''
                   : 'join users_office on uf_office_id=office_id join users on uf_user_id=user_id where user_id=${DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']}',
             );
-            office_ids('task_office_id');
+            office_ids(offname: 'task_office_id');
             await dbController.gettable(
                 usertable: DB.userstable,
                 list: DB.tasktable,
@@ -2379,7 +2455,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                         ? 'where 1=2'
                         : 'where ${LogIn.office_ids}');
 
-            office_ids('todo_office_id');
+            office_ids(offname: 'todo_office_id');
             await dbController.gettable(
                 usertable: DB.userstable,
                 list: DB.todotable,
@@ -2391,7 +2467,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                     : LogIn.office_ids.contains('= _')
                         ? 'where 1=2'
                         : 'where ${LogIn.office_ids}');
-            office_ids('remind_office_id');
+            office_ids(offname: 'remind_office_id');
             await dbController.gettable(
                 usertable: DB.userstable,
                 list: DB.remindtable,
@@ -2426,9 +2502,9 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
         }
       }
     } catch (e) {
-      print(e);
       LogIn.errorMSglogin = "لايمكن الوصول للمخدم";
     }
+    LogIn.loginwait = false;
     update();
   }
 
@@ -2440,7 +2516,8 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
   }
 
   url_launch({url}) async {
-    if (!await launchUrl(Uri.parse(url))) {
+    if (!await launchUrl(Uri.parse(url),
+        mode: LaunchMode.externalNonBrowserApplication)) {
       throw Exception('لا يمكن الوصول للموقع $url');
     }
   }

@@ -249,7 +249,7 @@ class Tasks extends StatelessWidget {
             ),
           ),
         ]);
-    mainController.office_ids('task_office_id');
+    mainController.office_ids(offname: 'task_office_id');
     return MYPAGE(
       mylista: mylista,
       table: 'tasks',
@@ -339,12 +339,14 @@ class Tasks extends StatelessWidget {
             : false,
         child: Row(
           children: [
-            Text(MYPAGE.eE['notifi'] == 1 ? "إشعار مفعل" : "إشعار ملغى"),
             Switch(
                 value: MYPAGE.eE['notifi'] == 1 ? true : false,
                 onChanged: (x) {
                   mainController.tasknotifichg(x: x, e: MYPAGE.eE);
                 }),
+            Text(MYPAGE.eE['notifi'] == 1
+                ? " تفعيل الإشعارات"
+                : "إيقاف الاِشعارات"),
           ],
         ),
       ),

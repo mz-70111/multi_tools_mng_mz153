@@ -887,60 +887,49 @@ class ADDEDITINFOItem extends StatelessWidget {
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(
               children: [
-                IconButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    icon: Icon(Icons.close)),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Visibility(
-                          visible: editpanelvisible,
-                          child: Expanded(
-                              child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: editpanel))),
-                      Visibility(
-                          visible: !editpanelvisible,
-                          child: Expanded(
-                              child: Padding(
+                Visibility(
+                    visible: editpanelvisible,
+                    child: Expanded(
+                        child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Visibility(
-                                    visible: !firstpage,
-                                    child: Row(
-                                      children: [
-                                        IconButton(
-                                            onPressed: () =>
-                                                mainController.firstbackpage(),
-                                            icon: const Icon(
-                                              Icons.arrow_back,
-                                            )),
-                                        addpanel,
-                                      ],
-                                    )),
-                                Visibility(
-                                  visible: firstpage,
-                                  child: IconButton(
-                                      onPressed: () {
-                                        mainController.firstbackpage();
-                                      },
-                                      icon: Transform.rotate(
-                                        angle: 180 * pi / 180,
-                                        child: const Icon(
-                                          Icons.arrow_back,
-                                        ),
+                            child: editpanel))),
+                Visibility(
+                    visible: !editpanelvisible,
+                    child: Expanded(
+                        child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Visibility(
+                              visible: !firstpage,
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                      onPressed: () =>
+                                          mainController.firstbackpage(),
+                                      icon: const Icon(
+                                        Icons.arrow_back,
                                       )),
-                                )
-                              ],
-                            ),
-                          ))),
-                    ],
-                  ),
-                ),
+                                  addpanel,
+                                ],
+                              )),
+                          Visibility(
+                            visible: firstpage,
+                            child: IconButton(
+                                onPressed: () {
+                                  mainController.firstbackpage();
+                                },
+                                icon: Transform.rotate(
+                                  angle: 180 * pi / 180,
+                                  child: const Icon(
+                                    Icons.arrow_back,
+                                  ),
+                                )),
+                          )
+                        ],
+                      ),
+                    ))),
               ],
             ),
             Visibility(
@@ -1120,18 +1109,22 @@ class Editpanel extends StatelessWidget {
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
     List edititems() => [
+          
           {
-            'n': 0,
-            'visible1': true,
-            'visible0': page == Employ
-                ? e['username'] == Home.logininfo
-                    ? false
-                    : true
-                : true,
-            'visible': !savevisible,
-            'icon': Icons.delete,
-            'action': () => actionDelete(),
-            'color': Colors.redAccent
+            'n': 3,
+            'visible1': ADDEDITINFOItem.firstpage,
+            'visible0': subeditvisible(),
+            'visible': savevisible,
+            'icon': Icons.arrow_back,
+            'action': () => mainController.firstbackpage(),
+          },
+          {
+            'n': 4,
+            'visible1': !ADDEDITINFOItem.firstpage,
+            'visible0': subeditvisible(),
+            'visible': savevisible,
+            'icon': Icons.arrow_back,
+            'action': () => mainController.firstbackpage(),
           },
           {
             'n': 1,
@@ -1152,71 +1145,69 @@ class Editpanel extends StatelessWidget {
             'color': Colors.indigoAccent
           },
           {
-            'n': 3,
-            'visible1': ADDEDITINFOItem.firstpage,
-            'visible0': subeditvisible(),
-            'visible': savevisible,
-            'icon': Icons.arrow_back,
-            'action': () => mainController.firstbackpage(),
+            'n': 0,
+            'visible1': true,
+            'visible0': page == Employ
+                ? e['username'] == Home.logininfo
+                    ? false
+                    : true
+                : true,
+            'visible': !savevisible,
+            'icon': Icons.delete,
+            'action': () => actionDelete(),
+            'color': Colors.redAccent
           },
-          {
-            'n': 4,
-            'visible1': !ADDEDITINFOItem.firstpage,
-            'visible0': subeditvisible(),
-            'visible': savevisible,
-            'icon': Icons.arrow_back,
-            'action': () => mainController.firstbackpage(),
-          }
         ];
-    return Visibility(
-      visible: mainEditvisible(),
-      child: Column(
-        children: [
-          Visibility(
-            visible: !wait,
-            child: Directionality(
-              textDirection: TextDirection.ltr,
-              child: Row(children: [
-                ...edititems().map((e) => Visibility(
-                      visible: e['visible1'],
-                      child: Visibility(
-                        visible: e['visible0'],
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        customeditpanelitem(),
+        Visibility(
+          visible: mainEditvisible(),
+          child: Column(
+            children: [
+              Visibility(
+                visible: !wait,
+                child: Row(children: [
+                  ...edititems().map((e) => Visibility(
+                        visible: e['visible1'],
                         child: Visibility(
-                          visible: e['visible'],
-                          child: e['n'] == 4
-                              ? Transform.rotate(
-                                  angle: 180 * pi / 180,
-                                  child: IconButton(
-                                      onPressed: e['action'],
-                                      icon: Icon(
-                                        e['icon'],
-                                        color: e['color'],
-                                      )),
-                                )
-                              : IconButton(
-                                  onPressed: e['action'],
-                                  icon: Icon(
-                                    e['icon'],
-                                    color: e['color'],
-                                  )),
+                          visible: e['visible0'],
+                          child: Visibility(
+                            visible: e['visible'],
+                            child: e['n'] == 3
+                                ? Transform.rotate(
+                                    angle: 180 * pi / 180,
+                                    child: IconButton(
+                                        onPressed: e['action'],
+                                        icon: Icon(
+                                          e['icon'],
+                                          color: e['color'],
+                                        )),
+                                  )
+                                : IconButton(
+                                    onPressed: e['action'],
+                                    icon: Icon(
+                                      e['icon'],
+                                      color: e['color'],
+                                    )),
+                          ),
                         ),
-                      ),
-                    )),
-                const Expanded(child: SizedBox()),
-                customeditpanelitem(),
-              ]),
-            ),
+                      )),
+                ]),
+              ),
+              Visibility(
+                  visible: wait,
+                  child: const SizedBox(
+                    width: 100,
+                    child: LinearProgressIndicator(
+                      color: Colors.grey,
+                    ),
+                  )),
+            ],
           ),
-          Visibility(
-              visible: wait,
-              child: const SizedBox(
-                width: 100,
-                child: LinearProgressIndicator(
-                  color: Colors.grey,
-                ),
-              ))
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -1320,6 +1311,12 @@ getprivileges() {
               (element) => element['username'] == Home.logininfo)]['addtodo'] ==
           1
       ? p += "\n -إضافة إجرائية"
+      : null;
+  DB.userstable[DB.userstable.indexWhere(
+                  (element) => element['username'] == Home.logininfo)]
+              ['addremind'] ==
+          1
+      ? p += "\n -إضافة تذكير"
       : null;
   return p;
 }

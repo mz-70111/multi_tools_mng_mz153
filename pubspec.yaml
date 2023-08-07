@@ -42,8 +42,9 @@ dependencies:
   teledart: ^0.5.6
   shell_cmd: ^0.2.5
   process_run: ^0.13.0
-  file_picker: ^5.3.2
+  file_picker: ^5.3.1
   url_launcher: ^6.1.12
+  file_selector: 0.9.3
   
 
 dev_dependencies:

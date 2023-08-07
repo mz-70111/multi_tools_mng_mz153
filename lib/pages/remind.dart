@@ -17,7 +17,7 @@ class Remind extends StatelessWidget {
   static TextEditingController reminddetails = TextEditingController();
   static TextEditingController autoCertificateurl = TextEditingController();
   static TextEditingController timez = TextEditingController(text: '25');
-
+  static int calcrd = 0;
   static String? remindofficeNameselected;
   static List remindofficelist = [];
   static List<Map> mylista = [], comment = [];
@@ -109,6 +109,7 @@ class Remind extends StatelessWidget {
       'notifi'
     ];
     List itemResult = [];
+
     List colors = [];
     Widget itemsWidget() {
       colors.clear();
@@ -145,7 +146,8 @@ class Remind extends StatelessWidget {
                           child: Container(
                             height: 10,
                             width: 20,
-                            color: itemResult[4] == 1 ? Colors.red : Colors.green,
+                            color:
+                                itemResult[4] == 1 ? Colors.red : Colors.green,
                           ),
                         ),
                         const Expanded(child: SizedBox())
@@ -327,20 +329,7 @@ class Remind extends StatelessWidget {
                         textEditingController: autoCertificateurl,
                         onChanged: (x) => null)),
                 const Divider(),
-                Row(
-                  children: [
-                    const Text("بدء التذكير عند الساعة"),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                          onPressed: () {
-                            mainController.setstartreminddate(ctx: context);
-                          },
-                          child: Text(
-                              "${hourlystartremindvalue.hour}:${hourlystartremindvalue.minute}")),
-                    )
-                  ],
-                ),
+               
                 Row(
                   children: [
                     const Padding(
@@ -377,7 +366,7 @@ class Remind extends StatelessWidget {
       monthlydays.add("$i");
     }
     days.clear();
-    mainController.office_ids('remind_office_id');
+    mainController.office_ids(offname: 'remind_office_id');
     return MYPAGE(
       mylista: mylista,
       table: 'remind',
@@ -468,9 +457,7 @@ class Remind extends StatelessWidget {
       actionSave: () => editremind(e: MYPAGE.eE),
       actionEdit: () => mainController.showeditpanel(),
       actionDelete: () => deleteremind(ctx: context, e: MYPAGE.eE),
-      customeditpanelitem: () => Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
+      customeditpanelitem: () =>
           Visibility(
             visible: (checkifUserisAdmin(
                             usertable: DB.userstable,
@@ -492,40 +479,35 @@ class Remind extends StatelessWidget {
                         DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
                 ? true
                 : false,
-            child: Row(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(MYPAGE.eE['notifi'] == 1 ? "إشعار مفعل" : "إشعار ملغى"),
-                Switch(
-                    value: MYPAGE.eE['notifi'] == 1 ? true : false,
-                    onChanged: (x) {
-                      mainController.remindnotifichg(x: x, e: MYPAGE.eE);
-                    }),
-              ],
-            ),
-          ),
-          Visibility(
-            visible: (checkifUserisAdmin(
-                            usertable: DB.userstable,
-                            userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                ['user_id']) ==
-                        true ||
-                    ((checkifUserisUserinOffice(
-                                    usertable: DB.userstable,
-                                    userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                        ['user_id'],
-                                    officeid: MYPAGE.eE['remind_office_id']) ==
-                                true ||
-                            checkifUserisSupervisorinOffice(
-                                    usertable: DB.userstable,
-                                    userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                        ['user_id'],
-                                    officeid: MYPAGE.eE['remind_office_id']) ==
-                                true) &&
-                        DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
-                ? true
-                : false,
-            child: Row(
-              children: [
+                Row(
+                  children: [
+                      Switch(
+                        value: MYPAGE.eE['notifi'] == 1 ? true : false,
+                        onChanged: (x) {
+                          mainController.remindnotifichg(x: x, e: MYPAGE.eE);
+                        }),
+                    Text(MYPAGE.eE['notifi'] == 1 ? "إشعار مفعل" : "إشعار ملغى"),
+                  
+                  ],
+                ),
+            
+         
+                Row(
+                  children: [
+                    Switch(
+                        value: MYPAGE.eE['pause'] == 1 ? true : false,
+                        onChanged: (x) {
+                          mainController.remindpausechg(x: x, e: MYPAGE.eE);
+                        }),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text("إيقاف مؤقت"),
+                    ),
+                    
+                  ],
+                ),
                 Visibility(
                     visible: MYPAGE.eE['pause'] == 1 ? true : false,
                     child: TextButton(
@@ -535,33 +517,13 @@ class Remind extends StatelessWidget {
                         },
                         child: Text(
                             "إلى تاريخ ${df.DateFormat("yyyy-MM-dd").format(MYPAGE.eE['pausedate'] ?? pausedate)}"))),
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text("إيقاف مؤقت"),
-                ),
-                Switch(
-                    value: MYPAGE.eE['pause'] == 1 ? true : false,
-                    onChanged: (x) {
-                      mainController.remindpausechg(x: x, e: MYPAGE.eE);
-                    }),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+    
+            
+       
+    ])));
   }
 
   getinfo({e, ctx}) {
-    int pause = 0;
-    if (e['pause'] == 1) {
-      if (e['pausedate'] != null) {
-        if (e['pausedate'].difference(DateTime.now()).inHours > 0) {
-          pause =
-              ((e['pausedate'].difference(DateTime.now()).inHours) / 24).ceil();
-        }
-      }
-    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -581,8 +543,7 @@ ${e['reminddetails']}
         Visibility(
           visible: e['reminddate'] == null ? false : true,
           child: e['reminddate'] != null
-              ? Text(
-                  "المدة المتبقية لارسال التنبيه ${((e['reminddate'].add(Duration(days: pause)).difference(DateTime.now().add(Duration(days: e['sendalertbefor']))).inHours) / 24).ceil()} يوم")
+              ? Text("المدة المتبقية لارسال التنبيه $calcrd يوم")
               : SizedBox(),
         ),
         Text(
@@ -623,11 +584,8 @@ ${e['reminddetails']}
             visible: e['reminddate'] == null ? false : true,
             child: e['reminddate'] != null
                 ? Text(e['reminddate'].difference(DateTime.now()).inDays > 0
-                    ? "المدة المتبقية  ${((e['reminddate'].difference(DateTime.now()).inHours) / 24).ceil()} يوم"
-                    : ((e['reminddate'].difference(DateTime.now()).inHours) /
-                                    24)
-                                .ceil() ==
-                            0
+                    ? "المدة المتبقية  ${e['reminddate'].difference(DateTime.now()).inDays} يوم"
+                    : e['reminddate'].difference(DateTime.now()).inDays == 0
                         ? (int.parse("${e['startsendat']}".substring(
                                         0,
                                         e['startsendat']
@@ -637,7 +595,7 @@ ${e['reminddetails']}
                                 0
                             ? 'المدة المتبقية ${int.parse("${e['startsendat']}".substring(0, e['startsendat'].toString().indexOf(":"))) - DateTime.now().hour} ساعة'
                             : 'المدة المتبقية منتهية منذ ${(int.parse("${e['startsendat']}".substring(0, e['startsendat'].toString().indexOf(":"))) - DateTime.now().hour) * -1} ساعة'
-                        : "المدة المتبقية منتهية منذ  ${((e['reminddate'].difference(DateTime.now()).inHours) / 24).ceil()} يوم")
+                        : "المدة المتبقية منتهية منذ  ${e['reminddate'].difference(DateTime.now()).inDays} يوم")
                 : const SizedBox()),
         const Divider(),
         Comment(
@@ -694,6 +652,7 @@ ${e['reminddetails']}
   }
 
   customInitforEdit({e}) async {
+    calcrd = await mainController.calcremind(e: e);
     for (var i in Remind.reminds) {
       i['error'] = null;
     }
@@ -811,6 +770,8 @@ ${e['reminddetails']}
   }
 
   updateafteredit({e}) async {
+    calcrd = await mainController.calcremind(e: e);
+    e['status'] = calcrd > 0 ? 0 : 1;
     e['remindname'] = Remind.reminds[0]['controller'].text;
     e['reminddetails'] = Remind.reminds[1]['controller'].text;
     e['editby_id'] = DB.userstable[DB.userstable
@@ -823,7 +784,6 @@ ${e['reminddetails']}
             : "2";
     e['manytimestype'] =
         Remind.manytimesremindgroup == Remind.manytimesremindlist[0] ? 0 : 1;
-
     e['reminddate'] = Remind.typevalue == Remind.typelist[0]
         ? Remind.onetimeremid
         : Remind.remiddate;

@@ -245,7 +245,7 @@ class Employ extends StatelessWidget {
           ),
           customWidgetofADD()
         ]);
-    mainController.office_ids('office_id');
+    mainController.office_ids(offname: 'office_id');
 
     return MYPAGE(
         mylista: mylista,

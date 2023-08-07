@@ -50,7 +50,6 @@ class PersonPanel extends StatelessWidget {
           'label': 'تسجيل الخروج',
           'action': () async {
             LogIn.removelogin();
-            Get.offNamed('/');
             personalvisible = false;
           },
           'size': 150.0

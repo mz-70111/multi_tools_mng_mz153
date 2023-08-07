@@ -10,6 +10,7 @@ import 'package:users_tasks_mz_153/pages/splash.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 import 'package:users_tasks_mz_153/tamplate/thememz.dart';
+import 'package:users_tasks_mz_153/tamplate/tweenmz.dart';
 
 class LogIn extends StatelessWidget {
   static String appversion = 'v_1.0.1';
@@ -32,6 +33,7 @@ class LogIn extends StatelessWidget {
   static bool usernamereadonly = false;
   @override
   Widget build(BuildContext context) {
+    List tak = ['T', 'A', 'K', 'A', 'M', 'O', 'L'];
     DBController dbController = Get.find();
     MainController mainController = Get.find();
     List logininfo() => [
@@ -95,160 +97,190 @@ class LogIn extends StatelessWidget {
                 const SizedBox(width: 100, child: LinearProgressIndicator()),
           },
         ];
-    Future(() async => await mainController.loginlogoutlog(1));
-    Future(() async => await mainController.autosendnotifitasks());
-    Future(() async => await mainController.getreminddate());
-    Future(() async => await mainController.autosendnotifiremind());
-    Future(() async => await mainController.getalluserstable());
     return Builder(builder: (context) {
       return GetBuilder<DBController>(
-        init: dbController,
-        builder: (_) => FutureBuilder(builder: (_, snap) {
-          LogIn.errorMSglogin = '';
-          if (LogIn.constatus == true) {
-            return Directionality(
-              textDirection: TextDirection.rtl,
-              child: GetBuilder<MainController>(
-                init: mainController,
-                builder: (_) => Scaffold(
-                    body: Center(
-                  child: LogIn.getversion != LogIn.appversion
-                      ? Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '''
+          init: dbController,
+          builder: (_) {
+            LogIn.errorMSglogin = '';
+
+            if (LogIn.constatus == true) {
+              return Directionality(
+                textDirection: TextDirection.rtl,
+                child: GetBuilder<MainController>(
+                  init: mainController,
+                  builder: (_) => Scaffold(
+                      body: Center(
+                    child: LogIn.getversion != LogIn.appversion
+                        ? Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '''
             النسخة الحالية من التطبيق لم تعد معتمدة
             قم بتحديث التطبيق
             ''',
-                                textAlign: TextAlign.center,
-                              ),
-                              InkWell(
-                                child: Icon(Icons.download),
-                                onTap: () async {
-                                  await mainController.url_launch(
-                                      url:
-                                          'https://github.com/mz-70111/multi_tools_mng_mz153');
-                                },
-                              )
-                            ],
-                          ),
-                        )
-                      : SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width < 500
-                                            ? MediaQuery.of(context).size.width
-                                            : 500,
-                                    child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'تسجيل الدخول',
-                                            style: ThemeMZ()
-                                                .theme()
-                                                .textTheme
-                                                .labelMedium,
-                                          ),
-                                          const Divider(),
-                                          ...logininfo()
-                                              .map(
-                                                (e) => Visibility(
-                                                  visible: e['visible'],
-                                                  child: TextFieldMZ(
-                                                    readonly: e['readonly'],
-                                                    onChanged: (x) => null,
-                                                    obscureText:
-                                                        e['obscuretext'],
-                                                    suffixIcon: IconButton(
-                                                        onPressed: e['action'],
-                                                        icon: Icon(e['icon'])),
-                                                    label: e['label'],
-                                                    textEditingController:
-                                                        e['controller'],
+                                  textAlign: TextAlign.center,
+                                ),
+                                InkWell(
+                                  child: Icon(Icons.download),
+                                  onTap: () async {
+                                    await mainController.url_launch(
+                                        url:
+                                            'https://github.com/mz-70111/multi_tools_mng_mz153');
+                                  },
+                                )
+                              ],
+                            ),
+                          )
+                        : SingleChildScrollView(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                      width: MediaQuery.of(context).size.width <
+                                              500
+                                          ? MediaQuery.of(context).size.width
+                                          : 500,
+                                      child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Directionality(
+                                              textDirection: TextDirection.ltr,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Image.asset(
+                                                    'lib\\assets\\images\\takamollogo.png',
+                                                    height: 75,
+                                                    width: 75,
                                                   ),
-                                                ),
-                                              )
-                                              .toList(),
-                                          GetBuilder<MainController>(
+                                                  Row(
+                                                    children: [
+                                                      ...tak.map((e) =>
+                                                          TweenMZ.transperant(
+                                                              duration:
+                                                                  tak.indexOf(
+                                                                          e) *
+                                                                      500,
+                                                              child0:
+                                                                  Text("$e")))
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            Text(
+                                              'تسجيل الدخول',
+                                              style: ThemeMZ()
+                                                  .theme()
+                                                  .textTheme
+                                                  .labelMedium,
+                                            ),
+                                            const Divider(),
+                                            ...logininfo()
+                                                .map(
+                                                  (e) => Visibility(
+                                                    visible: e['visible'],
+                                                    child: TextFieldMZ(
+                                                      readonly: e['readonly'],
+                                                      onChanged: (x) => null,
+                                                      obscureText:
+                                                          e['obscuretext'],
+                                                      suffixIcon: IconButton(
+                                                          onPressed:
+                                                              loginwait == false
+                                                                  ? e['action']
+                                                                  : null,
+                                                          icon:
+                                                              Icon(e['icon'])),
+                                                      label: e['label'],
+                                                      textEditingController:
+                                                          e['controller'],
+                                                    ),
+                                                  ),
+                                                )
+                                                .toList(),
+                                            GetBuilder<MainController>(
+                                                init: mainController,
+                                                builder: (_) => Visibility(
+                                                    visible:
+                                                        errorMSglogin.isEmpty
+                                                            ? false
+                                                            : true,
+                                                    child:
+                                                        Text(errorMSglogin))),
+                                            const Divider(),
+                                            GetBuilder<MainController>(
                                               init: mainController,
-                                              builder: (_) => Visibility(
-                                                  visible: errorMSglogin.isEmpty
-                                                      ? false
-                                                      : true,
-                                                  child: Text(errorMSglogin))),
-                                          const Divider(),
-                                          GetBuilder<MainController>(
-                                            init: mainController,
-                                            builder: (_) => Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: loginaction(
-                                                      wait: loginwait)
-                                                  .map((e) => e['label'].isEmpty
-                                                      ? Visibility(
-                                                          visible:
-                                                              e['visible0'],
-                                                          child: Visibility(
+                                              builder: (_) => Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: loginaction(
+                                                        wait: loginwait)
+                                                    .map((e) => e['label']
+                                                            .isEmpty
+                                                        ? Visibility(
+                                                            visible:
+                                                                e['visible0'],
+                                                            child: Visibility(
+                                                                visible: e[
+                                                                    'visible'],
+                                                                child: e['icon']
+                                                                    as Widget),
+                                                          )
+                                                        : Visibility(
+                                                            visible:
+                                                                e['visible0'],
+                                                            child: Visibility(
                                                               visible:
                                                                   e['visible'],
-                                                              child: e['icon']
-                                                                  as Widget),
-                                                        )
-                                                      : Visibility(
-                                                          visible:
-                                                              e['visible0'],
-                                                          child: Visibility(
-                                                            visible:
-                                                                e['visible'],
-                                                            child:
-                                                                TextButton.icon(
-                                                              onPressed:
-                                                                  e['action'],
-                                                              icon: Icon(
-                                                                  e['icon']),
-                                                              label: Text(
-                                                                  e['label']),
+                                                              child: TextButton
+                                                                  .icon(
+                                                                onPressed:
+                                                                    e['action'],
+                                                                icon: Icon(
+                                                                    e['icon']),
+                                                                label: Text(
+                                                                    e['label']),
+                                                              ),
                                                             ),
-                                                          ),
-                                                        ))
-                                                  .toList(),
+                                                          ))
+                                                    .toList(),
+                                              ),
                                             ),
-                                          ),
-                                        ])),
+                                          ])),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                )),
-              ),
-            );
-          } else {
-            return Scaffold(
-              body: Center(
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const Text("لا يمكن الوصول للمخدم"),
-                TextButton(
-                    onPressed: () async {
-                      dbController.update();
-                    },
-                    child: const Icon(Icons.refresh))
-              ])),
-            );
-          }
-        }),
-      );
+                  )),
+                ),
+              );
+            } else {
+              return Scaffold(
+                body: Center(
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  const Text("لا يمكن الوصول للمخدم"),
+                  TextButton(
+                      onPressed: () async {
+                        dbController.update();
+                      },
+                      child: const Icon(Icons.refresh))
+                ])),
+              );
+            }
+          });
     });
   }
 
   static removelogin() async {
+    LogIn.loginwait = false;
     Future(() async => await mainController.loginlogoutlog(0));
+    Get.offNamed('/login');
     Home.searchvis = false;
     LogIn.obscuretext = true;
     LogIn.iconpassvis = Icons.visibility_off;

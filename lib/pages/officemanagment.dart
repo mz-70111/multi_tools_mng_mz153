@@ -189,13 +189,13 @@ class Office extends StatelessWidget {
             : false,
         child: Row(
           children: [
-            Text("إرسال المهام تلقائيا"),
-            Text(MYPAGE.eE['autosendtasks'] == 1 ? "تفعيل" : "إيقاف"),
             Switch(
                 value: MYPAGE.eE['autosendtasks'] == 1 ? true : false,
                 onChanged: (x) {
                   mainController.autosendtasknotifichg(x: x, e: MYPAGE.eE);
                 }),
+            Text(MYPAGE.eE['autosendtasks'] == 1 ? " تفعيل" : " إيقاف"),
+            Text(" إرسال المهام تلقائيا"),
           ],
         ),
       ),

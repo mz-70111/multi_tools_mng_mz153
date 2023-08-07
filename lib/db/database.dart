@@ -6,7 +6,7 @@ import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 class DB {
   DBController dbController = Get.find();
   ConnectionSettings settings = ConnectionSettings(
-      host: '192.168.30.8',
+      host: '192.168.50.50',
       port: 3306,
       user: 'mz',
       password: 'mzrootmz',
@@ -28,6 +28,8 @@ create table if not exists version
 version varchar(255)
 );
 ''');
+
+    await conn.query('insert into version (version)values("v_1.0.1")');
     await conn.close();
   }
 
@@ -247,7 +249,7 @@ sendalertbefor int(11) default 0,
 autocerturl varchar(255),
 manytimestype tinyint(1),
 foreign key (remind_office_id) references office(office_id),
-pasue int(11) default 0,
+pause int(11) default 0,
 pausedate timestamp null default null
 );
 ''');

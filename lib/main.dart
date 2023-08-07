@@ -29,6 +29,7 @@ class UsersTasksmz extends StatelessWidget {
         theme: ThemeMZ().theme(),
         getPages: [
           GetPage(name: '/', page: () => const Splash()),
+          GetPage(name: '/login', page: () => const LogIn()),
           GetPage(name: '/home', page: () => HomePage())
         ],
       ),
