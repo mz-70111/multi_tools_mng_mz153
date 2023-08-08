@@ -329,7 +329,6 @@ class Remind extends StatelessWidget {
                         textEditingController: autoCertificateurl,
                         onChanged: (x) => null)),
                 const Divider(),
-               
                 Row(
                   children: [
                     const Padding(
@@ -368,159 +367,91 @@ class Remind extends StatelessWidget {
     days.clear();
     mainController.office_ids(offname: 'remind_office_id');
     return MYPAGE(
-      mylista: mylista,
-      table: 'remind',
-      tableId: 'remind_id',
-      where: DB.userstable[DB.userstable.indexWhere(
-                      (element) => element['username'] == Home.logininfo)]
-                  ['admin'] ==
-              1
-          ? ''
-          : LogIn.office_ids.contains('= _')
-              ? 'where 1=2'
-              : 'where ${LogIn.office_ids}',
-      page: Remind,
-      searchRange: const ['remindname', 'reminddetails'],
-      mainColumn: mainColumn,
-      items: itemskey,
-      itemsResult: itemResult,
-      itemsWidget: () => itemsWidget(),
-      notifi: const SizedBox(),
-      addlabel: addFunction['addlabel'],
-      action: addFunction['action'],
-      customInitdataforAdd: () => customInitforAdd(),
-      customWidgetofADD: customWidgetofADD(),
-      customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
-      customWidgetofEdit: customWidgetofEdit(),
-      textfeildlista: reminds,
-      scrollController: scrollController,
-      mainEditvisible: () => (checkifUserisAdmin(
-                      usertable: DB.userstable,
-                      userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                          ['user_id']) ==
-                  true ||
-              ((checkifUserisUserinOffice(
-                              usertable: DB.userstable,
-                              userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                  ['user_id'],
-                              officeid: MYPAGE.eE['remind_office_id']) ==
-                          true ||
-                      checkifUserisSupervisorinOffice(
-                              usertable: DB.userstable,
-                              userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'],
-                              officeid: MYPAGE.eE['remind_office_id']) ==
-                          true) &&
-                  DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
-          ? true
-          : false,
-      subeditvisible: () => ((checkifUserisUserinOffice(
-                          usertable: DB.userstable,
-                          userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                              ['user_id'],
-                          officeid: MYPAGE.eE['remind_office_id']) ==
-                      true ||
-                  checkifUserisSupervisorinOffice(
-                          usertable: DB.userstable,
-                          userid: DB.userstable[DB.userstable
-                                  .indexWhere((element) => element['username'] == Home.logininfo)]
-                              ['user_id'],
-                          officeid: MYPAGE.eE['remind_office_id']) ==
-                      true) &&
-              DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                      ['addremind'] ==
-                  1)
-          ? true
-          : false,
-      mainAddvisible: (checkifUserisinAnyOffice(
-                          usertable: DB.userstable,
-                          userid: DB.userstable[DB.userstable.indexWhere(
-                                  (element) => element['username'] == Home.logininfo)]
-                              ['user_id']) ==
-                      true ||
-                  checkifUserisSupervisorinAnyOffice(
-                          usertable: DB.userstable,
-                          userid:
-                              DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                  ['user_id']) ==
-                      true) &&
-              DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                      ['addremind'] ==
-                  1
-          ? true
-          : false,
-      getinfo: () {
-        return getinfo(
-          e: MYPAGE.eE,
-          ctx: context,
-        );
-      },
-      actionSave: () => editremind(e: MYPAGE.eE),
-      actionEdit: () => mainController.showeditpanel(),
-      actionDelete: () => deleteremind(ctx: context, e: MYPAGE.eE),
-      customeditpanelitem: () =>
-          Visibility(
-            visible: (checkifUserisAdmin(
-                            usertable: DB.userstable,
-                            userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                ['user_id']) ==
-                        true ||
-                    ((checkifUserisUserinOffice(
-                                    usertable: DB.userstable,
-                                    userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                        ['user_id'],
-                                    officeid: MYPAGE.eE['remind_office_id']) ==
-                                true ||
+        mylista: mylista,
+        table: 'remind',
+        tableId: 'remind_id',
+        where: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                    ['admin'] ==
+                1
+            ? ''
+            : LogIn.office_ids.contains('= _')
+                ? 'where 1=2'
+                : 'where ${LogIn.office_ids}',
+        page: Remind,
+        searchRange: const ['remindname', 'reminddetails'],
+        mainColumn: mainColumn,
+        items: itemskey,
+        itemsResult: itemResult,
+        itemsWidget: () => itemsWidget(),
+        notifi: const SizedBox(),
+        addlabel: addFunction['addlabel'],
+        action: addFunction['action'],
+        customInitdataforAdd: () => customInitforAdd(),
+        customWidgetofADD: customWidgetofADD(),
+        customInitforEdit: () => customInitforEdit(e: MYPAGE.eE),
+        customWidgetofEdit: customWidgetofEdit(),
+        textfeildlista: reminds,
+        scrollController: scrollController,
+        mainEditvisible: () =>
+            (checkifUserisAdmin(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) == true ||
+                    ((checkifUserisUserinOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'], officeid: MYPAGE.eE['remind_office_id']) == true ||
                             checkifUserisSupervisorinOffice(
                                     usertable: DB.userstable,
-                                    userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
-                                        ['user_id'],
+                                    userid:
+                                        DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]
+                                            ['user_id'],
                                     officeid: MYPAGE.eE['remind_office_id']) ==
                                 true) &&
                         DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1))
                 ? true
                 : false,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                      Switch(
-                        value: MYPAGE.eE['notifi'] == 1 ? true : false,
-                        onChanged: (x) {
-                          mainController.remindnotifichg(x: x, e: MYPAGE.eE);
-                        }),
-                    Text(MYPAGE.eE['notifi'] == 1 ? "إشعار مفعل" : "إشعار ملغى"),
-                  
-                  ],
-                ),
-            
-         
-                Row(
-                  children: [
-                    Switch(
-                        value: MYPAGE.eE['pause'] == 1 ? true : false,
-                        onChanged: (x) {
-                          mainController.remindpausechg(x: x, e: MYPAGE.eE);
-                        }),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text("إيقاف مؤقت"),
-                    ),
-                    
-                  ],
-                ),
-                Visibility(
-                    visible: MYPAGE.eE['pause'] == 1 ? true : false,
-                    child: TextButton(
-                        onPressed: () async {
-                          await mainController.setpausedate(
-                              ctx: context, e: MYPAGE.eE);
-                        },
-                        child: Text(
-                            "إلى تاريخ ${df.DateFormat("yyyy-MM-dd").format(MYPAGE.eE['pausedate'] ?? pausedate)}"))),
-    
-            
-       
-    ])));
+        subeditvisible: () => ((checkifUserisUserinOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'], officeid: MYPAGE.eE['remind_office_id']) == true || checkifUserisSupervisorinOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'], officeid: MYPAGE.eE['remind_office_id']) == true) && DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1) ? true : false,
+        mainAddvisible: (checkifUserisinAnyOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) == true || checkifUserisSupervisorinAnyOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) == true) && DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1 ? true : false,
+        getinfo: () {
+          return getinfo(
+            e: MYPAGE.eE,
+            ctx: context,
+          );
+        },
+        actionSave: () => editremind(e: MYPAGE.eE),
+        actionEdit: () => mainController.showeditpanel(),
+        actionDelete: () => deleteremind(ctx: context, e: MYPAGE.eE),
+        customeditpanelitem: () => Visibility(
+            visible: (checkifUserisAdmin(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id']) == true || ((checkifUserisUserinOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'], officeid: MYPAGE.eE['remind_office_id']) == true || checkifUserisSupervisorinOffice(usertable: DB.userstable, userid: DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['user_id'], officeid: MYPAGE.eE['remind_office_id']) == true) && DB.userstable[DB.userstable.indexWhere((element) => element['username'] == Home.logininfo)]['addremind'] == 1)) ? true : false,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(
+                children: [
+                  Switch(
+                      value: MYPAGE.eE['notifi'] == 1 ? true : false,
+                      onChanged: (x) {
+                        mainController.remindnotifichg(x: x, e: MYPAGE.eE);
+                      }),
+                  Text(MYPAGE.eE['notifi'] == 1 ? "إشعار مفعل" : "إشعار ملغى"),
+                ],
+              ),
+              Row(
+                children: [
+                  Switch(
+                      value: MYPAGE.eE['pause'] == 1 ? true : false,
+                      onChanged: (x) {
+                        mainController.remindpausechg(x: x, e: MYPAGE.eE);
+                      }),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("إيقاف مؤقت"),
+                  ),
+                ],
+              ),
+              Visibility(
+                  visible: MYPAGE.eE['pause'] == 1 ? true : false,
+                  child: TextButton(
+                      onPressed: () async {
+                        await mainController.setpausedate(
+                            ctx: context, e: MYPAGE.eE);
+                      },
+                      child: Text(
+                          "إلى تاريخ ${df.DateFormat("yyyy-MM-dd").format(MYPAGE.eE['pausedate'] ?? pausedate)}"))),
+            ])));
   }
 
   getinfo({e, ctx}) {
@@ -540,12 +471,6 @@ ${e['reminddetails']}
             : e['autocerturl'] != null
                 ? const Text(".. يتم محاولة جلب المعلومات في حال توفرها")
                 : const Text("تاريخ الانتهاء غير محدد"),
-        Visibility(
-          visible: e['reminddate'] == null ? false : true,
-          child: e['reminddate'] != null
-              ? Text("المدة المتبقية لارسال التنبيه $calcrd يوم")
-              : SizedBox(),
-        ),
         Text(
             "نمط التعيين : ${e['type'] == '0' ? 'يدوي مرة واحدة' : e['type'] == '1' ? 'يدوي عدة مرات ${e['manytimestype'] == 0 ? "أسبوعي" : "شهري"}' : 'تلقائي'}"),
         const Divider(),
@@ -583,19 +508,11 @@ ${e['reminddetails']}
         Visibility(
             visible: e['reminddate'] == null ? false : true,
             child: e['reminddate'] != null
-                ? Text(e['reminddate'].difference(DateTime.now()).inDays > 0
-                    ? "المدة المتبقية  ${e['reminddate'].difference(DateTime.now()).inDays} يوم"
-                    : e['reminddate'].difference(DateTime.now()).inDays == 0
-                        ? (int.parse("${e['startsendat']}".substring(
-                                        0,
-                                        e['startsendat']
-                                            .toString()
-                                            .indexOf(":"))) -
-                                    DateTime.now().hour) >=
-                                0
-                            ? 'المدة المتبقية ${int.parse("${e['startsendat']}".substring(0, e['startsendat'].toString().indexOf(":"))) - DateTime.now().hour} ساعة'
-                            : 'المدة المتبقية منتهية منذ ${(int.parse("${e['startsendat']}".substring(0, e['startsendat'].toString().indexOf(":"))) - DateTime.now().hour) * -1} ساعة'
-                        : "المدة المتبقية منتهية منذ  ${e['reminddate'].difference(DateTime.now()).inDays} يوم")
+                ? Text((calcrd / 24).ceil() > 0
+                    ? "المدة المتبقية  ${(calcrd / 24).ceil()} يوم"
+                    : (calcrd / 24).ceil() == 0
+                        ? 'المدة المتبقية منتهية منذ ${-1 * calcrd} ساعة'
+                        : "المدة المتبقية منتهية منذ  ${-1*(calcrd / 24).ceil()} يوم")
                 : const SizedBox()),
         const Divider(),
         Comment(
@@ -652,7 +569,7 @@ ${e['reminddetails']}
   }
 
   customInitforEdit({e}) async {
-    calcrd = await mainController.calcremind(e: e);
+    await mainController.calcremind(e: e);
     for (var i in Remind.reminds) {
       i['error'] = null;
     }
@@ -770,7 +687,7 @@ ${e['reminddetails']}
   }
 
   updateafteredit({e}) async {
-    calcrd = await mainController.calcremind(e: e);
+    await mainController.calcremind(e: e);
     e['status'] = calcrd > 0 ? 0 : 1;
     e['remindname'] = Remind.reminds[0]['controller'].text;
     e['reminddetails'] = Remind.reminds[1]['controller'].text;

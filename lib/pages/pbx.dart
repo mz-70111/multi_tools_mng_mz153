@@ -4,6 +4,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:users_tasks_mz_153/controllers/maincontroller0.dart';
+import 'package:users_tasks_mz_153/db/database.dart';
 import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 
@@ -12,6 +13,8 @@ class PBX extends StatelessWidget {
   static TextEditingController mainfolderpath = TextEditingController();
   static TextEditingController distfolderpath = TextEditingController();
   static TextEditingController searchfolderpath = TextEditingController();
+  static TextEditingController typefolderpath = TextEditingController();
+  static bool waitsearch = false;
   static List searchtype = ['رقم التحويلة', 'رقم المتصل'];
   static String searchvalue = 'رقم التحويلة';
   @override
@@ -49,7 +52,9 @@ class PBX extends StatelessWidget {
                             ),
                             Expanded(
                                 child: TextFieldMZ(
-                                    label: '', onChanged: (x) => null))
+                                    textEditingController: typefolderpath,
+                                    label: '',
+                                    onChanged: (x) => null))
                           ],
                         ),
                         TextFieldMZ(
@@ -62,7 +67,17 @@ class PBX extends StatelessWidget {
                                   getpath2();
                                 },
                                 icon: Icon(Icons.folder))),
-                        IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                        Row(
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  searchcmd(
+                                      username: 'muoaz.horani',
+                                      password: 'mh77@0111');
+                                },
+                                icon: Icon(Icons.search)),
+                          ],
+                        ),
                       ],
                     )),
               ),
@@ -179,16 +194,24 @@ class PBX extends StatelessWidget {
     }
   }
 
-  search({path}) async {
-    if (Platform.isWindows) {
-      final List? directoryPath = await openFiles();
-      if (directoryPath == null) {
-        return;
-      } else {
-        // searchfolderpath.text = directoryPath;
-      }
+  searchcmd({username, password}) async {
+    var connent = await Process.run('Powershell.exe', [
+      '''
+net use /delete \\\\192.168.30.15
+net use \\\\192.168.30.15 /user:$username@social.takamol.local $password
+'''
+    ]);
+    if (connent.stdout.contains('successfully')) {
+      print(connent.stdout);
+      searchfolderpath.text.replaceAll('\\', "\\\\");
+      print(searchfolderpath.text);
+      var result = await Process.run('Powershell.exe', [
+        '''
+Get-ChildItem -Path \\\\192.168.30.15\\pbx_record\\PBX_REC\\autorecords\\*-475-* -Recurse |select Name'''
+      ]);
+      print(result.stdout);
     } else {
-      final FilePickerResult? files = await FilePicker.platform.pickFiles();
+      print('error');
     }
   }
 }

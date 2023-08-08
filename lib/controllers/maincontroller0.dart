@@ -295,6 +295,7 @@ class MainController extends GetxController {
   }
 
   autosendnotifiremind() async {
+    print('remind');
     Home.logininfo = 'admin';
     List<Map> office = [], users = [], remind = [];
     DBController dbController = Get.find();
@@ -320,6 +321,7 @@ class MainController extends GetxController {
           tableid: 'remind_id');
 
       for (var i in office) {
+        print(i['officename']);
         var ls = await DB().customquery(
             query:
                 'select lastsendremind from office where office_id=${i['office_id']}');
@@ -327,11 +329,10 @@ class MainController extends GetxController {
           i['lastsendremind'] =
               ils[0] ?? DateTime.now().add(Duration(hours: -1));
         }
-        print(i['lastsendremind'].difference(DateTime.now()).inHours);
-        if (i['lastsendremind'].difference(DateTime.now()).inHours < 0) {
+        if (DateTime.now().isAfter(i['lastsendremind'])) {
           if (i['notifi'] == 1) {
             for (var j in remind) {
-              if (j['notifi'] == 1) {
+              if (j['notifi'] == 1 && j['remind_office_id'] == i['office_id']) {
                 if (j['reminddate'] != null) {
                   var calcrd;
                   if (j['pause'] == 1) {
@@ -358,7 +359,7 @@ ${j['reminddetails']}
 ${df.DateFormat('yyyy-MM-dd').format(j['reminddate'])}
 نمط التعيين ${j['type'] == '0' ? 'يدوي مرة واحدة' : j['type'] == '1' ? 'يدوي عدة مرات ${j['manytimestype'] == 0 ? "أسبوعي" : "شهري"}' : 'تلقائي'}
 ${j['type'] == '2' ? 'مصدر الشهادة ${j['autocerturl']}' : ''}
-${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتبقية  ${j['reminddate'].difference(DateTime.now()).inDays} يوم" : j['reminddate'].difference(DateTime.now()).inDays == 0 ? (int.parse("${j['startsendat']}".substring(0, j['startsendat'].toString().indexOf(":"))) - DateTime.now().hour) >= 0 ? 'المدة المتبقية ${int.parse("${j['startsendat']}".substring(0, j['startsendat'].toString().indexOf(":"))) - DateTime.now().hour} ساعة' : 'المدة المتبقية منتهية منذ ${(int.parse("${j['startsendat']}".substring(0, j['startsendat'].toString().indexOf(":"))) - DateTime.now().hour) * -1} ساعة' : "المدة المتبقية منتهية منذ  ${j['reminddate'].difference(DateTime.now()).inDays} يوم"}         
+"${j['reminddate'].difference(DateTime.now()).inDays == 0 ? "تاريخ التذكير هو اليوم" : "مر على انتهاء تاريخ التذكير ${j['reminddate'].difference(DateTime.now()).inDays} يوم"}"         
 -------------------------------------------------------------
 ''';
                     Tasks.sendtask(msg: mymsg, chatid: i['chatid']);
@@ -377,34 +378,30 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
             }
           }
         }
-        Future.delayed(const Duration(hours: 1), () async {
-          return await autosendnotifiremind();
-        });
       }
     } catch (e) {
-      print(e);
       null;
     }
+    Future.delayed(
+        const Duration(hours: 1), () async => autosendnotifiremind());
     Home.logininfo = LogIn.username.text.toLowerCase();
   }
 
   calcremind({e}) async {
-    DBController dbController = Get.find();
-    var calcrd = 0;
     if (e['pause'] == 1) {
       if (e['pausedate'] != null) {
-        calcrd = e['pausedate']
+        Remind.calcrd = e['pausedate']
             .difference(DateTime.now().add(Duration(days: e['sendalertbefor'])))
-            .inDays;
+            .inHours;
       }
     } else {
       if (e['reminddate'] != null) {
-        calcrd = e['reminddate']
+        Remind.calcrd = e['reminddate']
             .difference(DateTime.now().add(Duration(days: e['sendalertbefor'])))
-            .inDays;
+            .inHours;
       }
     }
-    if (calcrd <= 0) {
+    if (Remind.calcrd <= 0) {
       try {
         await DB().customquery(
             query:
@@ -417,8 +414,6 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                 'update remind set status=0 where remind_id=${e['remind_id']}');
       } catch (err) {}
     }
-    dbController.update();
-    return calcrd;
   }
 
   autosendnotifitasks() async {
@@ -1531,7 +1526,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
         } catch (e) {}
       }
     }
-    Remind.calcrd = await calcremind(e: e);
+    await calcremind(e: e);
     update();
   }
 
@@ -1555,7 +1550,7 @@ ${j['reminddate'].difference(DateTime.now()).inDays > 0 ? "المدة المتب
                 'update remind set pausedate="${df.DateFormat("yyyy-MM-dd").format(Remind.pausedate)}" where remind_id=${e['remind_id']}');
       }
     } catch (t) {}
-    Remind.calcrd = await calcremind(e: e);
+    await calcremind(e: e);
     update();
   }
 

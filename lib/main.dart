@@ -25,11 +25,10 @@ class UsersTasksmz extends StatelessWidget {
       init: themeController,
       builder: (_) => GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        home: const Splash(),
+        home: const LogIn(),
         theme: ThemeMZ().theme(),
         getPages: [
-          GetPage(name: '/', page: () => const Splash()),
-          GetPage(name: '/login', page: () => const LogIn()),
+          GetPage(name: '/', page: () => const LogIn()),
           GetPage(name: '/home', page: () => HomePage())
         ],
       ),
