@@ -458,6 +458,13 @@ class Tasks extends StatelessWidget {
   }
 
   static mymsgTask({e}) {
+    for (var u = 0; u < e['userstask_name'].length; u++) {
+      for (var u2 = 1; u2 < e['userstask_name'].length; u++) {
+        if (u == u2) {
+          e['userstask_name'].removeAt(u2);
+        }
+      }
+    }
     String mymsg = """
 اسم المهمة ${e['taskname']}
 التفاصيل:\n ${e['taskdetails']}

@@ -233,7 +233,7 @@ class DBController extends GetxController {
         } else {
           xx = await DB().customquery(
               query:
-                  'select * from users_tasks join users_office on uf_user_id=ut_user_id where ${LogIn.office_ids}');
+                  'select * from users_tasks join users_office on uf_user_id=ut_user_id where ${LogIn.office_ids} group by ut_user_id');
         }
         ui.clear();
         un.clear();

@@ -37,14 +37,14 @@ class PersonPanel extends StatelessWidget {
           'action': () {
             showinfo(ctx: ctx);
           },
-          'size': 150.0
+          'size': 250.0
         },
         {
           'label': 'تغيير كلمة المرور',
           'action': () {
             mainController.changepasswordPresonal(ctx: ctx);
           },
-          'size': 150.0
+          'size': 250.0
         },
         {
           'label': 'تسجيل الخروج',
@@ -52,7 +52,7 @@ class PersonPanel extends StatelessWidget {
             LogIn.removelogin();
             personalvisible = false;
           },
-          'size': 150.0
+          'size': 250.0
         }
       ];
   static List dropdbitemz = [];
@@ -67,6 +67,7 @@ class PersonPanel extends StatelessWidget {
           child: SizedBox(
             width: 180,
             child: Card(
+              color: ThemeMZ.mode == 'light' ? Colors.white : Colors.grey,
               child: Column(
                 children: dropdbitemz
                     .map((e) => SizedBox(
@@ -82,18 +83,20 @@ class PersonPanel extends StatelessWidget {
                               begin: -100.0,
                               end: 0.0,
                               duration: 100 * dropdbitemz.indexOf(e),
-                              child0: Card(
-                                color: Colors.indigoAccent.withOpacity(0.7),
-                                child: GetBuilder<ThemeController>(
-                                  init: themeController,
-                                  builder: (_) => Padding(
-                                    padding: EdgeInsets.only(right: 10),
-                                    child: Text(
-                                      e['label'],
-                                      style: ThemeMZ()
-                                          .theme()
-                                          .textTheme
-                                          .labelMedium,
+                              child0: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Card(
+                                  color: ThemeMZ.mode == 'light'
+                                      ? Color.fromARGB(238, 32, 91, 194)
+                                      : Color.fromARGB(255, 42, 43, 80),
+                                  child: GetBuilder<ThemeController>(
+                                    init: themeController,
+                                    builder: (_) => Padding(
+                                      padding: EdgeInsets.only(right: 10),
+                                      child: Text(
+                                        e['label'],
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     ),
                                   ),
                                 ),

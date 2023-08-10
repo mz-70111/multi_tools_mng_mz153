@@ -51,7 +51,6 @@ class TextFieldMZ extends StatelessWidget {
               ? 500
               : MediaQuery.of(context).size.width,
           child: TextField(
-            focusNode: FocusNode(),
             maxLines: maxlines,
             controller: textEditingController,
             obscureText: obscureText,
@@ -619,8 +618,8 @@ class MYPAGE extends StatelessWidget {
                                                           icon: const Icon(Icons
                                                               .date_range))),
                                                   label: "بحث",
-                                                  onChanged: (word) {
-                                                    mainController.search(
+                                                  onChanged: (word) async {
+                                                    await mainController.search(
                                                         word: word,
                                                         list: mylista,
                                                         range: searchRange
@@ -1109,7 +1108,6 @@ class Editpanel extends StatelessWidget {
   Widget build(BuildContext context) {
     MainController mainController = Get.find();
     List edititems() => [
-          
           {
             'n': 3,
             'visible1': ADDEDITINFOItem.firstpage,

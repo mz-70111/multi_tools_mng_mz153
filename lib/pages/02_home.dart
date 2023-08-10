@@ -39,70 +39,70 @@ class Home extends StatelessWidget {
       'label': 'الصفحة الرئيسية',
       'icon': Icons.departure_board,
       'page': Home(),
-      'size': 50.0
+      'size': 25.0
     },
     {
       'visible': false,
       'label': 'السجل',
       'icon': Icons.departure_board,
       'page': Logs(),
-      'size': 50.0
+      'size': 25.0
     },
     {
       'visible': true,
       'label': 'المكاتب',
       'icon': Icons.work,
       'page': const Office(),
-      'size': 50.0
+      'size': 25.0
     },
     {
       'visible': true,
       'label': 'الحسابات',
       'icon': Icons.people,
       'page': const Employ(),
-      'size': 50.0
+      'size': 25.0
     },
     {
       'visible': true,
       'label': 'المهام',
       'icon': Icons.task_alt_outlined,
       'page': Tasks(),
-      'size': 50.0
+      'size': 25.0
     },
     {
       'visible': true,
       'label': 'الإجرائيات',
       'icon': Icons.work_history,
       'page': Whattodo(),
-      'size': 50.0
+      'size': 25.0
     },
     {
       'visible': true,
       'label': 'التذكير',
       'icon': Icons.punch_clock,
       'page': Remind(),
-      'size': 50.0
+      'size': 25.0
     },
     {
       'visible': true,
       'label': 'بينغ',
       'icon': Icons.wifi_2_bar_rounded,
       'page': Ping(),
-      'size': 50.0
+      'size': 25.0
     },
     {
       'visible': true,
       'label': 'تسجيلات المقسم',
       'icon': Icons.phone,
       'page': PBX(),
-      'size': 50.0
+      'size': 25.0
     },
     {
       'visible': true,
       'label': 'تفقد أخطاء البريد الالكتروني',
       'icon': Icons.mark_email_unread_outlined,
       'page': Checkemail(),
-      'size': 50.0
+      'size': 25.0
     },
   ];
   Home({super.key});
@@ -115,217 +115,118 @@ class Home extends StatelessWidget {
         builder: (_) => Stack(
           children: [
             Center(
-              child: GetBuilder<MainController>(
-                init: mainController,
-                builder: (_) => Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "تكامل",
-                          style: TextStyle(fontSize: 30),
-                        ),
-                        TweenMZ.transperant(
-                          duration: 2000,
-                          child0: Image.asset(
-                            'lib\\assets\\images\\takamollogo.png',
-                            width: 100,
-                            height: 100,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                child: GetBuilder<MainController>(
+              init: mainController,
+              builder: (_) {
+                pages[2]['visible'] = pages[3]['visible'] = checkifUserisAdmin(
+                    usertable: DB.userstable,
+                    userid: DB.userstable[DB.userstable.indexWhere(
+                            (element) => element['username'] == Home.logininfo)]
+                        ['user_id']);
+                pages[8]['visible'] = DB.userstable[DB.userstable.indexWhere(
+                                (element) =>
+                                    element['username'] == Home.logininfo)]
+                            ['pbx'] ==
+                        1
+                    ? true
+                    : false;
+                return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Visibility(
-                              visible: searchvis,
-                              child: Expanded(
-                                flex: 4,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Card(
-                                    child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          TextFieldMZ(
-                                              suffixIcon: IconButton(
-                                                  onPressed: () {
-                                                    searchbydate(ctx: context);
-                                                  },
-                                                  icon: const Icon(
-                                                      Icons.date_range)),
-                                              label: "بحث",
-                                              onChanged: (x) {
-                                                mainController.search(
-                                                    word: x,
-                                                    list: Home.searchlist,
-                                                    range: [
-                                                      'user_id',
-                                                      'username',
-                                                      'fullname',
-                                                      'officename',
-                                                      'taskname',
-                                                      'todoname',
-                                                      'remindname'
-                                                    ]);
-                                              }),
-                                          Expanded(
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      Checkbox(
-                                                          value: selectall,
-                                                          onChanged: (x) {
-                                                            mainController
-                                                                .checkboxSelectallHomeSearch(
-                                                                    x);
-                                                          }),
-                                                      Text(
-                                                        "تحديد الكل",
+                          Text(
+                            "تكامل",
+                            style: TextStyle(fontSize: 30),
+                          ),
+                          TweenMZ.transperant(
+                            duration: 2000,
+                            child0: Image.asset(
+                              'lib\\assets\\images\\takamollogo.png',
+                              width: 100,
+                              height: 100,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: GridView(
+                            gridDelegate:
+                                const SliverGridDelegateWithMaxCrossAxisExtent(
+                                    mainAxisExtent: 75,
+                                    mainAxisSpacing: 10,
+                                    crossAxisSpacing: 10,
+                                    maxCrossAxisExtent: 250),
+                            children: [
+                              ...pages
+                                  .where(
+                                      (element) => element['visible'] != false)
+                                  .map((m) {
+                                return GestureDetector(
+                                    onTap: () => mainController
+                                        .homemaincontent(pages.indexOf(m)),
+                                    child: TweenMZ.translatey(
+                                      begin: -150.0,
+                                      duration: (pages.indexOf(m) + 1) * 50,
+                                      end: 0.0,
+                                      child0: MouseRegion(
+                                          onHover: (x) {
+                                            mainController
+                                                .changeonhoverpagestitle(
+                                                    ctx: context,
+                                                    x: pages.indexOf(m));
+                                          },
+                                          onExit: (x) {
+                                            mainController.changeonexitdropMore(
+                                                ctx: context,
+                                                x: pages.indexOf(m));
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                      color: Colors.grey,
+                                                      blurRadius: 3)
+                                                ]),
+                                            child: Card(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Icon(
+                                                        m['icon'],
+                                                        size: m['size'],
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        m['label'],
                                                         style: ThemeMZ()
                                                             .theme()
                                                             .textTheme
                                                             .labelMedium,
-                                                      )
-                                                    ],
-                                                  ),
-                                                  ...searchlist.map((e) {
-                                                    String i = '';
-                                                    i = isearchlist(e: e);
-
-                                                    return Visibility(
-                                                      visible: e['visible'],
-                                                      child: Row(
-                                                        children: [
-                                                          Checkbox(
-                                                              value: e['check'],
-                                                              onChanged: (x) {
-                                                                mainController
-                                                                    .checkboxsearch(
-                                                                        x,
-                                                                        searchlist
-                                                                            .indexOf(e));
-                                                              }),
-                                                          Expanded(
-                                                            child: Text(
-                                                              i,
-                                                              softWrap: true,
-                                                              style: ThemeMZ()
-                                                                  .theme()
-                                                                  .textTheme
-                                                                  .labelMedium,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ]),
-                                  ),
-                                ),
-                              )),
-                          Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(25),
-                                )),
-                            child: IconButton(
-                                onPressed: () {
-                                  mainController.searchvis();
-                                },
-                                icon:
-                                    const Icon(Icons.settings_input_component)),
-                          ),
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ...pages.map(
-                                      (e) => Visibility(
-                                          visible: e['visible'],
-                                          child: GestureDetector(
-                                            onTap: () =>
-                                                mainController.homemaincontent(
-                                                    pages.indexOf(e)),
-                                            child: TweenMZ.translatex(
-                                              begin: -150.0,
-                                              duration:
-                                                  (pages.indexOf(e) + 1) * 50,
-                                              end: 0.0,
-                                              child0: MouseRegion(
-                                                  onHover: (x) {
-                                                    mainController
-                                                        .changeonhoverpagestitle(
-                                                            ctx: context,
-                                                            x: pages
-                                                                .indexOf(e));
-                                                  },
-                                                  onExit: (x) {
-                                                    mainController
-                                                        .changeonexitdropMore(
-                                                            ctx: context,
-                                                            x: pages
-                                                                .indexOf(e));
-                                                  },
-                                                  child: SizedBox(
-                                                    height: e['size'],
-                                                    child: Card(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(e['icon']),
-                                                            Visibility(
-                                                                visible:
-                                                                    !searchvis,
-                                                                child: Row(
-                                                                  children: [
-                                                                    const SizedBox(),
-                                                                    Text(e['label'],
-                                                                        style: ThemeMZ()
-                                                                            .theme()
-                                                                            .textTheme
-                                                                            .labelMedium),
-                                                                  ],
-                                                                )),
-                                                          ],
-                                                        ),
                                                       ),
                                                     ),
-                                                  )),
+                                                  ],
+                                                ),
+                                              ),
                                             ),
                                           )),
-                                    )
-                                  ]),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                                    ));
+                              })
+                            ]),
+                      )
+                    ]);
+              },
+            )),
             Positioned(left: 0, child: Notificationm()),
             Positioned(left: 0, child: PersonPanel()),
           ],

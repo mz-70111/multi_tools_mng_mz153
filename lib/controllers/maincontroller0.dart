@@ -1,5 +1,5 @@
 // ignore_for_file: unnecessary_string_interpolations
-
+import 'package:file_selector/file_selector.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -23,6 +23,7 @@ import 'package:users_tasks_mz_153/tamplate/appbar.dart';
 import 'package:users_tasks_mz_153/tamplate/bottomnavbar.dart';
 import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 import 'package:intl/intl.dart' as df;
+import 'package:users_tasks_mz_153/tamplate/thememz.dart';
 
 class MainController extends GetxController {
   @override
@@ -38,6 +39,64 @@ class MainController extends GetxController {
     update();
   }
 
+  searchcmd({username, password}) async {
+    PBX.errormsg = PBX.searchresult = null;
+    PBX.waitsearch = true;
+    update();
+    try {
+      var connent = await Process.run('Powershell.exe', [
+        '''
+net use /delete \\\\192.168.30.15
+net use \\\\192.168.30.15 /user:muoaz.horani@social.takamol.local mh77@0111
+'''
+      ]);
+      if (connent.stdout.contains('successfully')) {
+        PBX.searchfolderpath.text.replaceAll('\\', "\\\\");
+        var result = await Process.run('Powershell.exe', [
+          '''
+Get-ChildItem -Path ${PBX.searchfolderpath.text}\\*${PBX.typefolderpath.text}* |select Name'''
+        ]);
+        List resultlist = result.stdout.toString().trim().split('\n');
+        try {
+          resultlist.removeAt(0);
+          resultlist.removeAt(0);
+        } catch (i) {}
+        PBX.searchresult =
+            resultlist.map((e) => e = {'path': e, 'check': false}).toList();
+      } else {
+        PBX.errormsg = 'حصل خطأ أثماء محاولة البحث.. حاول مجددا';
+        update();
+      }
+      await Process.run('Powershell.exe', [
+        '''
+net use /delete \\\\192.168.30.15'''
+      ]);
+      PBX.waitsearch = false;
+    } catch (err) {
+      PBX.errormsg = "$err";
+      PBX.waitsearch = false;
+      update();
+    }
+    update();
+  }
+
+  checkboxpbxsearch({x, index}) {
+    PBX.searchresult![index]['check'] = x;
+
+    update();
+  }
+
+  checkboxpbxsearchall(x) {
+    PBX.selectallsearchpbx = x;
+    for (var i in PBX.searchresult!) {
+      i['check'] = x;
+    }
+    update();
+  }
+
+  saverecords() {
+
+  }
   passvis() {
     LogIn.iconpassvis = LogIn.iconpassvis == Icons.visibility_off
         ? Icons.visibility
@@ -71,22 +130,24 @@ class MainController extends GetxController {
         Colors.transparent,
         Colors.transparent,
       ];
-      i['border'] = Colors.transparent;
       i['rotate'] = i['irotate'] = 0.0 * pi / 180;
       i['rize'] = 0.0;
     }
-    BottomNBMZ.pageslist[x]['color'] = [
-      Colors.transparent,
-      Colors.indigoAccent,
-      Colors.transparent,
-    ];
-    BottomNBMZ.pageslist[x]['border'] = Colors.indigo;
+
     BottomNBMZ.pageslist[x]['rotate'] = 45.0 * pi / 180;
     BottomNBMZ.pageslist[x]['irotate'] = -45.0 * pi / 180;
     BottomNBMZ.pageslist[x]['rize'] = -25.0;
     HomePage.selectedPage = x;
     PersonPanel.dropend = -150;
     Notificationm.dropend = -150;
+
+    BottomNBMZ.pageslist[x]['color'] = ThemeMZ.mode == "light"
+        ? [Colors.transparent, Colors.indigoAccent, Colors.transparent]
+        : [
+            Colors.transparent,
+            Color.fromARGB(255, 42, 43, 80),
+            Colors.transparent
+          ];
     update();
   }
 
@@ -103,7 +164,7 @@ class MainController extends GetxController {
       i['rize'] = 0.0;
 
       for (var i in Home.pages) {
-        i['size'] = 50.0;
+        i['size'] = 35.0;
       }
     }
 
@@ -128,7 +189,7 @@ class MainController extends GetxController {
     for (var e in list) {
       for (var i in range) {
         try {
-          (e[i].toString().contains(word) ||
+          (e[i].toString().isCaseInsensitiveContainsAny(word) ||
                   e['createdate'].toString().substring(0, 10).contains(word))
               ? e['visible'] = true
               : null;
@@ -1810,14 +1871,14 @@ ${j['type'] == '2' ? 'مصدر الشهادة ${j['autocerturl']}' : ''}
 //endemploy
   changeonhoverpagestitle({x, required ctx}) {
     for (var i in Home.pages) {
-      i['size'] = 50.0;
+      i['size'] = 25.0;
     }
-    Home.pages[x]['size'] = 55.0;
+    Home.pages[x]['size'] = 35.0;
     update();
   }
 
   changeonexitdropMore({x, required ctx}) {
-    Home.pages[x]['size'] = 50.0;
+    Home.pages[x]['size'] = 25.0;
     update();
   }
 
@@ -2006,6 +2067,8 @@ ${j['type'] == '2' ? 'مصدر الشهادة ${j['autocerturl']}' : ''}
       var vt = await DB().customquery(query: 'select * from version;');
       for (var v in vt) {
         LogIn.getversion = v[0];
+        LogIn.androidapp = v[1];
+        LogIn.windowsapp = v[2];
         LogIn.constatus = true;
         update();
       }
@@ -2383,6 +2446,7 @@ ${j['type'] == '2' ? 'مصدر الشهادة ${j['autocerturl']}' : ''}
   }
 
   autologin() async {
+    LogIn.errorMSglogin = '';
     bool check = false;
     DBController dbController = Get.find();
     DB.userstable.clear();
@@ -2511,9 +2575,11 @@ ${j['type'] == '2' ? 'مصدر الشهادة ${j['autocerturl']}' : ''}
   }
 
   url_launch({url}) async {
-    if (!await launchUrl(Uri.parse(url),
-        mode: LaunchMode.externalNonBrowserApplication)) {
-      throw Exception('لا يمكن الوصول للموقع $url');
-    }
+    try {
+      if (!await launchUrl(Uri.parse(url),
+          mode: LaunchMode.externalNonBrowserApplication)) {
+        throw Exception('لا يمكن الوصول للموقع $url');
+      }
+    } catch (e) {}
   }
 }

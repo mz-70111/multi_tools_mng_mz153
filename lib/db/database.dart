@@ -6,7 +6,7 @@ import 'package:users_tasks_mz_153/tamplate/tamplateofclass.dart';
 class DB {
   DBController dbController = Get.find();
   ConnectionSettings settings = ConnectionSettings(
-      host: '192.168.50.50',
+      host: '192.168.30.8',
       port: 3306,
       user: 'mz',
       password: 'mzrootmz',
@@ -25,7 +25,9 @@ class DB {
     await conn.query('''
 create table if not exists version
 (
-version varchar(255)
+version varchar(255),
+android varchar(255),
+windows varchar(255)
 );
 ''');
 
